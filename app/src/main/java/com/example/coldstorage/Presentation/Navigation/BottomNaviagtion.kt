@@ -22,6 +22,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.coldstorage.Presentation.Screens.AllScreens
@@ -65,9 +66,12 @@ fun bottomNav(){
         )
     )
     var selectedItem by remember { mutableStateOf(items[0]) }
+    val navBackStackEntry by navHostController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     Scaffold(
       bottomBar = {
+          if (currentRoute != AllScreens.StoreOrRetrieve.name){
           NavigationBar {
           items.forEach { navigationItem ->
           NavigationBarItem(
@@ -77,7 +81,7 @@ fun bottomNav(){
                       icon ={ Icon(imageVector = navigationItem.icon, contentDescription = "")},
                       label = {Text(text = navigationItem.label)})
 }
-          }
+          } }
       }
     ) {
         NavHost(navController = navHostController, startDestination = AllScreens.Dashboard.name , modifier = Modifier.padding(it) ){

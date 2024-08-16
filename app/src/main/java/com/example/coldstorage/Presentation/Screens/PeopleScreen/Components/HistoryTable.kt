@@ -13,27 +13,27 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun HistoryTable() {
-    val backgroundColor = Color.Gray
+    val backgroundColor = Color.White
 
     Box(
         modifier = Modifier
-            .width(180.dp)
-            .height(80.dp)
+            .width(300.dp)
+            //.height(80.dp)
             .background(backgroundColor)
             .padding(8.dp) // Optional padding inside the table
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             // First row
             Row(
-                modifier = Modifier.fillMaxWidth().weight(1f),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                TableCell(text = "Total Incoming")
+                SecTableCell(text = "Total Incoming")
 
-                TableCell(text = "600")
+                SecTableCell(text = "600")
 
 
             }
@@ -43,9 +43,9 @@ fun HistoryTable() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                TableCell(text = "Total outgoing")
+                SecTableCell(text = "Total outgoing")
 
-                TableCell(text = "200")
+                SecTableCell(text = "200")
 
 
 
@@ -56,9 +56,9 @@ fun HistoryTable() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                TableCell(text = "Remaining stock")
+                SecTableCell(text = "Remaining stock")
 
-                TableCell(text = "400")
+                SecTableCell(text = "400")
 
 
 

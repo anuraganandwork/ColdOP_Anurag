@@ -1,5 +1,6 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.ui.unit.sp
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
@@ -22,18 +24,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,8 +50,12 @@ import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.AssignLocation
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ConfirmationPageForOrder
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.HistoryTable
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.LotDetailsDialog
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.LotDetailsDialogWrapper
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ManageStocks
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.TableView
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
+import com.example.coldstorage.R
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,6 +88,11 @@ fun storeOrRetrieve(){
         mutableStateOf(false)
     }
 
+
+    //for dailog box
+    var selectedRow = remember{ mutableStateOf<String?>(null) }
+    var isDailogOpen= remember { mutableStateOf<Boolean>(false) }
+    Log.d("PopOP","OPOPO initial ${isDailogOpen.value}")
 
     val  hideBottomSheet: ()-> Unit = {
         scope.launch {
@@ -116,7 +131,26 @@ fun storeOrRetrieve(){
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(  modifier = Modifier.padding(horizontal = 12.dp, vertical = 20.dp)) {
-  Text(text = "Manage stocks", fontWeight = FontWeight.Bold, fontSize = 24.sp)
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Icon(
+                    painter = painterResource(id = R.drawable.backicon),
+                    contentDescription = "Back Icon",
+                    tint = Color.Black,
+                    modifier = Modifier.size(30.dp)
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.more),
+                    contentDescription = "More Icon",
+                    tint = Color.Black,
+                    modifier = Modifier.size(30.dp)
+
+                )
+
+            }
+            Spacer(modifier = Modifier.padding(10.dp))
+
+            Text(text = "Manage stocks", fontWeight = FontWeight.Bold, fontSize = 24.sp)
             
             Spacer(modifier = Modifier.padding(15.dp))
            Row ( horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
@@ -127,8 +161,8 @@ fun storeOrRetrieve(){
                 .background(Color.Green)
                 .clickable { showBottomSheet.value = true }) {
                 Text(text = "Deposit stocks" , modifier = Modifier
-                    .border(1.dp, Color.Green, RoundedCornerShape(10.dp))
-                    .background(Color.Green, RoundedCornerShape(10.dp))
+                    .border(1.dp, Color(0xFF22C55E), RoundedCornerShape(10.dp))
+                    .background(Color(0xFF22C55E), RoundedCornerShape(10.dp))
                     .width(148.dp)
                     .height(70.dp)
                     .wrapContentSize(align = Alignment.Center)
@@ -144,17 +178,43 @@ fun storeOrRetrieve(){
                     .height(70.dp)
                     .wrapContentSize(align = Alignment.Center))
 
-            }}
+            }
+
+           }
 
             //table starting here
             Spacer(modifier = Modifier.padding(15.dp))
 
             Text(text = "History", fontWeight = FontWeight.Bold)
             HistoryTable()
+            Spacer(modifier = Modifier.padding(20.dp))
+
+            TableView(selectedRow= selectedRow, isDailogOpen= isDailogOpen )
+            Spacer(modifier = Modifier.padding(15.dp))
+
+            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
+
+            Surface(modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .clickable { }
+                , ) {
+                Text(text = "Scrollable View", modifier = Modifier
+                    .background(Color(0xFF22C55E), RoundedCornerShape(10.dp))
+
+                    .width(148.dp)
+                    .height(50.dp)
+                    .wrapContentSize(align = Alignment.Center))
+
+            }}
 
 
         }
+        if(isDailogOpen.value){
+            LotDetailsDialogWrapper(reciept = selectedRow, bags = selectedRow.value!!, onClose =  {isDailogOpen.value = false} )
+            Log.d("PopOP","OPOPO ${isDailogOpen.value}")
 
+
+        }
         if (showBottomSheet.value){
             ModalBottomSheet(onDismissRequest = { showBottomSheet.value = false },
                 sheetState = sheetState, modifier = Modifier.height(700.dp ),
@@ -178,6 +238,8 @@ fun storeOrRetrieve(){
                         }
                     }
                 }
+
+
             }
         }
         if(showSecondBottomSheet.value
