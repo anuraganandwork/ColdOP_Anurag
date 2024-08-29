@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -39,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -49,14 +52,72 @@ import androidx.compose.ui.window.SecureFlagPolicy
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.AssignLocation
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ConfirmationPageForOrder
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.EmailFilterDropdowns
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.HistoryTable
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.LotDetailsDialog
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.LotDetailsDialogWrapper
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ManageStocks
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.TableView
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.TransactionCard
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.AddressDetails
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.OtherDetails
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.StockDetails
 import com.example.coldstorage.R
 import kotlinx.coroutines.launch
+
+data class Transaction(
+    val stockDetails: StockDetails,
+    val addressDetails: AddressDetails,
+    val otherDetails: OtherDetails,
+    val date: String,
+    val receiptNo: String,
+    val type: String
+)
+
+val dummyTransactions = listOf(
+    Transaction(
+        StockDetails("50", "40", "30", "10", "20", "150"),
+        AddressDetails("A", "5", "29"),
+        OtherDetails("Pukhraj", "150", "230/150"),
+        "16.12.23",
+        "230",
+        "incoming"
+    ),
+    Transaction(
+        StockDetails("45", "35", "25", "15", "30", "150"),
+        AddressDetails("B", "3", "17"),
+        OtherDetails("Kufri Jyoti", "120", "180/120"),
+        "17.12.23",
+        "231",
+        "outgoing"
+    ),
+    Transaction(
+        StockDetails("60", "50", "20", "5", "15", "150"),
+        AddressDetails("C", "2", "41"),
+        OtherDetails("Chipsona", "100", "200/100"),
+        "18.12.23",
+        "232",
+        "incoming"
+    ),
+    Transaction(
+        StockDetails("55", "45", "35", "5", "10", "150"),
+        AddressDetails("D", "1", "33"),
+        OtherDetails("Kufri", "130", "210/130"),
+        "19.12.23",
+        "233",
+        "outgoing"
+    ),
+    Transaction(
+        StockDetails("40", "30", "40", "20", "20", "150"),
+        AddressDetails("E", "4", "22"),
+        OtherDetails("Rosetta", "140", "220/140"),
+        "20.12.23",
+        "234",
+        "incoming"
+    )
+)
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -128,9 +189,15 @@ fun storeOrRetrieve(){
             showFourthBottomSheet.value = true
         }
     }
+    var expandedGroupBy = remember { mutableStateOf(false) }
+    var selectedGroupBy = remember { mutableStateOf("Group by") }
+    var expandedSortBy = remember { mutableStateOf(false) }
+    var selectedSortBy = remember { mutableStateOf("Sort by Date") }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(  modifier = Modifier.padding(horizontal = 12.dp, vertical = 20.dp)) {
+    Column(modifier = Modifier.verticalScroll(enabled = true, state = rememberScrollState() ,)) {
+        Column(  modifier = Modifier
+            .padding(horizontal = 12.dp, vertical = 20.dp)
+            ) {
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Icon(
@@ -151,32 +218,112 @@ fun storeOrRetrieve(){
             Spacer(modifier = Modifier.padding(10.dp))
 
             Text(text = "Manage stocks", fontWeight = FontWeight.Bold, fontSize = 24.sp)
-            
+
+
             Spacer(modifier = Modifier.padding(15.dp))
-           Row ( horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
+            Text(text = "Summary", fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.padding(8.dp))
+
+            Column {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color.Black)
+                )
+
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)){
+                    Text(text = "Criterion", fontWeight = FontWeight.Bold , modifier = Modifier.weight(2f))
+                    Text(text = "No. of bags",fontWeight = FontWeight.Bold , modifier = Modifier.weight(1f))
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color.Black)
+                )
+                Row(){
+                    Text(text = "Total bags incoming", modifier = Modifier.weight(2f))
+                    Text(text = "1000", modifier = Modifier.weight(1f))
+                }
+                Row(){
+                    Text(text = "Total bags outgoing", modifier = Modifier.weight(2f))
+                    Text(text = "40", modifier = Modifier.weight(1f))
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color.Black)
+                )
+
+                Row(){
+                    Text(text = "Current holdings", fontWeight = FontWeight.Bold , modifier = Modifier.weight(2f))
+                    Text(text = "960", fontWeight = FontWeight.Bold , modifier = Modifier.weight(1f))
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color.Black)
+                )
+            }
+
+            Spacer(modifier = Modifier.padding(15.dp))
+            Text(text = "Actions", fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.padding(8.dp))
+
+            Surface(modifier = Modifier
+                .padding(vertical = 0.dp)
+                .background(Color.Green)
+                .clickable { showBottomSheet.value = true }) {
+                Text(text = "View/Download Ledger Report" , modifier = Modifier
+                    .border(1.dp, Color(0xFF22C55E), RoundedCornerShape(10.dp))
+                    .background(Color(0xFF22C55E), RoundedCornerShape(10.dp))
+                    .fillMaxWidth()
+                    .height(35.dp)
+                    .wrapContentSize(align = Alignment.Center),
+                    color = Color.White
+
+                    , style = TextStyle(textAlign = TextAlign.Center, textDirection = TextDirection.Content)
+                )
+            }
+
+            Spacer(modifier = Modifier.padding(5.dp))
+
+            Row ( horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
 
 
             Surface(modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 0.dp)
+                .padding(vertical = 0.dp)
                 .background(Color.Green)
                 .clickable { showBottomSheet.value = true }) {
-                Text(text = "Deposit stocks" , modifier = Modifier
+                Text(text = "Incoming" , modifier = Modifier
                     .border(1.dp, Color(0xFF22C55E), RoundedCornerShape(10.dp))
                     .background(Color(0xFF22C55E), RoundedCornerShape(10.dp))
                     .width(148.dp)
-                    .height(70.dp)
-                    .wrapContentSize(align = Alignment.Center)
-                , style = TextStyle(textAlign = TextAlign.Center, textDirection = TextDirection.Content)
+                    .height(35.dp)
+                    .wrapContentSize(align = Alignment.Center),
+                        color = Color.White
+
+                    , style = TextStyle(textAlign = TextAlign.Center, textDirection = TextDirection.Content)
                 )
             }
             Surface(modifier = Modifier
-                .padding(horizontal = 12.dp)) {
-                Text(text = "Deliver stocks", modifier = Modifier
+                .padding()) {
+                Text(text = "Outgoing", modifier = Modifier
                     .background(Color.Red, RoundedCornerShape(10.dp))
 
                     .width(148.dp)
-                    .height(70.dp)
-                    .wrapContentSize(align = Alignment.Center))
+                    .height(35.dp)
+                    .wrapContentSize(align = Alignment.Center) ,
+                    color = Color.White
+                )
 
             }
 
@@ -185,27 +332,108 @@ fun storeOrRetrieve(){
             //table starting here
             Spacer(modifier = Modifier.padding(15.dp))
 
-            Text(text = "History", fontWeight = FontWeight.Bold)
-            HistoryTable()
-            Spacer(modifier = Modifier.padding(20.dp))
+            Text(text = "Transaction", fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.padding(8.dp))
 
-            TableView(selectedRow= selectedRow, isDailogOpen= isDailogOpen )
-            Spacer(modifier = Modifier.padding(15.dp))
+            EmailFilterDropdowns(expandedGroupBy= expandedGroupBy, selectedGroupBy = selectedGroupBy , expandedSortBy = expandedSortBy , selectedSortBy = selectedSortBy )
 
-            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
 
-            Surface(modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .clickable { }
-                , ) {
-                Text(text = "Scrollable View", modifier = Modifier
-                    .background(Color(0xFF22C55E), RoundedCornerShape(10.dp))
 
-                    .width(148.dp)
-                    .height(50.dp)
-                    .wrapContentSize(align = Alignment.Center))
+//            LazyColumn {
+//                items(dummyTransactions){ data -> TransactionCard(
+//                    stockDetails = data.stockDetails,
+//                    addressDetails = data.addressDetails ,
+//                    otherDetails = data.otherDetails,
+//                    date = data.date,
+//                    reciptNo = data.receiptNo,
+//                    type = data.type
+//                )}
+//            }
+            Column{
+                Log.d("Dummy transactionnn" , dummyTransactions.toString())
 
-            }}
+                if(selectedGroupBy.value == "Only Incoming"){
+                    dummyTransactions.filter { data -> data.type == "incoming" }.forEach { data -> TransactionCard(
+                        stockDetails = data.stockDetails,
+                        addressDetails = data.addressDetails ,
+                        otherDetails = data.otherDetails,
+                        date = data.date,
+                        reciptNo = data.receiptNo,
+                        type = data.type
+                    )  }
+                    Log.d("Dummy transaction" , dummyTransactions.toString())
+                }
+
+               else  if (selectedGroupBy.value == "Only Outgoing"){
+                    dummyTransactions.filter { data -> data.type == "outgoing" }.forEach { data -> TransactionCard(
+                        stockDetails = data.stockDetails,
+                        addressDetails = data.addressDetails ,
+                        otherDetails = data.otherDetails,
+                        date = data.date,
+                        reciptNo = data.receiptNo,
+                        type = data.type
+                    )  }
+                    Log.d("Dummy transaction" , dummyTransactions.toString())
+                }
+
+                else  if (selectedGroupBy.value == "Both"){
+                    dummyTransactions.forEach { data -> TransactionCard(
+                        stockDetails = data.stockDetails,
+                        addressDetails = data.addressDetails ,
+                        otherDetails = data.otherDetails,
+                        date = data.date,
+                        reciptNo = data.receiptNo,
+                        type = data.type
+                    )  }
+                    Log.d("Dummy transaction" , dummyTransactions.toString())
+                }
+                else {
+                    dummyTransactions.forEach { data -> TransactionCard(
+                        stockDetails = data.stockDetails,
+                        addressDetails = data.addressDetails ,
+                        otherDetails = data.otherDetails,
+                        date = data.date,
+                        reciptNo = data.receiptNo,
+                        type = data.type
+                    )  }
+                }
+
+
+
+
+//            dummyTransactions.forEach { data -> TransactionCard(
+//                    stockDetails = data.stockDetails,
+//                    addressDetails = data.addressDetails ,
+//                   otherDetails = data.otherDetails,
+//                    date = data.date,
+//                   reciptNo = data.receiptNo,
+//                   type = data.type
+//               )  }
+
+            }
+
+            //HistoryTable()
+            //Spacer(modifier = Modifier.padding(20.dp))
+
+            //TableView(selectedRow= selectedRow, isDailogOpen= isDailogOpen )
+            //Spacer(modifier = Modifier.padding(15.dp))
+
+            //Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
+
+//            Surface(modifier = Modifier
+//                .padding(horizontal = 10.dp)
+//                .clickable { }
+//                , ) {
+//                Text(text = "Scrollable View", modifier = Modifier
+//                    .background(Color(0xFF22C55E), RoundedCornerShape(10.dp))
+//
+//                    .width(148.dp)
+//                    .height(50.dp)
+//                    .wrapContentSize(align = Alignment.Center))
+//
+//            }
+
+        }
 
 
         }
@@ -295,4 +523,3 @@ fun storeOrRetrieve(){
         }
 
     }
-}

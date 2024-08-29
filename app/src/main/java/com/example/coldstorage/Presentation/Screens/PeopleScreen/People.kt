@@ -93,7 +93,7 @@ Column(modifier = Modifier.padding(
     
     LazyColumn(){
         items(listOfFarmer){farmer->
-            farmerCard(farmerName = farmer.name, fatherName = farmer.fatherName, accNum = farmer.accNUmber, navController = navController)
+            farmerCard(farmerName = farmer.name, fatherName = farmer.fatherName, accNum = farmer.accNUmber, navController = navController , showAcc = true)
 
             Spacer(modifier = Modifier.padding(15.dp))
         }

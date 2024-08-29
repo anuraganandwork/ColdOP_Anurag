@@ -29,7 +29,7 @@ fun Nav(navHostContorller : NavHostController){
      }
 
      composable(route= Sections.Farmer.route){
-         FarmerSection()
+         FarmerBottomNav()
      }
 
  }
