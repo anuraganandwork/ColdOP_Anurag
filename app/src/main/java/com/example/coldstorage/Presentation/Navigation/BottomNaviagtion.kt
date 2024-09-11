@@ -26,6 +26,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.coldstorage.Presentation.Screens.AllScreens
+import com.example.coldstorage.Presentation.Screens.Auth.StoreAdminRegistrationForm
 import com.example.coldstorage.Presentation.Screens.DashBoardScreen.Dashboard
 import com.example.coldstorage.Presentation.Screens.OfflineScreen.Offline
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.People
@@ -114,6 +115,8 @@ fun bottomNav(){
             composable(route= AllScreens.StoreOrRetrieve.name){
                 storeOrRetrieve()
             }
+
+
         }
     }
 }

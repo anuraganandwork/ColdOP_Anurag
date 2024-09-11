@@ -7,5 +7,6 @@ enum class AllScreens {
     Setting,
     FarmerDetailedScreen,
     StoreOrRetrieve,
-    PickYourRole
+    PickYourRole,
+    StoreAdminRegistrationForm
 }

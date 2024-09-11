@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.coldstorage.Presentation.Screens.AllScreens
+import com.example.coldstorage.Presentation.Screens.Auth.StoreAdminRegistrationForm
 import com.example.coldstorage.Presentation.Screens.OnboardingScreens.pickYourRole
 
 @Composable
 fun Nav(navHostContorller : NavHostController){
- NavHost(navController = navHostContorller, startDestination = Sections.roleSelectionScreen.route ){
+ NavHost(navController = navHostContorller, startDestination = AllScreens.StoreAdminRegistrationForm.name ){
 
      composable(route = Sections.roleSelectionScreen.route){
          pickYourRole{roles ->
@@ -32,5 +34,11 @@ fun Nav(navHostContorller : NavHostController){
          FarmerBottomNav()
      }
 
+     composable(route = AllScreens.StoreAdminRegistrationForm.name){
+         StoreAdminRegistrationForm(navController = navHostContorller )
+     }
+
  }
 }
+
+//1120
