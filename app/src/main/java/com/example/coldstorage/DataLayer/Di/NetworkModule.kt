@@ -1,14 +1,80 @@
 package com.example.coldstorage.DataLayer.Di
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
 import com.example.coldstorage.DataLayer.Api.ColdOpApi
+import com.example.coldstorage.DataLayer.Auth.AuthManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
+import javax.inject.Inject
 import javax.inject.Singleton
+
+
+
+class AuthInterceptor @Inject constructor( @ApplicationContext private  val context: Context) : Interceptor {
+
+
+
+    @SuppressLint("LongLogTag")
+    override fun intercept(chain: Interceptor.Chain): Response {
+
+        val sharedPreference = context.getSharedPreferences("AuthToken" , Context.MODE_PRIVATE)
+
+        val originalRequest = chain.request()
+        val token = sharedPreference.getString("auth_token", null)
+        //val cookie = authManager.getCookie()
+        //val newRequestBuilder = originalRequest.newBuilder()
+//        if (token != null) {
+//            if (token.isNotEmpty()) {
+//                newRequestBuilder.header("Authorization", "Bearer $token")
+//            }
+//        }
+
+        Log.d("token from shared preference ", ""+token)
+        if(token.isNullOrEmpty()){
+            return chain.proceed(originalRequest)
+        }
+        val newRequest = originalRequest.newBuilder()
+            .addHeader("Authorization", "Bearer $token")
+            .build()
+
+        return chain.proceed(newRequest)
+
+//        if (cookie.isNotEmpty()) {
+//            newRequestBuilder.header("Cookie", cookie)
+//        }
+
+
+    }
+
+//    private fun getAuthToken(): String {
+//        val prefs = context.getSharedPreferences("AuthPrefs", Context.MODE_PRIVATE)
+//        return prefs.getString("AUTH_TOKEN", "") ?: ""
+//    }
+
+    @SuppressLint("SuspiciousIndentation")
+    public fun saveToken(token: String) {
+        //val prefs = context.getSharedPreferences("CookiePrefs", Context.MODE_PRIVATE)
+        val sharedPreference = context.getSharedPreferences("AuthToken" , Context.MODE_PRIVATE)
+
+        val editor = sharedPreference.edit()
+            editor.putString("auth_token", token)
+
+        editor.apply()
+    }
+}
+
+
 
 
 @Module
@@ -16,14 +82,39 @@ import javax.inject.Singleton
 class NetworkModule {
 
 
+
+        @Provides
+        @Singleton
+        fun provideAuthManager(@ApplicationContext context: Context): AuthManager {
+            return AuthManager(context)
+        }
+
+    //cookie saving
     @Singleton
     @Provides
-    fun provideRetrofit():Retrofit{
-        return Retrofit.Builder().baseUrl("https://coldop-backend-1gn6.onrender.com")
-            .addConverterFactory(GsonConverterFactory.create())
+    fun provideAuthInterceptor(@ApplicationContext context: Context): AuthInterceptor {
+        return AuthInterceptor(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
             .build()
     }
 
+
+
+    @Singleton
+    @Provides
+    fun provideRetrofit(okHttpClient: OkHttpClient):Retrofit{
+        return Retrofit.Builder().baseUrl("https://coldop-backend-1gn6.onrender.com")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmUxZjIyZDc4MmJiZDY3ZDM0NDY4MDUiLCJpYXQiOjE3MjYyMTkwMjQsImV4cCI6MTcyODgxMTAyNH0.5w02NCDoXrKJVR9fEHkcLQmpV_NZmoPAMIssCcyXGRQ
 
     @Singleton
     @Provides
@@ -34,3 +125,5 @@ class NetworkModule {
 
 
 }
+
+//710

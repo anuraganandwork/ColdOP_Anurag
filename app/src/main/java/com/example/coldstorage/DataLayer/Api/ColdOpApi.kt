@@ -21,4 +21,11 @@ interface ColdOpApi {
 //  @POST("/api/store-admin/register")
 //  suspend fun registerStoreOwner(@Body storeOwnerData:StoreAdminFormData)  : Response<StoreOwnerRegisteredDetails>
 
+
+  @POST("/api/store-admin/quick-register?=")
+  suspend fun quickRegister(@Body farmerData:FarmerData) :Response<sendOtpResponse>
+
+
+  @POST("api/store-admin/login?")
+  suspend fun logInStoreOwner(@Body logInData: logInData):Response<StoreAdminResponse>
 }

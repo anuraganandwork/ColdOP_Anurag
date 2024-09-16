@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.ColdOpApi
 import com.example.coldstorage.DataLayer.Api.StoreAdminFormData
 import com.example.coldstorage.DataLayer.Api.StoreAdminModel
+import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -152,6 +153,7 @@ fun StoreAdminRegistrationForm(navController: NavController, viewModel: AuthView
                     personalAddress = personalAddress
                 )
                 viewModel.registerStoreOwner(formData)
+                navController.navigate(AllScreens.QuickAddFarmer.name)
                 //onSubmit(formData)
             },
             modifier = Modifier.fillMaxWidth()

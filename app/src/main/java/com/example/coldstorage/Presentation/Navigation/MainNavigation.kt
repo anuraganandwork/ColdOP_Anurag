@@ -6,12 +6,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.coldstorage.Presentation.Screens.AllScreens
+import com.example.coldstorage.Presentation.Screens.Auth.CustomLoginPage
+import com.example.coldstorage.Presentation.Screens.Auth.FarmerQuickAddInputForm
 import com.example.coldstorage.Presentation.Screens.Auth.StoreAdminRegistrationForm
 import com.example.coldstorage.Presentation.Screens.OnboardingScreens.pickYourRole
 
 @Composable
 fun Nav(navHostContorller : NavHostController){
- NavHost(navController = navHostContorller, startDestination = AllScreens.StoreAdminRegistrationForm.name ){
+ NavHost(navController = navHostContorller, startDestination = AllScreens.LogIn.name ){
 
      composable(route = Sections.roleSelectionScreen.route){
          pickYourRole{roles ->
@@ -36,6 +38,15 @@ fun Nav(navHostContorller : NavHostController){
 
      composable(route = AllScreens.StoreAdminRegistrationForm.name){
          StoreAdminRegistrationForm(navController = navHostContorller )
+     }
+
+     composable(route = AllScreens.QuickAddFarmer.name){
+         FarmerQuickAddInputForm()
+     }
+
+     composable(route = AllScreens.LogIn.name){
+
+         CustomLoginPage(navController = navHostContorller)
      }
 
  }

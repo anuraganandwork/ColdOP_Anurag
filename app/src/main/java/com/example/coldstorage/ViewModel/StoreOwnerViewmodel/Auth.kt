@@ -1,5 +1,6 @@
 package com.example.coldstorage.ViewModel.StoreOwnerViewmodel
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,8 +10,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coldstorage.DataLayer.Api.ColdOpApi
+import com.example.coldstorage.DataLayer.Api.FarmerData
 import com.example.coldstorage.DataLayer.Api.StoreAdminFormData
+import com.example.coldstorage.DataLayer.Api.logInData
 import com.example.coldstorage.DataLayer.Api.sendOtpResponse
+import com.example.coldstorage.DataLayer.Auth.AuthManager
+import com.example.coldstorage.DataLayer.Di.AuthInterceptor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -19,6 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewmodel @Inject constructor(
+    private val authIntercepter: AuthInterceptor,
     private val api: ColdOpApi
 ) : ViewModel() {
 
@@ -65,10 +71,66 @@ class AuthViewmodel @Inject constructor(
         viewModelScope.launch {
             try{
                 val response = api.registerStoreAdmin(storeOwnerData)
-            }catch(e : Exception){
+//                response.body()?.token?.let { token ->
+//                    authManager.saveAuthToken(token)
+//                    // Handle successful login
+//                }
+               }catch(e : Exception){
                 Log.d("Error in registering", "Error in registering")
             }
         }
+    }
+
+
+    @SuppressLint("SuspiciousIndentation")
+    fun quickRegister(farmerData: FarmerData){
+        viewModelScope.launch {
+            try{
+                 val resposne = api.quickRegister(farmerData)
+                if(resposne.isSuccessful){
+                Log.d("SuccessfullLOG","farmer added quikly"+resposne.body()?.status)}
+                else{
+                    val errorBody = resposne.errorBody()?.string()
+                    Log.d("ErrorLOG", "Status code ${resposne.code()}, Else code Logged in: $errorBody")
+
+
+                }
+            } catch (e: Exception){
+                Log.d("SuccessfullLOG"," NOOOOOOOO farmer added quikly"+e)
+
+            }
+        }
+
+
+
+    }
+
+    @SuppressLint("SuspiciousIndentation")
+    fun  logInStoreOwner(logInData: logInData){
+        viewModelScope.launch {
+            try {
+              val response=   api.logInStoreOwner(logInData)
+                if(response.isSuccessful){
+                   val token = response.body()?.data?.token // Adjust based on actual response
+                    if (token != null) {
+                        authIntercepter.saveToken(token)
+                       Log.d("SuccessfullLOG", "Login successful, token saved.")
+                    }
+
+
+                    Log.d("SuccessfullLOG", "Successfully logged in: ${response.body()?.status}")
+                    Log.d("SuccessfullLOG","Success Logged in"+response.body())}
+                else{
+                    val errorBody = response.errorBody()?.string()
+                    Log.d("ErrorLOG", "Status code ${response.code()}, Else code Logged in: $errorBody")
+            }
+            }
+            catch (e:Exception){
+                Log.d("SuccessfullLOG", "falied in the viemodel")
+
+            }
+        }
+
     }
 
 

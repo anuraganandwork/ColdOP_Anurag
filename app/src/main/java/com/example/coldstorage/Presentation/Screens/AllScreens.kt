@@ -8,5 +8,8 @@ enum class AllScreens {
     FarmerDetailedScreen,
     StoreOrRetrieve,
     PickYourRole,
-    StoreAdminRegistrationForm
+    StoreAdminRegistrationForm,
+    QuickAddFarmer,
+    LogIn
+
 }
