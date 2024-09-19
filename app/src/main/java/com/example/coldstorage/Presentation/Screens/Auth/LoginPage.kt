@@ -1,5 +1,6 @@
 package com.example.coldstorage.Presentation.Screens.Auth
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.logInData
+import com.example.coldstorage.Presentation.Navigation.Sections
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 
@@ -75,7 +77,13 @@ fun CustomLoginPage(navController: NavController, viewModel: AuthViewmodel = hil
 
                     )
                     viewModel.logInStoreOwner(data)
-                    navController.navigate(AllScreens.QuickAddFarmer.name)
+                    if(viewModel.logInStatus.value == "Success"){
+                        Log.d("ErrorLogIn",viewModel.logInStatus.value)
+
+                    navController.navigate(Sections.StoreOwner.route)}
+                    else{
+                        Log.d(".","Error in log in"+viewModel.logInStatus.value)
+                    }
 
                           },
                 text = "Log In"

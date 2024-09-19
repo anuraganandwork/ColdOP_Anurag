@@ -1,5 +1,6 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,16 +39,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.SecureFlagPolicy
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.AssignLocation
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ManageStocks
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FarmerApiState
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun farmerDetailedScreen(accNumber: String, navController: NavController){
+fun farmerDetailedScreen(accNumber: String, navController: NavController , viewModel:FunctionStoreOwner= hiltViewModel()){
 
+    LaunchedEffect(Unit ){
+        viewModel.fetchSinglFarmerClick(accNumber)
+    }
+
+    val farmerData by viewModel.farmerData.collectAsState();
 
     //
 
@@ -57,19 +69,41 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController){
         } })
     }) {
         Column(modifier = Modifier.padding(it)){
-    Column(modifier = Modifier.padding(12.dp)) {
-    Text(text = "Account no :  $accNumber")
-    Text(text = "Name : ")
-    Text(text = "S/O :")
-    Text(text = "Address : ")
-    Text(text = "Contact : ")
+
+            when(farmerData){
+                is FarmerApiState.success -> {
+                    val farmerInfoAtui = (farmerData as FarmerApiState.success)?.farmerInfo
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        if (farmerInfoAtui != null) {
+                            Text(text = "Account no :  ${farmerInfoAtui.farmerId}")
+                        }
+                        if (farmerInfoAtui != null) {
+                            Text(text = "Name : ${farmerInfoAtui.name}")
+                        }
+                        //Text(text = "S/O :")
+                        if (farmerInfoAtui != null) {
+                            Text(text = "Address : ${farmerInfoAtui.address}")
+                        }
+                        if (farmerInfoAtui != null) {
+                            Text(text = "Contact : ${farmerInfoAtui.mobileNumber}")
+                        }
 
 
 
-}
+                    }
+                }
+
+                else -> {
+                    Text("Loading...")
+                    Log.d("ErrorLog" , "errrrorororororororo")
+                }
+            }
+
             
             Text(text = "Choose Action" , fontSize = 24.sp , fontWeight = FontWeight.Bold, modifier = Modifier.padding(12.dp))
-            Row(modifier = Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween){
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween){
                 Surface(modifier = Modifier
                     .width(160.dp)
                     .height(95.dp)
@@ -94,7 +128,9 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController){
                     .width(160.dp)
 
                     .clickable { }) {
-                    Text(text = "Manage payments", modifier = Modifier.background(Color.Green).padding(horizontal = 15.dp, vertical  =15.dp))
+                    Text(text = "Manage payments", modifier = Modifier
+                        .background(Color.Green)
+                        .padding(horizontal = 15.dp, vertical = 15.dp))
                 }
             }
 

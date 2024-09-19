@@ -1,6 +1,8 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen
 
 import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,10 +17,12 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,52 +32,42 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.farmerCard
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.nameAndFathersName
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun People(navController: NavHostController){
+fun People(navController: NavHostController, viewmodel:FunctionStoreOwner = hiltViewModel()){
    // val navController = rememberNavController()
 
-    val listOfFarmer = mutableListOf(
-        nameAndFathersName(
-            "Farmer's name","S/O: Father's name","1"
-        ),
-        nameAndFathersName(
-            "Farmer's name","S/O: Father's name","2"
-        ),
-        nameAndFathersName(
-            "Farmer's name","S/O: Father's name","3"
-        ),
-        nameAndFathersName(
-            "Farmer's name","S/O: Father's name","4"
-        ),
-        nameAndFathersName(
-            "Farmer's name","S/O: Father's name","5"
-        ),
-        nameAndFathersName(
-            "Farmer's name","S/O: Father's name","6"
-        ),
-        nameAndFathersName(
-            "Farmer's name","S/O: Father's name","7"
-        ),
-        nameAndFathersName(
-            "Farmer's name","S/O: Father's name","8"
-        ),
-        nameAndFathersName(
-            "Farmer's name","S/O: Father's name","9"
-        )
-    )
-var farmerName = remember{ mutableStateOf("") }
+    val listOfFarmer = viewmodel.listOfFarmers
+  var farmerName = remember{ mutableStateOf("") }
    // Text(text = "People" , fontSize = 24.sp , fontWeight = FontWeight.Bold)
     val keyboardController = LocalSoftwareKeyboardController.current
+    Log.d("List of farmers", "Farmers "+listOfFarmer)
 
-Scaffold(topBar = {
-    TopAppBar(title = { Text(text = "People") })
+
+
+    LaunchedEffect(Unit ){
+    viewmodel.fetchFarmersList()
+        Log.d("List of farmers", "Farmers, inside launched effect "+listOfFarmer)
+
+    }
+Scaffold(modifier = Modifier.padding(10.dp), topBar = {
+    TopAppBar(title = { Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(text = "People")
+        Surface(modifier = Modifier.clickable {
+            navController.navigate(AllScreens.QuickAddFarmer.name)
+        }) {
+            Text(text = "Add")
+        }
+    } })
 }) {
 
 Column(modifier = Modifier.padding(
@@ -93,7 +87,11 @@ Column(modifier = Modifier.padding(
     
     LazyColumn(){
         items(listOfFarmer){farmer->
-            farmerCard(farmerName = farmer.name, fatherName = farmer.fatherName, accNum = farmer.accNUmber, navController = navController , showAcc = true)
+           if (farmer != null){
+               farmerCard(farmerName = farmer.name, fatherName = farmer.address, accNum = farmer._id, navController = navController , showAcc = true)
+
+           }
+
 
             Spacer(modifier = Modifier.padding(15.dp))
         }
@@ -102,3 +100,5 @@ Column(modifier = Modifier.padding(
 }
 
 }
+
+//5:00

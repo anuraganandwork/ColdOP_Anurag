@@ -26,6 +26,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.coldstorage.Presentation.Screens.AllScreens
+import com.example.coldstorage.Presentation.Screens.Auth.FarmerQuickAddInputForm
 import com.example.coldstorage.Presentation.Screens.Auth.StoreAdminRegistrationForm
 import com.example.coldstorage.Presentation.Screens.DashBoardScreen.Dashboard
 import com.example.coldstorage.Presentation.Screens.OfflineScreen.Offline
@@ -110,7 +111,9 @@ fun bottomNav(){
                 val accNum = it.arguments!!.getString("accountNumber")
                 farmerDetailedScreen(accNum!!, navHostController)
             }
-
+            composable(route = AllScreens.QuickAddFarmer.name){
+                FarmerQuickAddInputForm()
+            }
 
             composable(route= AllScreens.StoreOrRetrieve.name){
                 storeOrRetrieve()

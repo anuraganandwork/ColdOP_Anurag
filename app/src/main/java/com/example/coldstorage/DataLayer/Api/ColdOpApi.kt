@@ -2,7 +2,9 @@ package com.example.coldstorage.DataLayer.Api
 
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ColdOpApi {
 
@@ -28,4 +30,14 @@ interface ColdOpApi {
 
   @POST("api/store-admin/login?")
   suspend fun logInStoreOwner(@Body logInData: logInData):Response<StoreAdminResponse>
+
+
+  @GET("api/store-admin/farmers")
+  suspend fun getAllFarmers():Response<ListOfFarmersDataType>
+
+  @GET("api/store-admin/farmers/{id}")
+  suspend fun getSingleFarmer(@Path("id") farmerId:String):Response<singleFarmerClickData>
+
 }
+
+//1149

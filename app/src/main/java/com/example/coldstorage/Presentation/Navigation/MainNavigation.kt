@@ -13,7 +13,7 @@ import com.example.coldstorage.Presentation.Screens.OnboardingScreens.pickYourRo
 
 @Composable
 fun Nav(navHostContorller : NavHostController){
- NavHost(navController = navHostContorller, startDestination = AllScreens.LogIn.name ){
+ NavHost(navController = navHostContorller, startDestination = Sections.roleSelectionScreen.route ){
 
      composable(route = Sections.roleSelectionScreen.route){
          pickYourRole{roles ->
@@ -21,7 +21,7 @@ fun Nav(navHostContorller : NavHostController){
                  Roles.Farmer -> Sections.Farmer.route
                  Roles.ColdStoreOwnere -> Sections.StoreOwner.route
              }
-        navHostContorller.navigate(destination)
+        navHostContorller.navigate(AllScreens.LogIn.name)
          }
      }
 
@@ -40,9 +40,7 @@ fun Nav(navHostContorller : NavHostController){
          StoreAdminRegistrationForm(navController = navHostContorller )
      }
 
-     composable(route = AllScreens.QuickAddFarmer.name){
-         FarmerQuickAddInputForm()
-     }
+
 
      composable(route = AllScreens.LogIn.name){
 
@@ -52,4 +50,4 @@ fun Nav(navHostContorller : NavHostController){
  }
 }
 
-//1120
+//1159

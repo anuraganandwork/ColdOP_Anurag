@@ -2,6 +2,7 @@ package com.example.coldstorage.ViewModel.StoreOwnerViewmodel
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -32,6 +33,9 @@ class AuthViewmodel @Inject constructor(
     var otpResponse by mutableStateOf<Response<sendOtpResponse>?>(null);
     private val _verificationResult = MutableLiveData<Boolean>()
     val verificationResult: LiveData<Boolean> = _verificationResult
+
+    private val _logInStatus = mutableStateOf("");
+    val logInStatus:MutableState<String> = _logInStatus
     fun sendOtp(mobileNumber: String) {
         viewModelScope.launch {
             try {
@@ -116,7 +120,8 @@ class AuthViewmodel @Inject constructor(
                         authIntercepter.saveToken(token)
                        Log.d("SuccessfullLOG", "Login successful, token saved.")
                     }
-
+                     _logInStatus.value = response.body()?.status!!;
+                    Log.d("SuccessfullLOG", "Successfully logged in: ${_logInStatus.value}"+"fg${logInStatus.value}")
 
                     Log.d("SuccessfullLOG", "Successfully logged in: ${response.body()?.status}")
                     Log.d("SuccessfullLOG","Success Logged in"+response.body())}
