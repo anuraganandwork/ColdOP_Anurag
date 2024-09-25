@@ -27,6 +27,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -40,34 +41,23 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import kotlinx.coroutines.DisposableHandle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ManageStocks(onContinue: ()->Unit, onClick: ()->Unit){
+fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewModel(), onClick: ()->Unit){
     val keyboardController = LocalSoftwareKeyboardController.current
-    val variety = remember{
-        mutableStateOf("")
-    }
-    val lotSize = remember{
-        mutableStateOf("")
-    }
-    val Ration = remember{
-        mutableStateOf("")
-    }
-    val seedBags = remember{
-        mutableStateOf("")
-    }
-    val twelveNumber = remember{
-        mutableStateOf("")
-    }
+    val variety = viewmodel.variety.collectAsState()
+    val lotSize = viewmodel.lotsize.collectAsState()
+    val Ration = viewmodel.Ration.collectAsState()
+    val seedBags = viewmodel.seedBags.collectAsState()
+    val twelveNumber = viewmodel.twelveNumber.collectAsState()
 
-    val Goli = remember{
-        mutableStateOf("")
-    }
-    val cutAndTok = remember{
-        mutableStateOf("")
-    }
+    val Goli = viewmodel.goli.collectAsState()
+    val cutAndTok = viewmodel.cuttok.collectAsState()
 //    val textFieldColors = MaterialTheme.Color.textFieldColors.copy(
 //        backgroundColor = Color.Transparent, // Set background color to transparent
 //        focusedIndicatorColor = Color.Transparent // Optional: Set focused indicator color
@@ -89,7 +79,7 @@ fun ManageStocks(onContinue: ()->Unit, onClick: ()->Unit){
 
          Text(text = "Enter variety ", fontSize = 14.sp, fontWeight = FontWeight.Medium)
 
-         TextField(value = variety.value , onValueChange ={ text-> variety.value= text},
+         TextField(value = variety.value , onValueChange ={ text-> viewmodel.updateVariety(text)},
              label = { Text(text = "Enter name of variety")},
              keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
              keyboardActions = KeyboardActions(onDone ={keyboardController?.hide()})
@@ -99,7 +89,7 @@ fun ManageStocks(onContinue: ()->Unit, onClick: ()->Unit){
          Spacer(modifier = Modifier.padding(10.dp))
 
          Text(text = "Enter Lot Number/ Lot Size ", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-         TextField(value = lotSize.value , onValueChange ={ text-> lotSize.value= text},
+         TextField(value = lotSize.value , onValueChange ={ text-> viewmodel.updateLotSize(text)},
              label = { Text(text = "No. of bags in this receipt")},
              keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
              keyboardActions = KeyboardActions(onDone ={keyboardController?.hide()})
@@ -119,7 +109,7 @@ fun ManageStocks(onContinue: ()->Unit, onClick: ()->Unit){
               Text(text = "Ration/Table bags", fontSize = 14.sp, fontWeight = FontWeight.Medium)
                   BasicTextField(
                       value = Ration.value,
-                      onValueChange = { text -> Ration.value = text },
+                      onValueChange = { text -> viewmodel.updateRation(text) },
                       keyboardOptions = KeyboardOptions(
                           imeAction = ImeAction.Done,
                           keyboardType = KeyboardType.Number
@@ -144,7 +134,7 @@ fun ManageStocks(onContinue: ()->Unit, onClick: ()->Unit){
          Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
          ) {
              Text(text = "Seed bags", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-             BasicTextField(value = seedBags.value , onValueChange ={ text-> seedBags.value= text},
+             BasicTextField(value = seedBags.value , onValueChange ={ text-> viewmodel.updateSeedBags(text)},
                  keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done , keyboardType = KeyboardType.Number),
                  keyboardActions = KeyboardActions(onDone ={keyboardController?.hide()})
                  ,
@@ -168,7 +158,7 @@ fun ManageStocks(onContinue: ()->Unit, onClick: ()->Unit){
          Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
          ) {
              Text(text = "12 No. seed bags", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-             BasicTextField(value = twelveNumber.value , onValueChange ={ text-> twelveNumber.value= text},
+             BasicTextField(value = twelveNumber.value , onValueChange ={ text-> viewmodel.updateTwelveNumber(text)},
                  keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done , keyboardType = KeyboardType.Number),
                  keyboardActions = KeyboardActions(onDone ={keyboardController?.hide()})
                  , modifier = Modifier
@@ -191,7 +181,7 @@ fun ManageStocks(onContinue: ()->Unit, onClick: ()->Unit){
          Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
          ) {
              Text(text = "Goli bags", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-             BasicTextField(value = Goli.value , onValueChange ={ text-> Goli.value= text},
+             BasicTextField(value = Goli.value , onValueChange ={ text-> viewmodel.updateGoli(text)},
                  keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done , keyboardType = KeyboardType.Number),
                  keyboardActions = KeyboardActions(onDone ={keyboardController?.hide()})
                  ,
@@ -214,7 +204,7 @@ fun ManageStocks(onContinue: ()->Unit, onClick: ()->Unit){
          Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
          ) {
              Text(text = "Cut & Tok bags", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-             BasicTextField(value = cutAndTok.value , onValueChange ={ text-> cutAndTok.value= text},
+             BasicTextField(value = cutAndTok.value , onValueChange ={ text-> viewmodel.updateCutAndTok(text)},
                  keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done , keyboardType = KeyboardType.Number),
                  keyboardActions = KeyboardActions(onDone ={keyboardController?.hide()})
                  ,

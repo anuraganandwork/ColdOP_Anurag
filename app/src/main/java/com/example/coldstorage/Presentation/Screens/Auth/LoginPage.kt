@@ -29,6 +29,10 @@ fun CustomLoginPage(navController: NavController, viewModel: AuthViewmodel = hil
     var mobileNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    LaunchedEffect(Unit ){
+
+    }
+   var sharedPreference =
     Box(
         modifier = Modifier
             .fillMaxSize()

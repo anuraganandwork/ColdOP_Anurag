@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -35,22 +36,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 
 @Composable
-fun AssignLocation(onContinue:()->Unit, onClick:()->Unit){
+fun AssignLocation(onContinue:()->Unit, viewmodel:FunctionStoreOwner= hiltViewModel(), onClick:()->Unit){
     val keyboardController = LocalSoftwareKeyboardController.current
-    val chamber = remember{
-        mutableStateOf("")
-    }
-    val floor = remember{
-        mutableStateOf("")
-    }
-    val row = remember{
-        mutableStateOf("")
-    }
-    val rack = remember{
-        mutableStateOf("")
-    }
+    val chamber = viewmodel.chamber.collectAsState()
+    val floor = viewmodel.floor.collectAsState()
+    val row = viewmodel.row.collectAsState()
+//    val rack = remember{
+//        mutableStateOf("")
+//    }
 
     Column(modifier = Modifier.padding(12.dp)) {
         Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween) {
@@ -73,10 +70,10 @@ fun AssignLocation(onContinue:()->Unit, onClick:()->Unit){
                 Text(text = "Chamber", fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 BasicTextField(
                     value = chamber.value,
-                    onValueChange = { text -> chamber.value = text },
+                    onValueChange = { text -> viewmodel.updateChamber(text) },
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number
+                        keyboardType = KeyboardType.Text
                     ),
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                     modifier = Modifier
@@ -99,10 +96,10 @@ fun AssignLocation(onContinue:()->Unit, onClick:()->Unit){
                 Text(text = "Floor", fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 BasicTextField(
                     value = floor.value,
-                    onValueChange = { text -> chamber.value = text },
+                    onValueChange = { text -> viewmodel.updateFloor(text) },
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number
+                        keyboardType = KeyboardType.Text
                     ),
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                     modifier = Modifier
@@ -125,10 +122,10 @@ fun AssignLocation(onContinue:()->Unit, onClick:()->Unit){
                 Text(text = "Row", fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 BasicTextField(
                     value = row.value,
-                    onValueChange = { text -> chamber.value = text },
+                    onValueChange = { text -> viewmodel.updateRow(text)  },
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number
+                        keyboardType = KeyboardType.Text
                     ),
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                     modifier = Modifier
@@ -147,31 +144,31 @@ fun AssignLocation(onContinue:()->Unit, onClick:()->Unit){
             }
             Spacer(modifier = Modifier.padding(10.dp))
 
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Rack", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                BasicTextField(
-                    value = rack.value,
-                    onValueChange = { text -> chamber.value = text },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number
-                    ),
-                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                    modifier = Modifier
-                        .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
-                        .border(
-                            BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .padding(horizontal = 5.dp)
-                        .width(134.dp)
-                        .height(40.dp),
-                    singleLine = true,
-                    maxLines = 1,
-                    textStyle = TextStyle(fontSize = 24.sp)
-                )
-            }
+//            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Text(text = "Rack", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+//                BasicTextField(
+//                    value = rack.value,
+//                    onValueChange = { text -> viewmodel.updateFloor(text) },
+//                    keyboardOptions = KeyboardOptions(
+//                        imeAction = ImeAction.Done,
+//                        keyboardType = KeyboardType.Number
+//                    ),
+//                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+//                    modifier = Modifier
+//                        .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
+//                        .border(
+//                            BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
+//                            shape = MaterialTheme.shapes.small
+//                        )
+//                        .padding(horizontal = 5.dp)
+//                        .width(134.dp)
+//                        .height(40.dp),
+//                    singleLine = true,
+//                    maxLines = 1,
+//                    textStyle = TextStyle(fontSize = 24.sp)
+//                )
+//            }
             Spacer(modifier = Modifier.padding(10.dp))
             Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
                 Surface(modifier = Modifier
@@ -189,7 +186,7 @@ fun AssignLocation(onContinue:()->Unit, onClick:()->Unit){
                     .padding(10.dp)
                     .background(Color.Green)
                     .clickable {
-  // Todo
+                        // Todo
                     }
                 ) {
                     Text(text = "Continue" , modifier = Modifier

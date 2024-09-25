@@ -1,5 +1,7 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen.Components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,9 +28,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ConfirmationPageForOrder(onPrevious:()-> Unit, onContinue:()->Unit){
+fun ConfirmationPageForOrder(onPrevious:()-> Unit , viewModel: FunctionStoreOwner = hiltViewModel() , onContinue:()->Unit){
 
 Column(modifier = Modifier.padding(horizontal = 10.dp)) {
     Text(text = "Confirmation",  fontSize = 30.sp, fontWeight = FontWeight.Bold)
@@ -73,7 +79,10 @@ Column(modifier = Modifier.padding(horizontal = 10.dp)) {
             Surface(modifier = Modifier
                 .padding(20.dp)
                 .background(Color.Red)
-                .clickable { onContinue() }) {
+                .clickable {
+                    viewModel.createIncomingOrder()
+
+                    onContinue() }) {
                 Text(text = "Confirm" , modifier = Modifier
                     .border(1.dp, Color.Green, RoundedCornerShape(10.dp))
                     .background(Color.Green, RoundedCornerShape(10.dp))
@@ -88,3 +97,5 @@ Column(modifier = Modifier.padding(horizontal = 10.dp)) {
     }
 
 }
+
+//1158

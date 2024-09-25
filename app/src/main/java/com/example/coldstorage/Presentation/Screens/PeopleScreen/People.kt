@@ -43,14 +43,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun People(navController: NavHostController, viewmodel:FunctionStoreOwner = hiltViewModel()){
+fun People(navController: NavHostController , viewmodel:FunctionStoreOwner = hiltViewModel()){
    // val navController = rememberNavController()
 
     val listOfFarmer = viewmodel.listOfFarmers
   var farmerName = remember{ mutableStateOf("") }
    // Text(text = "People" , fontSize = 24.sp , fontWeight = FontWeight.Bold)
     val keyboardController = LocalSoftwareKeyboardController.current
-    Log.d("List of farmers", "Farmers "+listOfFarmer)
+    //Log.d("List of farmers", "Farmers "+listOfFarmer)
 
 
 

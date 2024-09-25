@@ -57,6 +57,7 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
     }
 
     val farmerData by viewModel.farmerData.collectAsState();
+    //val farmerInfoAtui = (farmerData as FarmerApiState.success)?.farmerInfo
 
     //
 
@@ -108,7 +109,15 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                     .width(160.dp)
                     .height(95.dp)
 
-                    .clickable { navController.navigate(route = AllScreens.StoreOrRetrieve.name) }) {
+                    .clickable { when(farmerData){
+                        is FarmerApiState.success ->{
+                            val farmerInfoAtui = (farmerData as FarmerApiState.success)?.farmerInfo
+
+                            navController.navigate(route = AllScreens.StoreOrRetrieve.name + "/${farmerInfoAtui?._id}")}
+                        else ->{
+                            Log.d("Errrr","erererere")
+                        }
+                    } }) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()

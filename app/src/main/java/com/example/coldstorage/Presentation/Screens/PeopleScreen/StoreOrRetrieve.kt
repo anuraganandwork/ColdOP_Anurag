@@ -1,6 +1,8 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.ui.unit.sp
@@ -33,6 +35,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.SecureFlagPolicy
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.AssignLocation
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ConfirmationPageForOrder
@@ -64,6 +68,7 @@ import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.Addre
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.OtherDetails
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.StockDetails
 import com.example.coldstorage.R
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import kotlinx.coroutines.launch
 
 data class Transaction(
@@ -119,11 +124,15 @@ val dummyTransactions = listOf(
 )
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun storeOrRetrieve(){
+fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltViewModel()){
     //variables for bottom sheet
 
+    LaunchedEffect(Unit ){
+        viewmodel.updateFarmerAcc(accNumber)
+    }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     var showBottomSheet = remember{
@@ -470,8 +479,7 @@ fun storeOrRetrieve(){
 
             }
         }
-        if(showSecondBottomSheet.value
-        ){
+        if(showSecondBottomSheet.value){
             ModalBottomSheet(onDismissRequest = { showSecondBottomSheet.value = false },
                 sheetState = sheetState, modifier = Modifier.height(700.dp ),
                 properties = ModalBottomSheetProperties(securePolicy = SecureFlagPolicy.Inherit, isFocusable = true, shouldDismissOnBackPress = true)

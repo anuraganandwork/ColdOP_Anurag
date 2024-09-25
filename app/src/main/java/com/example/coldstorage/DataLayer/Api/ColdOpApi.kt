@@ -1,5 +1,6 @@
 package com.example.coldstorage.DataLayer.Api
 
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.IncomingOrderResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -38,6 +39,12 @@ interface ColdOpApi {
   @GET("api/store-admin/farmers/{id}")
   suspend fun getSingleFarmer(@Path("id") farmerId:String):Response<singleFarmerClickData>
 
+
+
+  @POST("api/store-admin/orders")
+  suspend fun createIncomingOrder(@Body incomingOrderData: IncomingOrderData):Response<IncomingOrderResponse>
+
+  //suspend fun getOldReciepts(@Path("id") farmerId: String):Response<>
 }
 
 //1149

@@ -115,8 +115,14 @@ fun bottomNav(){
                 FarmerQuickAddInputForm()
             }
 
-            composable(route= AllScreens.StoreOrRetrieve.name){
-                storeOrRetrieve()
+            composable(route= AllScreens.StoreOrRetrieve.name+"/{accountNumber}" ,
+                arguments = listOf(navArgument("accountNumber"){
+                    type = NavType.StringType
+                })
+            ){
+                val accNum = it.arguments!!.getString("accountNumber")
+
+                storeOrRetrieve(accNum!!)
             }
 
 

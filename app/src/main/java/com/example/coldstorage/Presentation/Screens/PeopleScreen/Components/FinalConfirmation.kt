@@ -51,5 +51,15 @@ fun finalConfirmation(goBackToProfile: ()-> Unit){
                 , style = TextStyle(textAlign = TextAlign.Center, textDirection = TextDirection.Content)
             )
         }
+        Surface(){
+            Text(text = "Print receipt" , modifier = Modifier
+                .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+                .background(Color.Gray, RoundedCornerShape(10.dp))
+                .padding(horizontal = 20.dp, vertical = 10.dp)
+                .height(40.dp)
+                .wrapContentSize(align = Alignment.Center)
+                , style = TextStyle(textAlign = TextAlign.Center, textDirection = TextDirection.Content)
+            )
+        }
     }}
 }

@@ -33,7 +33,7 @@ data class StoreAdminDetails(
     val token:String,// "store-admin"
     val storeAdminId: Int,         // 2
     val imageUrl: String,          // ""
-    val id: String                 // "66e1f22d782bbd67d3446805"
+    val _id: String                 // "66e1f22d782bbd67d3446805"
 )
 
 // Data class representing the "coldStorageDetails" field

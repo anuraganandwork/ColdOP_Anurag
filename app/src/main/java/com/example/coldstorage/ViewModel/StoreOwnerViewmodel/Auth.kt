@@ -115,10 +115,19 @@ class AuthViewmodel @Inject constructor(
             try {
               val response=   api.logInStoreOwner(logInData)
                 if(response.isSuccessful){
-                   val token = response.body()?.data?.token // Adjust based on actual response
+                   val token = response.body()?.data?.token
+                    val store_id = response.body()?.data?._id//
+                    Log.d("SuccessfullLOG", "Store id , sLogin successful, store id is. "+store_id)
+                  authIntercepter.clearStore_id()
                     if (token != null) {
                         authIntercepter.saveToken(token)
+
                        Log.d("SuccessfullLOG", "Login successful, token saved.")
+                    }
+                    if(store_id!= null){
+                        authIntercepter.saveStoreId(store_id);
+                        Log.d("SuccessfullLOG", "Login successful, store_id saved!.")
+
                     }
                      _logInStatus.value = response.body()?.status!!;
                     Log.d("SuccessfullLOG", "Successfully logged in: ${_logInStatus.value}"+"fg${logInStatus.value}")

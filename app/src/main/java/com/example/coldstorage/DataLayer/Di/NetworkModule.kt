@@ -72,6 +72,28 @@ class AuthInterceptor @Inject constructor( @ApplicationContext private  val cont
 
         editor.apply()
     }
+    val sharedPrefStoreId = context.getSharedPreferences("ColdStore_ID", Context.MODE_PRIVATE)
+
+    public fun saveStoreId(id:String){
+
+        val editor = sharedPrefStoreId.edit()
+        editor.putString("cold_store_token" , id)
+        editor.apply()
+    }
+
+    public fun getStore_id(key:String):String{
+       val id = if( sharedPrefStoreId.getString("cold_store_token", "DEFAULT") != null) {
+           return sharedPrefStoreId.getString("cold_store_token", "DEFAULT")!!
+       }
+        else{
+           return  "Not found the store id"
+        }
+
+    }
+
+    public fun clearStore_id(){
+        sharedPrefStoreId.edit().clear().apply()
+    }
 }
 
 
