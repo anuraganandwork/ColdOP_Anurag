@@ -10,6 +10,8 @@ enum class AllScreens {
     PickYourRole,
     StoreAdminRegistrationForm,
     QuickAddFarmer,
-    LogIn
+    LogIn,
+    OutgoingStockScreen,
+    OutgoingSecondScreen
 
 }

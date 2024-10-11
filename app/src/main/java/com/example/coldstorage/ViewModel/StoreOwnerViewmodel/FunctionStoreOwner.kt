@@ -16,6 +16,8 @@ import com.example.coldstorage.DataLayer.Api.Location
 import com.example.coldstorage.DataLayer.Api.OrderDetail
 import com.example.coldstorage.DataLayer.Api.PopulatedFarmer
 import com.example.coldstorage.DataLayer.Api.Quantity
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Order
 import com.example.coldstorage.DataLayer.Di.AuthInterceptor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +27,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+
 @HiltViewModel
 class FunctionStoreOwner @Inject constructor(
     private val api:ColdOpApi,
@@ -75,6 +78,10 @@ class FunctionStoreOwner @Inject constructor(
     private val _farmerAcc = MutableStateFlow<String>("")
     val farmerAcc :StateFlow<String> = _farmerAcc.asStateFlow()
 
+    //get transaction history data
+
+    private val _transactionHistory = MutableStateFlow<getAllReciptsResponse>(getAllReciptsResponse.idle)
+    val transactionHistory :StateFlow<getAllReciptsResponse> = _transactionHistory.asStateFlow()
 
     fun updateVariety(value: String) { _variety.value = value }
     fun updateLotSize(value: String) { _lotSize.value = value }
@@ -127,7 +134,7 @@ class FunctionStoreOwner @Inject constructor(
                 val response = api.getSingleFarmer(farmerId)
                 if(response.isSuccessful){
                     _farmerdata.value = if (response.isSuccessful) {
-                        FarmerApiState.success(response.body()?.farmerInfo)
+                        FarmerApiState.success(response.body()?.farmerInfo) //to learn
                     } else {
                         FarmerApiState.error("Error fetching farmer data")
                     }
@@ -221,6 +228,37 @@ class FunctionStoreOwner @Inject constructor(
             }
         }
     }
+
+
+
+    //function for getting the recipts
+
+    fun getAllRecipts(farmerId: String){
+        viewModelScope.launch {
+_transactionHistory.value = getAllReciptsResponse.loading
+
+             try {
+                 val response = api.getOldReciepts(farmerId)
+                 if(response.isSuccessful){
+                     Log.d("transactionSucessssOut" , _transactionHistory.value.toString())
+
+                     response.body()?.let {
+                         _transactionHistory.value = getAllReciptsResponse.success(it.data)
+                          Log.d("transactionSuces" , _transactionHistory.value.toString())
+                     // Directly update state with data
+                     } ?: run {
+                         // Handle null response body, consider this as failure
+                        // _transactionHistory.value = getAllReciptsResponse.failure("Response body is null")
+                     }                 }
+                 else {
+                 Log.d("ErrorLog" , "inside the else block")
+                 }
+             } catch (e:Exception){
+                 Log.d("ErrorLog" , "Inside the catch block in transaction history "+e.message)
+             }
+
+        }
+    }
 }
 
 //learnt new thing
@@ -230,4 +268,13 @@ sealed class FarmerApiState{
     data class success(val farmerInfo: FarmerInfo?):FarmerApiState();
 
     data class error(val message:String):FarmerApiState();
+}
+
+
+sealed class getAllReciptsResponse{
+    object idle : getAllReciptsResponse();
+
+    object loading : getAllReciptsResponse();
+
+    data class success(val reciptData: List<Order>) : getAllReciptsResponse()
 }

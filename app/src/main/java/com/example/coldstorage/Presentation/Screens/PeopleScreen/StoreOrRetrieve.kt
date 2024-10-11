@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,7 +25,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -36,15 +35,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -53,22 +50,21 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.AssignLocation
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ConfirmationPageForOrder
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.EmailFilterDropdowns
-import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.HistoryTable
-import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.LotDetailsDialog
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.LotDetailsDialogWrapper
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ManageStocks
-import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.TableView
-import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.TransactionCard
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.OrderCard
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.AddressDetails
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.OtherDetails
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.StockDetails
 import com.example.coldstorage.R
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.getAllReciptsResponse
 import kotlinx.coroutines.launch
 
 data class Transaction(
@@ -127,44 +123,49 @@ val dummyTransactions = listOf(
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltViewModel()){
+fun storeOrRetrieve(accNumber: String, navController: NavHostController, viewmodel: FunctionStoreOwner = hiltViewModel()) {
     //variables for bottom sheet
-
-    LaunchedEffect(Unit ){
+    val transactionHistory = viewmodel.transactionHistory.collectAsState() // to learn
+//755
+    LaunchedEffect(Unit) {
         viewmodel.updateFarmerAcc(accNumber)
+        viewmodel.getAllRecipts("66eab27610eb613c2efca3bc")
+
+        //
     }
+    Log.d("TransactionhistoryUI", transactionHistory.value.toString())
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
-    var showBottomSheet = remember{
+    var showBottomSheet = remember {
         mutableStateOf(false)
     }
 
     //For second bottom sheet
     val secondSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val showSecondBottomSheet = remember{
+    val showSecondBottomSheet = remember {
         mutableStateOf(false)
     }
 
 
     //For third bottom sheet
     val thirdSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val showThirdBottomSheet = remember{
+    val showThirdBottomSheet = remember {
         mutableStateOf(false)
     }
 
     //For fourth bottom sheet
-   val fourthSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val showFourthBottomSheet = remember{
+    val fourthSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val showFourthBottomSheet = remember {
         mutableStateOf(false)
     }
 
 
     //for dailog box
-    var selectedRow = remember{ mutableStateOf<String?>(null) }
-    var isDailogOpen= remember { mutableStateOf<Boolean>(false) }
-    Log.d("PopOP","OPOPO initial ${isDailogOpen.value}")
+    var selectedRow = remember { mutableStateOf<String?>(null) }
+    var isDailogOpen = remember { mutableStateOf<Boolean>(false) }
+    Log.d("PopOP", "OPOPO initial ${isDailogOpen.value}")
 
-    val  hideBottomSheet: ()-> Unit = {
+    val hideBottomSheet: () -> Unit = {
         scope.launch {
             sheetState.hide()
         }.invokeOnCompletion {
@@ -176,7 +177,7 @@ fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltView
     }
 
     //hiding the second bottom sheet
-    val  hideSecondBottomSheet: ()-> Unit = {
+    val hideSecondBottomSheet: () -> Unit = {
         scope.launch {
             secondSheetState.hide()
         }.invokeOnCompletion {
@@ -188,7 +189,7 @@ fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltView
     }
 
     //hiding the third bottom sheet
-    val  hideThirdBottomSheet: ()-> Unit = {
+    val hideThirdBottomSheet: () -> Unit = {
         scope.launch {
             thirdSheetState.hide()
         }.invokeOnCompletion {
@@ -203,12 +204,16 @@ fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltView
     var expandedSortBy = remember { mutableStateOf(false) }
     var selectedSortBy = remember { mutableStateOf("Sort by Date") }
 
-    Column(modifier = Modifier.verticalScroll(enabled = true, state = rememberScrollState() ,)) {
-        Column(  modifier = Modifier
-            .padding(horizontal = 12.dp, vertical = 20.dp)
-            ) {
+    Column(modifier = Modifier.verticalScroll(enabled = true, state = rememberScrollState(),)) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 20.dp)
+        ) {
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.backicon),
                     contentDescription = "Back Icon",
@@ -242,11 +247,21 @@ fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltView
                         .background(Color.Black)
                 )
 
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)){
-                    Text(text = "Criterion", fontWeight = FontWeight.Bold , modifier = Modifier.weight(2f))
-                    Text(text = "No. of bags",fontWeight = FontWeight.Bold , modifier = Modifier.weight(1f))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "Criterion",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(2f)
+                    )
+                    Text(
+                        text = "No. of bags",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
                 Box(
                     modifier = Modifier
@@ -254,11 +269,11 @@ fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltView
                         .height(1.dp)
                         .background(Color.Black)
                 )
-                Row(){
+                Row() {
                     Text(text = "Total bags incoming", modifier = Modifier.weight(2f))
                     Text(text = "1000", modifier = Modifier.weight(1f))
                 }
-                Row(){
+                Row() {
                     Text(text = "Total bags outgoing", modifier = Modifier.weight(2f))
                     Text(text = "40", modifier = Modifier.weight(1f))
                 }
@@ -270,9 +285,13 @@ fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltView
                         .background(Color.Black)
                 )
 
-                Row(){
-                    Text(text = "Current holdings", fontWeight = FontWeight.Bold , modifier = Modifier.weight(2f))
-                    Text(text = "960", fontWeight = FontWeight.Bold , modifier = Modifier.weight(1f))
+                Row() {
+                    Text(
+                        text = "Current holdings",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(2f)
+                    )
+                    Text(text = "960", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 }
 
                 Box(
@@ -291,52 +310,67 @@ fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltView
                 .padding(vertical = 0.dp)
                 .background(Color.Green)
                 .clickable { showBottomSheet.value = true }) {
-                Text(text = "View/Download Ledger Report" , modifier = Modifier
-                    .border(1.dp, Color(0xFF22C55E), RoundedCornerShape(10.dp))
-                    .background(Color(0xFF22C55E), RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
-                    .height(35.dp)
-                    .wrapContentSize(align = Alignment.Center),
-                    color = Color.White
-
-                    , style = TextStyle(textAlign = TextAlign.Center, textDirection = TextDirection.Content)
+                Text(
+                    text = "View/Download Ledger Report",
+                    modifier = Modifier
+                        .border(1.dp, Color(0xFF22C55E), RoundedCornerShape(10.dp))
+                        .background(Color(0xFF22C55E), RoundedCornerShape(10.dp))
+                        .fillMaxWidth()
+                        .height(35.dp)
+                        .wrapContentSize(align = Alignment.Center),
+                    color = Color.White,
+                    style = TextStyle(
+                        textAlign = TextAlign.Center,
+                        textDirection = TextDirection.Content
+                    )
                 )
             }
 
             Spacer(modifier = Modifier.padding(5.dp))
 
-            Row ( horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
 
 
-            Surface(modifier = Modifier
-                .padding(vertical = 0.dp)
-                .background(Color.Green)
-                .clickable { showBottomSheet.value = true }) {
-                Text(text = "Incoming" , modifier = Modifier
-                    .border(1.dp, Color(0xFF22C55E), RoundedCornerShape(10.dp))
-                    .background(Color(0xFF22C55E), RoundedCornerShape(10.dp))
-                    .width(148.dp)
-                    .height(35.dp)
-                    .wrapContentSize(align = Alignment.Center),
+                Surface(modifier = Modifier
+                    .padding(vertical = 0.dp)
+                    .background(Color.Green)
+                    .clickable { showBottomSheet.value = true }) {
+                    Text(
+                        text = "Incoming",
+                        modifier = Modifier
+                            .border(1.dp, Color(0xFF22C55E), RoundedCornerShape(10.dp))
+                            .background(Color(0xFF22C55E), RoundedCornerShape(10.dp))
+                            .width(148.dp)
+                            .height(35.dp)
+                            .wrapContentSize(align = Alignment.Center),
+                        color = Color.White,
+                        style = TextStyle(
+                            textAlign = TextAlign.Center,
+                            textDirection = TextDirection.Content
+                        )
+                    )
+                }
+                Surface(
+                    modifier = Modifier
+                        .padding()
+                        .clickable {  navController.navigate(AllScreens.OutgoingStockScreen.name) }
+                ) {
+                    Text(
+                        text = "Outgoing", modifier = Modifier
+                            .background(Color.Red, RoundedCornerShape(10.dp))
+
+                            .width(148.dp)
+                            .height(35.dp)
+                            .wrapContentSize(align = Alignment.Center),
                         color = Color.White
+                    )
 
-                    , style = TextStyle(textAlign = TextAlign.Center, textDirection = TextDirection.Content)
-                )
-            }
-            Surface(modifier = Modifier
-                .padding()) {
-                Text(text = "Outgoing", modifier = Modifier
-                    .background(Color.Red, RoundedCornerShape(10.dp))
-
-                    .width(148.dp)
-                    .height(35.dp)
-                    .wrapContentSize(align = Alignment.Center) ,
-                    color = Color.White
-                )
+                }
 
             }
-
-           }
 
             //table starting here
             Spacer(modifier = Modifier.padding(15.dp))
@@ -344,8 +378,12 @@ fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltView
             Text(text = "Transaction", fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.padding(8.dp))
 
-            EmailFilterDropdowns(expandedGroupBy= expandedGroupBy, selectedGroupBy = selectedGroupBy , expandedSortBy = expandedSortBy , selectedSortBy = selectedSortBy )
-
+            EmailFilterDropdowns(
+                expandedGroupBy = expandedGroupBy,
+                selectedGroupBy = selectedGroupBy,
+                expandedSortBy = expandedSortBy,
+                selectedSortBy = selectedSortBy
+            )
 
 
 //            LazyColumn {
@@ -358,68 +396,86 @@ fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltView
 //                    type = data.type
 //                )}
 //            }
-            Column{
-                Log.d("Dummy transactionnn" , dummyTransactions.toString())
 
-                if(selectedGroupBy.value == "Only Incoming"){
-                    dummyTransactions.filter { data -> data.type == "incoming" }.forEach { data -> TransactionCard(
-                        stockDetails = data.stockDetails,
-                        addressDetails = data.addressDetails ,
-                        otherDetails = data.otherDetails,
-                        date = data.date,
-                        reciptNo = data.receiptNo,
-                        type = data.type
-                    )  }
-                    Log.d("Dummy transaction" , dummyTransactions.toString())
+            when (val state = transactionHistory.value) {
+
+                is getAllReciptsResponse.idle -> {
+                    Text(text = "No previous history!")
                 }
 
-               else  if (selectedGroupBy.value == "Only Outgoing"){
-                    dummyTransactions.filter { data -> data.type == "outgoing" }.forEach { data -> TransactionCard(
-                        stockDetails = data.stockDetails,
-                        addressDetails = data.addressDetails ,
-                        otherDetails = data.otherDetails,
-                        date = data.date,
-                        reciptNo = data.receiptNo,
-                        type = data.type
-                    )  }
-                    Log.d("Dummy transaction" , dummyTransactions.toString())
+                is getAllReciptsResponse.loading -> {
+                    CircularProgressIndicator()
                 }
 
-                else  if (selectedGroupBy.value == "Both"){
-                    dummyTransactions.forEach { data -> TransactionCard(
-                        stockDetails = data.stockDetails,
-                        addressDetails = data.addressDetails ,
-                        otherDetails = data.otherDetails,
-                        date = data.date,
-                        reciptNo = data.receiptNo,
-                        type = data.type
-                    )  }
-                    Log.d("Dummy transaction" , dummyTransactions.toString())
+                is getAllReciptsResponse.success -> {
+                    Log.d("Succ", state.reciptData.toString())
+                    Text(text = "HI")
+                    Text(text = state.reciptData.toString())
                 }
-                else {
-                    dummyTransactions.forEach { data -> TransactionCard(
-                        stockDetails = data.stockDetails,
-                        addressDetails = data.addressDetails ,
-                        otherDetails = data.otherDetails,
-                        date = data.date,
-                        reciptNo = data.receiptNo,
-                        type = data.type
-                    )  }
-                }
-
-
-
-
-//            dummyTransactions.forEach { data -> TransactionCard(
-//                    stockDetails = data.stockDetails,
-//                    addressDetails = data.addressDetails ,
-//                   otherDetails = data.otherDetails,
-//                    date = data.date,
-//                   reciptNo = data.receiptNo,
-//                   type = data.type
-//               )  }
-
             }
+//            Column {
+//                Log.d("Dummy transactionnn", dummyTransactions.toString())
+//
+//                if (selectedGroupBy.value == "Only Incoming") {
+//                    dummyTransactions.filter { data -> data.type == "incoming" }.forEach { data ->
+//                        TransactionCard(
+//                            stockDetails = data.stockDetails,
+//                            addressDetails = data.addressDetails,
+//                            otherDetails = data.otherDetails,
+//                            date = data.date,
+//                            reciptNo = data.receiptNo,
+//                            type = data.type
+//                        )
+//                    }
+//                    Log.d("Dummy transaction", dummyTransactions.toString())
+//                } else if (selectedGroupBy.value == "Only Outgoing") {
+//                    dummyTransactions.filter { data -> data.type == "outgoing" }.forEach { data ->
+//                        TransactionCard(
+//                            stockDetails = data.stockDetails,
+//                            addressDetails = data.addressDetails,
+//                            otherDetails = data.otherDetails,
+//                            date = data.date,
+//                            reciptNo = data.receiptNo,
+//                            type = data.type
+//                        )
+//                    }
+//                    Log.d("Dummy transaction", dummyTransactions.toString())
+//                } else if (selectedGroupBy.value == "Both") {
+//                    dummyTransactions.forEach { data ->
+//                        TransactionCard(
+//                            stockDetails = data.stockDetails,
+//                            addressDetails = data.addressDetails,
+//                            otherDetails = data.otherDetails,
+//                            date = data.date,
+//                            reciptNo = data.receiptNo,
+//                            type = data.type
+//                        )
+//                    }
+//                    Log.d("Dummy transaction", dummyTransactions.toString())
+//                } else {
+//                    dummyTransactions.forEach { data ->
+//                        TransactionCard(
+//                            stockDetails = data.stockDetails,
+//                            addressDetails = data.addressDetails,
+//                            otherDetails = data.otherDetails,
+//                            date = data.date,
+//                            reciptNo = data.receiptNo,
+//                            type = data.type
+//                        )
+//                    }
+//                }
+//
+//
+////            dummyTransactions.forEach { data -> TransactionCard(
+////                    stockDetails = data.stockDetails,
+////                    addressDetails = data.addressDetails ,
+////                   otherDetails = data.otherDetails,
+////                    date = data.date,
+////                   reciptNo = data.receiptNo,
+////                   type = data.type
+////               )  }
+//
+//            }
 
             //HistoryTable()
             //Spacer(modifier = Modifier.padding(20.dp))
@@ -445,89 +501,112 @@ fun storeOrRetrieve(accNumber: String , viewmodel: FunctionStoreOwner = hiltView
         }
 
 
-        }
-        if(isDailogOpen.value){
-            LotDetailsDialogWrapper(reciept = selectedRow, bags = selectedRow.value!!, onClose =  {isDailogOpen.value = false} )
-            Log.d("PopOP","OPOPO ${isDailogOpen.value}")
+    }
+    if (isDailogOpen.value) {
+        LotDetailsDialogWrapper(
+            reciept = selectedRow,
+            bags = selectedRow.value!!,
+            onClose = { isDailogOpen.value = false })
+        Log.d("PopOP", "OPOPO ${isDailogOpen.value}")
 
 
-        }
-        if (showBottomSheet.value){
-            ModalBottomSheet(onDismissRequest = { showBottomSheet.value = false },
-                sheetState = sheetState, modifier = Modifier.height(700.dp ),
-                properties = ModalBottomSheetProperties(securePolicy = SecureFlagPolicy.Inherit, isFocusable = true, shouldDismissOnBackPress = true)
+    }
+    if (showBottomSheet.value) {
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet.value = false },
+            sheetState = sheetState, modifier = Modifier.height(700.dp),
+            properties = ModalBottomSheetProperties(
+                securePolicy = SecureFlagPolicy.Inherit,
+                isFocusable = true,
+                shouldDismissOnBackPress = true
+            )
 
 
-
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState()), // fill maximum available height
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .verticalScroll(rememberScrollState()), // fill maximum available height
-                ) {
 //important
-                    ManageStocks({ hideBottomSheet() }){
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                showBottomSheet.value = false
-                            }
+                ManageStocks({ hideBottomSheet() }) {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet.value = false
                         }
                     }
                 }
-
-
             }
+
+
         }
-        if(showSecondBottomSheet.value){
-            ModalBottomSheet(onDismissRequest = { showSecondBottomSheet.value = false },
-                sheetState = sheetState, modifier = Modifier.height(700.dp ),
-                properties = ModalBottomSheetProperties(securePolicy = SecureFlagPolicy.Inherit, isFocusable = true, shouldDismissOnBackPress = true)
+    }
+    if (showSecondBottomSheet.value) {
+        ModalBottomSheet(
+            onDismissRequest = { showSecondBottomSheet.value = false },
+            sheetState = sheetState, modifier = Modifier.height(700.dp),
+            properties = ModalBottomSheetProperties(
+                securePolicy = SecureFlagPolicy.Inherit,
+                isFocusable = true,
+                shouldDismissOnBackPress = true
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState()), // fill maximum available height
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .verticalScroll(rememberScrollState()), // fill maximum available height
-                ){
-                    AssignLocation(onContinue = { hideSecondBottomSheet()}) {
-                        scope.launch { secondSheetState.hide() }.invokeOnCompletion {
-                            if (!secondSheetState.isVisible) {
-                                showSecondBottomSheet.value = false
+                AssignLocation(onContinue = { hideSecondBottomSheet() }) {
+                    scope.launch { secondSheetState.hide() }.invokeOnCompletion {
+                        if (!secondSheetState.isVisible) {
+                            showSecondBottomSheet.value = false
 
-                            }
-                            showBottomSheet.value= true
                         }
+                        showBottomSheet.value = true
                     }
                 }
             }
         }
+    }
 
-        if(showThirdBottomSheet.value){
-            ModalBottomSheet(onDismissRequest = { showThirdBottomSheet.value = false },
-                sheetState = thirdSheetState, modifier = Modifier.height(700.dp ),
-                properties = ModalBottomSheetProperties(securePolicy = SecureFlagPolicy.Inherit, isFocusable = true, shouldDismissOnBackPress = true)
-            ){
-                ConfirmationPageForOrder(onPrevious = { /*TODO*/ }) {
-                    hideThirdBottomSheet()
-                }
+    if (showThirdBottomSheet.value) {
+        ModalBottomSheet(
+            onDismissRequest = { showThirdBottomSheet.value = false },
+            sheetState = thirdSheetState, modifier = Modifier.height(700.dp),
+            properties = ModalBottomSheetProperties(
+                securePolicy = SecureFlagPolicy.Inherit,
+                isFocusable = true,
+                shouldDismissOnBackPress = true
+            )
+        ) {
+            ConfirmationPageForOrder(onPrevious = { /*TODO*/ }) {
+                hideThirdBottomSheet()
             }
         }
+    }
 
-        if(showFourthBottomSheet.value){
-            ModalBottomSheet(onDismissRequest = { showFourthBottomSheet.value = false },
-                sheetState = fourthSheetState, modifier = Modifier.height(700.dp ),
+    if (showFourthBottomSheet.value) {
+        ModalBottomSheet(
+            onDismissRequest = { showFourthBottomSheet.value = false },
+            sheetState = fourthSheetState, modifier = Modifier.height(700.dp),
 
-                properties = ModalBottomSheetProperties(securePolicy = SecureFlagPolicy.Inherit, isFocusable = true, shouldDismissOnBackPress = true, ),
+            properties = ModalBottomSheetProperties(
+                securePolicy = SecureFlagPolicy.Inherit,
+                isFocusable = true,
+                shouldDismissOnBackPress = true,
+            ),
 
 
-            ){
-                Box(modifier = Modifier.height(700.dp) ){
+            ) {
+            Box(modifier = Modifier.height(700.dp)) {
                 finalConfirmation {
                     // TODO:
-                }}
+                }
             }
-
         }
 
     }
+
+}

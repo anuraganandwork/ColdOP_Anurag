@@ -18,7 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,9 +26,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.Auth.FarmerQuickAddInputForm
-import com.example.coldstorage.Presentation.Screens.Auth.StoreAdminRegistrationForm
 import com.example.coldstorage.Presentation.Screens.DashBoardScreen.Dashboard
 import com.example.coldstorage.Presentation.Screens.OfflineScreen.Offline
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing.OutgoingSecondScreen
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing.OutgoingStockScreen
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.People
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.farmerDetailedScreen
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.storeOrRetrieve
@@ -122,8 +122,19 @@ fun bottomNav(){
             ){
                 val accNum = it.arguments!!.getString("accountNumber")
 
-                storeOrRetrieve(accNum!!)
+                storeOrRetrieve(accNum!! , navHostController)
             }
+
+            composable(route = AllScreens.OutgoingStockScreen.name){
+                OutgoingStockScreen(navHostController)
+            }
+
+            composable(route = AllScreens.OutgoingSecondScreen.name){
+                OutgoingSecondScreen()
+            }
+
+
+
 
 
         }

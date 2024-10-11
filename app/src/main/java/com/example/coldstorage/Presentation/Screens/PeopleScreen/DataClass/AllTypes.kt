@@ -1,9 +1,10 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass
 
 data class AddressDetails(
-    val chamber :String,
     val floor:String,
-    val row:String
+    val row:String,
+
+    val chamber :String,
 )
 
 

@@ -17,17 +17,30 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Canvas
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.BagSize
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Location
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.AddressDetails
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.OtherDetails
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.StockDetails
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.getAllReciptsResponse
 
 @Composable
-fun TransactionCard(stockDetails: StockDetails,addressDetails: AddressDetails, otherDetails: OtherDetails,
-                    date:String, reciptNo:String , type:String){
+fun TransactionCard(
+    stockDetails: List<BagSize>, addressDetails: Location, otherDetails: OtherDetails,
+    date: String, reciptNo: String, type: String,
+){
+
+
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -75,14 +88,13 @@ fun TransactionCard(stockDetails: StockDetails,addressDetails: AddressDetails, o
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("Ration: ${stockDetails.Ration}" , fontSize = 15.sp)
-                    Text("Goli: ${stockDetails.Goli}" , fontSize = 15.sp)
-                    Text("Cut & Tok: ${stockDetails.cutTok}" , fontSize = 15.sp)
+                    Text("Ration: ${stockDetails[0].quantity.currentQuantity}" , fontSize = 15.sp)
+                    Text("Goli: ${stockDetails[1].quantity.initialQuantity}" , fontSize = 15.sp)
+                    Text("Cut & Tok: ${stockDetails[2].quantity.currentQuantity}" , fontSize = 15.sp)
                 }
                 Column {
-                    Text("No. 12: ${stockDetails.no12}" , fontSize = 15.sp)
-                    Text("Seed: ${stockDetails.seed}" , fontSize = 15.sp)
-                    Text("Total: ${stockDetails.total}" , fontSize = 15.sp)
+                    Text("No. 12: ${stockDetails[3].quantity.currentQuantity}" , fontSize = 15.sp)
+                    Text("Seed: ${stockDetails[4].quantity.currentQuantity}" , fontSize = 15.sp)
                 }
             }
 
