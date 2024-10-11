@@ -37,7 +37,7 @@ import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.mapReceiptsToRows
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OutgoingStockScreen(navController: NavController) {
+fun OutgoingStockScreen(viewmodel: FunctionStoreOwner = hiltViewModel() ,navController: NavController) {
     var selectedVariety by remember { mutableStateOf("") }
     var selectedBagSize by remember { mutableStateOf("") }
 
@@ -87,23 +87,9 @@ fun OutgoingStockScreen(navController: NavController) {
                     .fillMaxWidth()
                     .weight(1.25f) // This makes the table take the remaining space
             ) {
-                StockTable()
+                StockTable( viewmodel, navController)
             }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp) , horizontalArrangement = Arrangement.End) {
-                Surface(modifier = Modifier
-                    .padding(horizontal = 7.dp, vertical = 3.dp)
-                    .background(
-                        Color(0xFF23C45E), RoundedCornerShape(5.dp)
-                    )
-                    .clickable { navController.navigate(AllScreens.OutgoingSecondScreen.name) }
 
-                    , shape = RoundedCornerShape(5.dp) , color =Color(0xFF23C45E) ){
-                    Text(text = "Proceed" ,modifier = Modifier
-                        .padding(horizontal = 7.dp, vertical = 3.dp) )
-                }
-            }
 
 
 
@@ -147,7 +133,7 @@ fun DropdownMenu_(
 }
 
 @Composable
-fun StockTable(viewmodel: FunctionStoreOwner = hiltViewModel()) {
+fun StockTable(viewmodel: FunctionStoreOwner  , navController: NavController) {
     val headers = listOf("Voucher", "Variety", "Seed", "No. 12", "Ration", "Goli", "Cut & Tok", "Total")
     val selectedBlock =  remember { mutableStateOf(Color.White) }
    val selectedCells  = remember {
@@ -174,12 +160,14 @@ fun StockTable(viewmodel: FunctionStoreOwner = hiltViewModel()) {
     Log.d("OutgoingTable" , rows.toString())
 
 
+Column {
+
 
     LazyColumn {
         item {
             Row(Modifier.fillMaxWidth()) {
                 headers.forEach { header ->
-                    Log.d("OutgoingTable" , rows.toString())
+                    Log.d("OutgoingTable", rows.toString())
 
                     Text(
                         text = header,
@@ -193,7 +181,7 @@ fun StockTable(viewmodel: FunctionStoreOwner = hiltViewModel()) {
 
         items(rows.size) { rowIndex ->
             val row = rows[rowIndex]
-            Log.d("Outgoing" , row.toString())
+            Log.d("Outgoing", row.toString())
 
             Row(Modifier.fillMaxWidth()) {
                 Text(
@@ -222,55 +210,85 @@ fun StockTable(viewmodel: FunctionStoreOwner = hiltViewModel()) {
 //                }
                 ClickableBlock(
                     cell = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0",
-                        isSelected = selectedCells[Pair(rowIndex,  2)] ?: false, // Use +2 to skip the first two columns
-                        onToggle = { isSelected ->
-                            selectedCells[Pair(rowIndex,  2)] = isSelected
-                       }
-                   )
+                    isSelected = selectedCells[Pair(rowIndex, 2)]
+                        ?: false, // Use +2 to skip the first two columns
+                    onToggle = { isSelected ->
+                        selectedCells[Pair(rowIndex, 2)] = isSelected
+                    }
+                )
 
                 ClickableBlock(
                     cell = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0",
-                    isSelected = selectedCells[Pair(rowIndex,  3)] ?: false, // Use +2 to skip the first two columns
+                    isSelected = selectedCells[Pair(rowIndex, 3)]
+                        ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
-                        selectedCells[Pair(rowIndex,  3)] = isSelected
+                        selectedCells[Pair(rowIndex, 3)] = isSelected
                     }
                 )
                 ClickableBlock(
                     cell = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0",
-                    isSelected = selectedCells[Pair(rowIndex,  4)] ?: false, // Use +2 to skip the first two columns
+                    isSelected = selectedCells[Pair(rowIndex, 4)]
+                        ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
-                        selectedCells[Pair(rowIndex,  4)] = isSelected
+                        selectedCells[Pair(rowIndex, 4)] = isSelected
                     }
                 )
                 ClickableBlock(
                     cell = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0",
-                    isSelected = selectedCells[Pair(rowIndex, 5 )] ?: false, // Use +2 to skip the first two columns
+                    isSelected = selectedCells[Pair(rowIndex, 5)]
+                        ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
-                        selectedCells[Pair(rowIndex,  5)] = isSelected
+                        selectedCells[Pair(rowIndex, 5)] = isSelected
                     }
                 )
                 ClickableBlock(
                     cell = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0",
-                    isSelected = selectedCells[Pair(rowIndex,  6)] ?: false, // Use +2 to skip the first two columns
+                    isSelected = selectedCells[Pair(rowIndex, 6)]
+                        ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
-                        selectedCells[Pair(rowIndex,  6)] = isSelected
+                        selectedCells[Pair(rowIndex, 6)] = isSelected
                     }
                 )
                 val totalQuantity = row.size
                     .take(5) // Take the first 5 elements or fewer if the list is smaller
-                    .sumOf { it.quantity?.currentQuantity ?: 0 } // Safely access currentQuantity and sum them
+                    .sumOf {
+                        it.quantity?.currentQuantity ?: 0
+                    } // Safely access currentQuantity and sum them
 
                 ClickableBlock(
-                    cell = totalQuantity.toString()  ,
-                    isSelected = selectedCells[Pair(rowIndex,  7)] ?: false, // Use +2 to skip the first two columns
+                    cell = totalQuantity.toString(),
+                    isSelected = selectedCells[Pair(rowIndex, 7)]
+                        ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
-                        selectedCells[Pair(rowIndex,  7)] = isSelected
+                        selectedCells[Pair(rowIndex, 7)] = isSelected
                     }
                 )
 
             }
         }
     }
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 10.dp) , horizontalArrangement = Arrangement.End) {
+        Surface(modifier = Modifier
+            .padding(horizontal = 7.dp, vertical = 3.dp)
+            .background(
+                Color(0xFF23C45E), RoundedCornerShape(5.dp)
+            )
+            .clickable {
+                val (firstKeys, secondKeys) = getSeparateKeys(selectedCells)
+                val finalVouchers = firstKeys.map { itt -> rows[itt.toInt()].voucherNumber.toString() }
+                viewmodel.proceedToNextOutgoing(finalVouchers , secondKeys)
+                navController.navigate(AllScreens.OutgoingSecondScreen.name) }
+
+            , shape = RoundedCornerShape(5.dp) , color =Color(0xFF23C45E) ){
+            Text(text = "Proceed" ,modifier = Modifier
+                .padding(horizontal = 7.dp, vertical = 3.dp) )
+        }
+    }
+
+}
+    //add button here
 
 
 }
@@ -281,3 +299,12 @@ fun StockTable(viewmodel: FunctionStoreOwner = hiltViewModel()) {
 //fun OutgoingPreview(){
 //    OutgoingStockScreen()
 //}
+
+fun getSeparateKeys(selectedCells: MutableMap<Pair<Int, Int>, Boolean>): Pair<List<String>, List<String>> {
+    // Extract the first key and second key as separate lists
+    val firstKeyList = selectedCells.keys.map { it.first.toString() }
+    val secondKeyList = selectedCells.keys.map { it.second.toString() }
+
+    // Return the two lists as separate lists
+    return Pair(firstKeyList, secondKeyList)
+}

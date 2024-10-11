@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,13 +35,14 @@ import com.example.coldstorage.Presentation.Screens.PeopleScreen.People
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.farmerDetailedScreen
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.storeOrRetrieve
 import com.example.coldstorage.Presentation.Screens.SettingScreen.Setting
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun bottomNav(){
 /// because it is a different section , it will have  a different navcontroller
     val navHostController = rememberNavController()
-
+   val  viewmodel: FunctionStoreOwner = hiltViewModel()
     val items = listOf(
         NavigationItem(
             label = "Dashboard",
@@ -126,11 +128,11 @@ fun bottomNav(){
             }
 
             composable(route = AllScreens.OutgoingStockScreen.name){
-                OutgoingStockScreen(navHostController)
+                OutgoingStockScreen(viewmodel ,navHostController)
             }
 
             composable(route = AllScreens.OutgoingSecondScreen.name){
-                OutgoingSecondScreen()
+                OutgoingSecondScreen(viewmodel)
             }
 
 

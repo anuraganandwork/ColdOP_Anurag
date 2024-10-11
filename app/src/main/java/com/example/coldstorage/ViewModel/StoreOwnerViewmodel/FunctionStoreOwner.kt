@@ -259,6 +259,21 @@ _transactionHistory.value = getAllReciptsResponse.loading
 
         }
     }
+
+
+    fun proceedToNextOutgoing(voucherNumber: List<String> , Index : List<String>){
+
+        authIntercepter.saveSelectedOrder(voucherNumber ,Index)
+    }
+
+    fun getTheSelectedStock() : List<String>{
+       return authIntercepter.getSelectedOrder()
+    }
+
+    fun getTheSelectedIndex() : List<String>{
+      return  authIntercepter.getSelectedOrderIndex()
+    }
+
 }
 
 //learnt new thing

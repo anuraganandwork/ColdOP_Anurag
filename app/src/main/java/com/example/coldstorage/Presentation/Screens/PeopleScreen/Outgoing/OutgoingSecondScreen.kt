@@ -1,5 +1,6 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 
@@ -33,15 +34,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OutgoingSecondScreen() {
+fun OutgoingSecondScreen(viewmodel: FunctionStoreOwner ) {
     var seedBags by remember { mutableStateOf("0") }
     var rationBags by remember { mutableStateOf("0") }
     var no12Bags by remember { mutableStateOf("0") }
     var cutTokBags by remember { mutableStateOf("0") }
     var goliBags by remember { mutableStateOf("0") }
+
+    LaunchedEffect(Unit){
+        Log.d("OutgoingSh" , viewmodel.getTheSelectedStock().toString())
+        Log.d("OutgoingSh" , viewmodel.getTheSelectedIndex().toString())
+
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -55,7 +64,9 @@ fun OutgoingSecondScreen() {
             )
         }
     ){paddingValues ->
-    Column(modifier = Modifier.padding(horizontal = 14.dp , vertical = 8.dp).padding(paddingValues = paddingValues)) {
+    Column(modifier = Modifier
+        .padding(horizontal = 14.dp, vertical = 8.dp)
+        .padding(paddingValues = paddingValues)) {
         Text("Select Quantities Required for : Pukhraj")
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -97,7 +108,7 @@ fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
                 .width(134.dp)
                 .height(40.dp)
                 .padding(vertical = 4.dp)
-                .border(1.dp , Color.Gray , RoundedCornerShape(5.dp))
+                .border(1.dp, Color.Gray, RoundedCornerShape(5.dp))
                 //.padding(horizontal = 8.dp, vertical = 12.dp), // Adjust padding to vertically center the text
 
             , textStyle = TextStyle(textAlign = TextAlign.Center),
@@ -170,7 +181,7 @@ fun StockTablee() {
                                         .width(110.dp)
                                         .height(40.dp)
                                         .padding(vertical = 4.dp)
-                                        .border(1.dp , Color.Gray , RoundedCornerShape(5.dp))
+                                        .border(1.dp, Color.Gray, RoundedCornerShape(5.dp))
                                     //.padding(horizontal = 8.dp, vertical = 12.dp), // Adjust padding to vertically center the text
 
                                     , textStyle = TextStyle(textAlign = TextAlign.Center),

@@ -94,6 +94,42 @@ class AuthInterceptor @Inject constructor( @ApplicationContext private  val cont
     public fun clearStore_id(){
         sharedPrefStoreId.edit().clear().apply()
     }
+
+    val sharedPrefSelectedStock = context.getSharedPreferences("VoucherNumber" , Context.MODE_PRIVATE)
+    public fun saveSelectedOrder(myValues: List<String> , myIndexes:List<String>){
+        val concatenatedValues = myValues.joinToString(",") // Join values using a comma
+        val concatenatedValues2 = myIndexes.joinToString(",") // Join values using a comma
+        Log.d("XXXXxxxxxx" , concatenatedValues)
+
+        sharedPrefSelectedStock.edit().putString("voucher_number" ,concatenatedValues ).apply()
+        sharedPrefSelectedStock.edit().putString("indexSelected" , concatenatedValues2).apply()
+    }
+
+    public fun getSelectedOrder():List<String>{
+        if(sharedPrefSelectedStock.getString("voucher_number" , "DEFAULT") != null){
+            val concatenatedValues = sharedPrefSelectedStock.getString("voucher_number", "DEFAULT")
+            val myValues = concatenatedValues?.split(",") ?: listOf()
+            Log.d("XXXX" , myValues.toString())
+            return myValues
+        }
+        else {
+            return listOf()
+        }
+    }
+
+    public fun getSelectedOrderIndex():List<String>{
+        if(sharedPrefSelectedStock.getString("indexSelected" , "DEFAULT") != null){
+            val concatenatedValues = sharedPrefSelectedStock.getString("indexSelected", "DEFAULT")
+
+            val myValues = concatenatedValues?.split(",") ?: listOf()
+            Log.d("XXXXndexI" , myValues.toString())
+
+            return myValues
+        }
+        else {
+            return listOf()
+        }
+    }
 }
 
 
