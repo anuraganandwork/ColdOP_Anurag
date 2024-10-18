@@ -14,6 +14,8 @@ import com.example.coldstorage.DataLayer.Api.FarmerInfo
 import com.example.coldstorage.DataLayer.Api.IncomingOrderData
 import com.example.coldstorage.DataLayer.Api.Location
 import com.example.coldstorage.DataLayer.Api.OrderDetail
+import com.example.coldstorage.DataLayer.Api.OutgoingData.BagUpdate
+import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.PopulatedFarmer
 import com.example.coldstorage.DataLayer.Api.Quantity
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
@@ -270,8 +272,38 @@ _transactionHistory.value = getAllReciptsResponse.loading
        return authIntercepter.getSelectedOrder()
     }
 
+
+
+
     fun getTheSelectedIndex() : List<String>{
       return  authIntercepter.getSelectedOrderIndex()
+    }
+
+    fun clearSelectedCells(){
+        authIntercepter.clearSelectedCell()
+    }
+
+    fun confirmOutgoingOrder(farmerId : String  ){
+        viewModelScope.launch {
+
+            val bagUpdates = listOf(BagUpdate( "Goli", 50))
+            val orderItems = listOf(OutgoingDataClassItem( "66f587d254d44f78c70ff9c1", "Pukhraj",bagUpdates))
+           // val outgoingData = OutgoingDataClassBody(orderItems)
+         Log.d("OutgoingSuccess" , orderItems.toString())
+            try {
+                val response = api.confirmOutgoingOrder(farmerId, orderItems)
+                if (response.isSuccessful) {
+                    response.body()?.message?.let { Log.d("OutgoingSuccess" , it) }
+                } else {
+                    // Handle failure (e.g., log or show error message)
+                    Log.d("OutgoingSuccess" , "Errororrr "+ response.errorBody()?.string() + response.code() )
+                }
+            }
+            catch (e : Exception){
+                Log.d("OutgoingSuccess" , "In the catch block "+e.message)
+
+            }
+        }
     }
 
 }
@@ -292,4 +324,6 @@ sealed class getAllReciptsResponse{
     object loading : getAllReciptsResponse();
 
     data class success(val reciptData: List<Order>) : getAllReciptsResponse()
+
+
 }

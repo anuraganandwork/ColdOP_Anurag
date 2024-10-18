@@ -91,7 +91,7 @@ Column(modifier = Modifier.padding(horizontal = 10.dp)) {
                     .wrapContentSize(align = Alignment.Center)
                     , style = TextStyle(textAlign = TextAlign.Center, textDirection = TextDirection.Content)
                 )            }
-
+//1245
         }
 
     }

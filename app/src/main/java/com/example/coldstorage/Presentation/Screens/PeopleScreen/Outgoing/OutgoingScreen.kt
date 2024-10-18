@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -63,7 +65,7 @@ fun OutgoingStockScreen(viewmodel: FunctionStoreOwner = hiltViewModel() ,navCont
 
             DropdownMenu_(
                 label = "Which variety would you like to take?",
-                options = listOf("Pukfhra"),
+                options = listOf("Pukhraj"),
                 selectedOption = selectedVariety,
                 onOptionSelected = { selectedVariety = it }
             )
@@ -85,7 +87,6 @@ fun OutgoingStockScreen(viewmodel: FunctionStoreOwner = hiltViewModel() ,navCont
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1.25f) // This makes the table take the remaining space
             ) {
                 StockTable( viewmodel, navController)
             }
@@ -134,7 +135,7 @@ fun DropdownMenu_(
 
 @Composable
 fun StockTable(viewmodel: FunctionStoreOwner  , navController: NavController) {
-    val headers = listOf("Voucher", "Variety", "Seed", "No. 12", "Ration", "Goli", "Cut & Tok", "Total")
+    val headers = listOf("Voucher", "Variety", "Goli", "No. 12", "Ration", "Goli", "Cut & Tok", "Total")
     val selectedBlock =  remember { mutableStateOf(Color.White) }
    val selectedCells  = remember {
        mutableStateMapOf<Pair<Int , Int> , Boolean>()
@@ -160,10 +161,14 @@ fun StockTable(viewmodel: FunctionStoreOwner  , navController: NavController) {
     Log.d("OutgoingTable" , rows.toString())
 
 
-Column {
+Column(modifier = Modifier
+    .fillMaxHeight()
+    ) {
 
 
-    LazyColumn {
+    LazyColumn(modifier = Modifier
+        .fillMaxWidth()
+        .height(300.dp)) {
         item {
             Row(Modifier.fillMaxWidth()) {
                 headers.forEach { header ->
@@ -277,9 +282,11 @@ Column {
             )
             .clickable {
                 val (firstKeys, secondKeys) = getSeparateKeys(selectedCells)
-                val finalVouchers = firstKeys.map { itt -> rows[itt.toInt()].voucherNumber.toString() }
-                viewmodel.proceedToNextOutgoing(finalVouchers , secondKeys)
-                navController.navigate(AllScreens.OutgoingSecondScreen.name) }
+                val finalVouchers =
+                    firstKeys.map { itt -> rows[itt.toInt()].voucherNumber.toString() }
+                viewmodel.proceedToNextOutgoing(finalVouchers, secondKeys)
+                navController.navigate(AllScreens.OutgoingSecondScreen.name)
+            }
 
             , shape = RoundedCornerShape(5.dp) , color =Color(0xFF23C45E) ){
             Text(text = "Proceed" ,modifier = Modifier

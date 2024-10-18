@@ -356,7 +356,7 @@ fun storeOrRetrieve(accNumber: String, navController: NavHostController, viewmod
                 Surface(
                     modifier = Modifier
                         .padding()
-                        .clickable {  navController.navigate(AllScreens.OutgoingStockScreen.name) }
+                        .clickable { navController.navigate(AllScreens.OutgoingStockScreen.name) }
                 ) {
                     Text(
                         text = "Outgoing", modifier = Modifier
@@ -596,14 +596,12 @@ fun storeOrRetrieve(accNumber: String, navController: NavHostController, viewmod
                 securePolicy = SecureFlagPolicy.Inherit,
                 isFocusable = true,
                 shouldDismissOnBackPress = true,
-            ),
+            )
 
 
             ) {
-            Box(modifier = Modifier.height(700.dp)) {
-                finalConfirmation {
-                    // TODO:
-                }
+            finalConfirmation {
+
             }
         }
 

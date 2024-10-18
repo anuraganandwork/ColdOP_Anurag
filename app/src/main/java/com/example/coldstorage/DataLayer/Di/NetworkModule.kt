@@ -130,6 +130,11 @@ class AuthInterceptor @Inject constructor( @ApplicationContext private  val cont
             return listOf()
         }
     }
+
+
+    public fun clearSelectedCell(){
+        sharedPrefSelectedStock.edit().clear().apply()
+    }
 }
 
 

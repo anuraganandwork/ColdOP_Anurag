@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -107,7 +108,6 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                 .padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween){
                 Surface(modifier = Modifier
                     .width(160.dp)
-                    .height(95.dp)
 
                     .clickable { when(farmerData){
                         is FarmerApiState.success ->{
@@ -117,14 +117,11 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                         else ->{
                             Log.d("Errrr","erererere")
                         }
-                    } }) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 15.dp), // Padding inside the Surface
-                    ) {
+                    } } ,
+                    shape = RoundedCornerShape(13.dp)) {
+
                         Text(
-                            text = "Manage stocks",
+                            text = "Manage \n stocks",
                             color = Color.Black, // Text color
                             maxLines = 2, // Ensure text can wrap to two lines
                             overflow = TextOverflow.Ellipsis, // Handle overflow
@@ -132,11 +129,12 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                                 .background(Color.Green)
                                 .padding(horizontal = 15.dp, vertical = 15.dp) // Padding around the text
                         )
-                    }                }
+                                   }
                 Surface(modifier = Modifier
                     .width(160.dp)
 
-                    .clickable { }) {
+                    .clickable { } ,
+                    shape = RoundedCornerShape(13.dp)) {
                     Text(text = "Manage payments", modifier = Modifier
                         .background(Color.Green)
                         .padding(horizontal = 15.dp, vertical = 15.dp))

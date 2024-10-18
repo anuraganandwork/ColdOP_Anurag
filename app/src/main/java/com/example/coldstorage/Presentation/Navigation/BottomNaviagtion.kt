@@ -132,7 +132,7 @@ fun bottomNav(){
             }
 
             composable(route = AllScreens.OutgoingSecondScreen.name){
-                OutgoingSecondScreen(viewmodel)
+                OutgoingSecondScreen(viewmodel, navHostController)
             }
 
 
