@@ -7,6 +7,8 @@ import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderRespon
 
 
 data class  forSecondOutgoingPage(
+    val orderId :String,
+
     val dateOfSubmission : String,
     val voucherNum : Int ,
     val address : Location ,
@@ -20,6 +22,7 @@ fun mapDataForSecondOutgoingPage(recipts: List<Order>) : MutableList<forSecondOu
         order.orderDetails.forEach {
             rows.add(
                 forSecondOutgoingPage(
+                    orderId=  order._id,
                     dateOfSubmission = order.dateOfSubmission ,
                     voucherNum = order.voucher.voucherNumber,
                     address = it.location,

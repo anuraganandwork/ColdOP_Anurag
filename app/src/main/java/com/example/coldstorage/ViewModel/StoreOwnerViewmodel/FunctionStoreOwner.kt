@@ -5,7 +5,9 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coldstorage.DataLayer.Api.BagSize
@@ -20,8 +22,11 @@ import com.example.coldstorage.DataLayer.Api.PopulatedFarmer
 import com.example.coldstorage.DataLayer.Api.Quantity
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Order
+import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import com.example.coldstorage.DataLayer.Di.AuthInterceptor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -135,6 +140,8 @@ class FunctionStoreOwner @Inject constructor(
             try {
                 val response = api.getSingleFarmer(farmerId)
                 if(response.isSuccessful){
+                    response.body()?.farmerInfo?.let { Log.d("farmerInfo" , it._id) }
+
                     _farmerdata.value = if (response.isSuccessful) {
                         FarmerApiState.success(response.body()?.farmerInfo) //to learn
                     } else {
@@ -161,6 +168,7 @@ class FunctionStoreOwner @Inject constructor(
 
     fun createIncomingOrder(){
         viewModelScope.launch {
+            Log.d("farmerAcc" , farmerAcc.value)
             val incomingOrderData = IncomingOrderData(
                 coldStorageId = authIntercepter.getStore_id("store")!!,
                 //coldStorageId = "64f94fbb789b9f26bc3a1a20",
@@ -235,9 +243,10 @@ class FunctionStoreOwner @Inject constructor(
 
     //function for getting the recipts
 
+    @SuppressLint("SuspiciousIndentation")
     fun getAllRecipts(farmerId: String){
         viewModelScope.launch {
-_transactionHistory.value = getAllReciptsResponse.loading
+       _transactionHistory.value = getAllReciptsResponse.loading
 
              try {
                  val response = api.getOldReciepts(farmerId)
@@ -283,13 +292,39 @@ _transactionHistory.value = getAllReciptsResponse.loading
         authIntercepter.clearSelectedCell()
     }
 
+    //
+    var outgoingItemState: MutableState<OutgoingDataClassItem> = mutableStateOf(
+        OutgoingDataClassItem(
+            orderId = "",
+            variety = "",
+            bagUpdates = emptyList()
+        )
+    )
+
+    val bagUpdateState : MutableState<BagUpdate> = mutableStateOf(
+        BagUpdate("" , 0)
+    )
+
+    fun updateBagdata (newItem : BagUpdate){
+        bagUpdateState.value = newItem
+    }
+
+    // Function to update the state of OutgoingDataClassItem
+    fun updateOutgoingItem(newItem: OutgoingDataClassItem) {
+        outgoingItemState.value = newItem
+    }
+
+    // Function to update bag updates within the outgoing item
+    fun updateBagUpdates(newBagUpdates: List<BagUpdate>) {
+        outgoingItemState.value = outgoingItemState.value.copy(bagUpdates = newBagUpdates)
+    }
     fun confirmOutgoingOrder(farmerId : String  ){
         viewModelScope.launch {
 
-            val bagUpdates = listOf(BagUpdate( "Goli", 50))
-            val orderItems = listOf(OutgoingDataClassItem( "66f587d254d44f78c70ff9c1", "Pukhraj",bagUpdates))
+            val bagUpdates = listOf(BagUpdate( "Goli", 10))
+            val orderItems = listOf(OutgoingDataClassItem( "6713fb4f8082c69227ec72dc", "Pukhraj",bagUpdates))
            // val outgoingData = OutgoingDataClassBody(orderItems)
-         Log.d("OutgoingSuccess" , orderItems.toString())
+            Log.d("OutgoingSuccess" , orderItems.toString())
             try {
                 val response = api.confirmOutgoingOrder(farmerId, orderItems)
                 if (response.isSuccessful) {
@@ -305,6 +340,42 @@ _transactionHistory.value = getAllReciptsResponse.loading
             }
         }
     }
+
+
+
+    // viewmodel function for searching farmers
+
+    var searchResults by mutableStateOf<List<SearchResultsData>>(emptyList<SearchResultsData>())
+
+    private var searchJob : Job? = null
+
+
+    fun onSearchQuery( query :String){
+        if(query.length > 3){
+            searchJob?.cancel()
+            searchJob = viewModelScope.launch {
+                delay(300)
+                 searchFarmers(query)
+            }
+        } else{
+            searchResults = emptyList<SearchResultsData>()
+        }
+    }
+
+    private suspend fun searchFarmers(query:String){
+     try{
+        val response = api.searchFarmers(query)
+         searchResults = response
+     } catch (e : Exception){
+          Log.d("Searching" , "Error is "+e)
+          //
+
+
+     }
+    }
+
+
+
 
 }
 

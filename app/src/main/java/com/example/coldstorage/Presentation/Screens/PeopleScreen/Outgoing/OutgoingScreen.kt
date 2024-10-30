@@ -25,6 +25,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -135,14 +136,14 @@ fun DropdownMenu_(
 
 @Composable
 fun StockTable(viewmodel: FunctionStoreOwner  , navController: NavController) {
-    val headers = listOf("Voucher", "Variety", "Goli", "No. 12", "Ration", "Goli", "Cut & Tok", "Total")
+    val headers = listOf("Voucher", "Variety", "Seed", "No.12", "Ration","Goli", "Cut&Tok", "Total")
     val selectedBlock =  remember { mutableStateOf(Color.White) }
    val selectedCells  = remember {
        mutableStateMapOf<Pair<Int , Int> , Boolean>()
    }
     val transactionAllHistory = viewmodel.transactionHistory.collectAsState() // to learn
   LaunchedEffect(Unit){
-      viewmodel.getAllRecipts("66eab27610eb613c2efca3bc")
+      viewmodel.getAllRecipts("66eab1db10eb613c2efca385")
   }
 
     var rows by mutableStateOf<List<ReceiptRow>>(emptyList())
@@ -176,9 +177,11 @@ Column(modifier = Modifier
 
                     Text(
                         text = header,
-                        modifier = Modifier.weight(1f),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        fontSize = 8.sp,
+
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
@@ -192,15 +195,17 @@ Column(modifier = Modifier
                 Text(
                     text = row.voucherNumber.toString(), // First column - voucher number
                     modifier = Modifier
-                        .padding(horizontal = 5.dp)
-                        .weight(1f)
+                        .padding(start = 3.dp)
+                        .width(30.dp)
                 )
 
                 Text(
                     text = row.variety, // Second column - variety
                     modifier = Modifier
-                        .padding(horizontal = 5.dp)
-                        .weight(1f)
+                        .padding(start = 3.dp)
+                        .width(50.dp)
+                        ,
+                    fontSize = 11.sp
                 )
 //                listOf(row.size, row.currentQuantity /* Add other fields if needed */).forEachIndexed { index, cell ->
 //                    Log.d("Outgoing" , index.toString())
@@ -246,6 +251,8 @@ Column(modifier = Modifier
                         selectedCells[Pair(rowIndex, 5)] = isSelected
                     }
                 )
+                Spacer(modifier = Modifier.padding(start = 3.dp))
+
                 ClickableBlock(
                     cell = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0",
                     isSelected = selectedCells[Pair(rowIndex, 6)]
@@ -260,6 +267,7 @@ Column(modifier = Modifier
                         it.quantity?.currentQuantity ?: 0
                     } // Safely access currentQuantity and sum them
 
+                Spacer(modifier = Modifier.padding(start = 10.dp))
                 ClickableBlock(
                     cell = totalQuantity.toString(),
                     isSelected = selectedCells[Pair(rowIndex, 7)]

@@ -4,11 +4,13 @@ import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.IncomingOrderResponse
+import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ColdOpApi {
 
@@ -54,6 +56,10 @@ interface ColdOpApi {
 
  @POST("api/store-admin/farmers/{id}/outgoing") //create new outgoing order
  suspend fun confirmOutgoingOrder(@Path("id") farmerId: String ,  @Body requestBody :  List<OutgoingDataClassItem>) : Response<OutgoingResponse>
+
+
+  @GET("api/store-admin/66e1f22d782bbd67d3446805/farmers/search")
+  suspend fun searchFarmers(@Query("query") query: String): List<SearchResultsData>
 
 }
 

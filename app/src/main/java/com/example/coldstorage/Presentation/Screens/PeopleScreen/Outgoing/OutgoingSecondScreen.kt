@@ -37,9 +37,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Location
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.forSecondOutgoingPage
@@ -56,9 +58,9 @@ fun OutgoingSecondScreen(viewmodel: FunctionStoreOwner , navController: NavContr
     var goliBags by remember { mutableStateOf("0") }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-  val showBottomSheet = remember {
+    val showBottomSheet = remember {
       mutableStateOf(false)
-  }
+    }
 
 
     Scaffold(
@@ -103,8 +105,9 @@ fun OutgoingSecondScreen(viewmodel: FunctionStoreOwner , navController: NavContr
         Button(
             onClick = {
                 Log.d("OutgoingSuccess" , "Pressed button")
-  showBottomSheet.value = true
-                viewmodel.confirmOutgoingOrder("66eab27610eb613c2efca3bc" )  },
+                showBottomSheet.value = true
+                viewmodel.confirmOutgoingOrder("66eab1db10eb613c2efca385" )
+                      viewmodel.clearSelectedCells()},
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("Proceed")
@@ -166,10 +169,11 @@ fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
 @Composable
 fun StockTablee(viewmodel: FunctionStoreOwner) {
     val transactionHistory = viewmodel.transactionHistory.collectAsState()
+    val outgoingItem by viewmodel.outgoingItemState
 
     LaunchedEffect(Unit){
 
-        viewmodel.getAllRecipts("66eab27610eb613c2efca3bc")
+        viewmodel.getAllRecipts("66eab1db10eb613c2efca385")
 
         Log.d("OutgoingSh" , viewmodel.getTheSelectedStock().toString())
         Log.d("OutgoingSh" , viewmodel.getTheSelectedIndex().toString())
@@ -177,21 +181,53 @@ fun StockTablee(viewmodel: FunctionStoreOwner) {
     }
 
     val SelectedVoucherNumber = viewmodel.getTheSelectedStock()
+    Log.d("SelectedVoucher" ,SelectedVoucherNumber.toString())
     val selectedColumns = viewmodel.getTheSelectedIndex()
     var rows = mutableListOf<forSecondOutgoingPage>()
+//    val uniqueVoucherSizePairs = rows.flatMap { row ->
+//        row.bagsizeData.map { bagSize ->
+//            Pair(row.voucherNum, bagSize.size)
+//        }
+//    }.distinct() // Ensure we have unique pairs
 
-
+    // Step 2: Initialize the mutable state for each unique pair
+//    var quantityValues by remember {
+//        mutableStateOf(uniqueVoucherSizePairs.map { "" })
+//    }
     when(val state = transactionHistory.value){
         is getAllReciptsResponse.success ->{
             val filteredData = state.reciptData.filter { recipt ->
                 recipt.voucher.voucherNumber.toString() in SelectedVoucherNumber
             }
+            Log.d("FilteredId" , filteredData.toString())
             rows = mapDataForSecondOutgoingPage(filteredData)
+            Log.d("roowa" , rows.toString())
         }
         else ->{
             Log.d("Outgoing second " , "XXXXXX")
         }
     }
+    val voucherBagSizePairs = rows.flatMap { row ->
+        row.bagsizeData.map { bagSize ->
+            VoucherBagSizePair(
+                orderId = row.orderId,
+                voucherNum = row.voucherNum,
+                bagSize = bagSize.size,
+                date = row.dateOfSubmission,
+                address = row.address,
+                currentQuantity = bagSize.quantity.currentQuantity
+
+            )
+        }
+    }.distinctBy { it.voucherNum to it.bagSize }
+
+    // State for storing input values
+    var quantityValues by remember {
+        mutableStateOf(voucherBagSizePairs.associate {
+            (it.voucherNum to it.bagSize) to ""
+        })
+    }
+
 
     val headers = listOf("Dated", "Address", "Bag Type", "Current bags", "Quantity Reqd.")
     val data = listOf(
@@ -203,7 +239,10 @@ fun StockTablee(viewmodel: FunctionStoreOwner) {
     ///val editableValues = remember { mutableStateListOf<String>() }
     // Initialize the list with empty strings
 
-    var quantityValues by remember { mutableStateOf(data.map { it[4] }) }
+
+
+    //add rows here instead of data
+    //var quantityValues by remember { mutableStateOf(data.map { it[4] }) }
 
 //    LaunchedEffect(data) {
 //        editableValues.clear()
@@ -220,113 +259,185 @@ fun StockTablee(viewmodel: FunctionStoreOwner) {
             headers.forEach { header ->
                 Text(
                     text = header,
+
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+
+                    fontSize = 11.sp,
+                    modifier = Modifier.padding(horizontal = 5.dp)
+
                 )
             }
         }
-        LazyColumn {
-            items(rows.size) { index  ->
-                val row = rows[index]
-                selectedColumns.forEachIndexed { index, s ->
-
-                Row(modifier = Modifier.fillMaxWidth()) {
-//                    row.forEachIndexed  { Cellindex ,  cell ->
+//        LazyColumn {
+//            items(uniqueVoucherSizePairs.size) { index  ->
+//                val row = rows[index]
+//                Log.d("Rrroro" , row.toString())
+//                selectedColumns.forEachIndexed { index, s ->
 //
-//                        when {
-//                            Cellindex == 4 ->{
-//                                //on change methods
-//                                BasicTextField(
-//                                    value = quantityValues[index] ,
-//                                    onValueChange = { newValue ->
-//                                        quantityValues = quantityValues.toMutableList().also { it[index] = newValue }
-//                                    },
-//                                    modifier = Modifier
-//                                        .width(110.dp)
-//                                        .height(40.dp)
-//                                        .padding(vertical = 4.dp)
-//                                        .border(1.dp, Color.Gray, RoundedCornerShape(5.dp))
-//                                    //.padding(horizontal = 8.dp, vertical = 12.dp), // Adjust padding to vertically center the text
+//                Row(modifier = Modifier.fillMaxWidth()) {
+////                    row.forEachIndexed  { Cellindex ,  cell ->
+////
+////                        when {
+////                            Cellindex == 4 ->{
+////                                //on change methods
+////                                BasicTextField(
+////                                    value = quantityValues[index] ,
+////                                    onValueChange = { newValue ->
+////                                        quantityValues = quantityValues.toMutableList().also { it[index] = newValue }
+////                                    },
+////                                    modifier = Modifier
+////                                        .width(110.dp)
+////                                        .height(40.dp)
+////                                        .padding(vertical = 4.dp)
+////                                        .border(1.dp, Color.Gray, RoundedCornerShape(5.dp))
+////                                    //.padding(horizontal = 8.dp, vertical = 12.dp), // Adjust padding to vertically center the text
+////
+////                                    , textStyle = TextStyle(textAlign = TextAlign.Center),
+////                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+////                                    , maxLines = 1 ,
+////                                    decorationBox = { innerTextField ->
+////                                        Box(
+////                                            contentAlignment = Alignment.Center,
+////                                            modifier = Modifier.fillMaxSize()
+////                                        ) {
+////                                            innerTextField()
+////                                        }
+////                                    }
+////                                )
+////                            } else ->  Text(
+////                            text = cell,
+////                            modifier = Modifier.weight(1f)
+////                        )
+////                        }
+////
+////                    }
 //
-//                                    , textStyle = TextStyle(textAlign = TextAlign.Center),
-//                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-//                                    , maxLines = 1 ,
-//                                    decorationBox = { innerTextField ->
-//                                        Box(
-//                                            contentAlignment = Alignment.Center,
-//                                            modifier = Modifier.fillMaxSize()
-//                                        ) {
-//                                            innerTextField()
-//                                        }
-//                                    }
-//                                )
-//                            } else ->  Text(
-//                            text = cell,
+//
+//
+//                        Text(
+//                            text = row.dateOfSubmission,
 //                            modifier = Modifier.weight(1f)
 //                        )
-//                        }
+//
+//
+//                        Text(
+//                            text = row.address.chamber + "-" + row.address.floor + "-" + row.address.row,
+//                            modifier = Modifier.weight(1f)
+//                        )
+//                        val variety = if(s == "2") "Seed"
+//                        else if (s == "3") "Number-12"
+//                        else if(s == "4") "Ration"
+//                        else if (s =="5") "Goli"
+//                        else "Cut-Tok"
+//                    val matchingBagSize = row.bagsizeData.find { it.size == variety }
+//                    Log.d("Ouut" ,matchingBagSize.toString() + row.bagsizeData.toString() )
+//                        Text(
+//                            text = matchingBagSize?.size ?: "",
+//                            modifier = Modifier.weight(1f)
+//                        )
+//                    Text(
+//                        text = matchingBagSize?.quantity?.currentQuantity?.toString() ?: "0", // Display currentQuantity or 0 if no match
+//                        modifier = Modifier.weight(1f)
+//                    )
+//                    BasicTextField(
+//                            value = quantityValues[index],
+//                            onValueChange = { newValue ->
+//                                quantityValues =
+//                                    quantityValues.toMutableList().also { it[index] = newValue }
+//                            },
+//                            modifier = Modifier
+//                                .width(110.dp)
+//                                .height(40.dp)
+//                                .padding(vertical = 4.dp)
+//                                .border(1.dp, Color.Gray, RoundedCornerShape(5.dp))
+//                            //.padding(horizontal = 8.dp, vertical = 12.dp), // Adjust padding to vertically center the text
+//
+//                            ,
+//                            textStyle = TextStyle(textAlign = TextAlign.Center),
+//                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                            maxLines = 1,
+//                            decorationBox = { innerTextField ->
+//                                Box(
+//                                    contentAlignment = Alignment.Center,
+//                                    modifier = Modifier.fillMaxSize()
+//                                ) {
+//                                    innerTextField()
+//                                }
+//                            }
+//                        )
 //
 //                    }
-
-
-
-                        Text(
-                            text = row.dateOfSubmission,
-                            modifier = Modifier.weight(1f)
-                        )
-
-
-                        Text(
-                            text = row.address.chamber + "-" + row.address.floor + "-" + row.address.row,
-                            modifier = Modifier.weight(1f)
-                        )
-                        val variety = if(s == "2") "Seed"
-                        else if (s == "3") "number-12"
-                        else if(s == "4") "Ration"
-                        else if (s =="5") "Goli"
-                        else "Cut & Tok"
-                    val matchingBagSize = row.bagsizeData.find { it.size == variety }
-          Log.d("Ouut" ,matchingBagSize.toString() + row.bagsizeData.toString() )
-                        Text(
-                            text = matchingBagSize?.size ?: "",
-                            modifier = Modifier.weight(1f)
-                        )
+//
+//
+//                }
+//            }
+//        }
+        LazyColumn {
+            items(voucherBagSizePairs) { pair ->
+                Log.d("Rowwww" ,voucherBagSizePairs.toString())
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = matchingBagSize?.quantity?.currentQuantity?.toString() ?: "0", // Display currentQuantity or 0 if no match
-                        modifier = Modifier.weight(1f)
+                        text = pair.date,
+                        modifier = Modifier.weight(1f),
+                        fontSize = 12.sp
                     )
-                        BasicTextField(
-                            value = quantityValues[index],
-                            onValueChange = { newValue ->
-                                quantityValues =
-                                    quantityValues.toMutableList().also { it[index] = newValue }
-                            },
-                            modifier = Modifier
-                                .width(110.dp)
-                                .height(40.dp)
-                                .padding(vertical = 4.dp)
-                                .border(1.dp, Color.Gray, RoundedCornerShape(5.dp))
-                            //.padding(horizontal = 8.dp, vertical = 12.dp), // Adjust padding to vertically center the text
-
-                            ,
-                            textStyle = TextStyle(textAlign = TextAlign.Center),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            maxLines = 1,
-                            decorationBox = { innerTextField ->
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier.fillMaxSize()
-                                ) {
-                                    innerTextField()
-                                }
+                    Text(
+                        text = "${pair.address.chamber}-${pair.address.floor}-${pair.address.row}",
+                        modifier = Modifier.weight(1f),
+                        fontSize = 12.sp
+                    )
+                    Text(
+                        text = pair.bagSize,
+                        modifier = Modifier.weight(1f),
+                        fontSize = 12.sp
+                    )
+                    Text(
+                        text = pair.currentQuantity.toString(),
+                        modifier = Modifier.weight(1f),
+                        fontSize = 12.sp
+                    )
+                    BasicTextField(
+                        value = quantityValues[pair.voucherNum to pair.bagSize] ?: "",
+                        onValueChange = { newValue ->
+                            quantityValues = quantityValues.toMutableMap().apply {
+                                put(pair.voucherNum to pair.bagSize, newValue)
                             }
-                        )
-
-                    }
-
-
+                        },
+                        modifier = Modifier
+                            .width(80.dp)
+                            .height(40.dp)
+                            .border(1.dp, Color.Gray, RoundedCornerShape(5.dp)),
+                        textStyle = TextStyle(
+                            textAlign = TextAlign.Center,
+                            fontSize = 12.sp
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        maxLines = 1,
+                        decorationBox = { innerTextField ->
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                innerTextField()
+                            }
+                        }
+                    )
                 }
-            }
-        }
+
     }
-}
+}}}
+
+data class VoucherBagSizePair(
+    val orderId : String,
+    val voucherNum: Int,
+    val bagSize: String,
+    val date: String,
+    val address: Location,
+    val currentQuantity: Int
+)

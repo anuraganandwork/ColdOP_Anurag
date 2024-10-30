@@ -87,7 +87,7 @@ Column(modifier = Modifier.padding(
     
     LazyColumn(){
         items(listOfFarmer){farmer->
-           if (farmer != null){0
+           if (farmer != null){
                farmerCard(farmerName = farmer.name, fatherName = farmer.address, accNum = farmer._id, navController = navController , showAcc = true)
 
            }

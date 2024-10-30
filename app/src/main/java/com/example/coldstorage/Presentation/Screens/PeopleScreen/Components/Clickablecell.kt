@@ -22,9 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 
 @Composable
 fun ClickableBlock(cell: String ,  isSelected: Boolean,
@@ -33,8 +33,8 @@ fun ClickableBlock(cell: String ,  isSelected: Boolean,
     var selectedBlock = remember { mutableStateOf(Color.White) }
 
     Surface(modifier = Modifier
-        .width(34.dp)
-        .padding(start = 5.dp, top = 3.dp, end = 0.dp)
+        .width(37.dp)
+        .padding(start = 6.dp, top = 3.dp, end = 4.dp)
         .clickable {   onToggle(!isSelected) }) {
         Column(modifier = Modifier
             .fillMaxWidth()
