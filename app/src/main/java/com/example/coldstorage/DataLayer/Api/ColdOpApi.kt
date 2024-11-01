@@ -1,5 +1,6 @@
 package com.example.coldstorage.DataLayer.Api
 
+import com.example.coldstorage.DataLayer.Api.GetRecieptNumberdata.RecieptNumData
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
@@ -60,6 +61,9 @@ interface ColdOpApi {
 
   @GET("api/store-admin/66e1f22d782bbd67d3446805/farmers/search")
   suspend fun searchFarmers(@Query("query") query: String): List<SearchResultsData>
+
+  @GET("api/store-admin/receipt-number")
+  suspend fun getRecieptNum():Response<RecieptNumData>
 
 }
 

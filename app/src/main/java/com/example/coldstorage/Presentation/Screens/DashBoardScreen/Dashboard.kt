@@ -120,39 +120,7 @@ fun Dashboard(viewmodel: FunctionStoreOwner = hiltViewModel()){
                 isFocusable = true,
                 shouldDismissOnBackPress = true
             )){
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)) {
-                // Search TextField
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = {
-                        query = it
-                        viewmodel.onSearchQuery(query)
-                    },
-                    label = { Text("Search farmers") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Display search results
-//                LazyColumn(modifier = Modifier.fillMaxSize()) {
-//                    items(viewmodel.searchResults){
-//                        Text(text = it.)
-//                    }
-//                }
-                LazyColumn(){
-                    items(viewmodel.searchResults){
-                        Column {
-                            Text(text = it.name)
-                            Text(text = it.mobileNumber)
-
-                        }
-
-                    }
-                }
-            }
+            FirstBottomSheet(viewmodel = viewmodel)
             }
 
 
@@ -171,3 +139,5 @@ fun prevDay(){
 //406
 
 // work on the debouncing feature using jobs ,also  what is debouncing
+
+//1223- 123

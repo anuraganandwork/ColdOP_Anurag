@@ -7,7 +7,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coldstorage.DataLayer.Api.BagSize
@@ -372,6 +375,26 @@ class FunctionStoreOwner @Inject constructor(
 
 
      }
+    }
+
+
+   private val _currentReciptNum = MutableStateFlow(0)
+    val currentRecieptNum : StateFlow<Int>  =  _currentReciptNum.asStateFlow()
+     fun getRecieptNumbers(){
+        viewModelScope.launch {
+            try {
+                val response = api.getRecieptNum()
+                if (response.isSuccessful){
+                    Log.d("Response recipt" , " Recipet num is "+response.body()?.receiptNumber + " Status " +response.body()?.status)
+                    _currentReciptNum.value = response.body()?.receiptNumber!!
+                } else
+                {
+                    Log.d("Response recipt" , response.errorBody().toString())
+                }
+            } catch (e : Exception){
+                Log.d("Response recipt" , "In the cathc block "+e.message)
+            }
+        }
     }
 
 
