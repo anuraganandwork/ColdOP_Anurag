@@ -20,6 +20,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +29,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -75,8 +78,18 @@ Column(modifier = Modifier.padding(
 )) {
     TextField(value =farmerName.value , onValueChange = {name ->farmerName.value= name},
         label = { Text(text = "Search by name or mobile")
-    }, modifier = Modifier.fillMaxWidth() , keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onSearch = {keyboardController?.hide()})
+    }, modifier = Modifier.fillMaxWidth()
+            , keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = {keyboardController?.hide()}),
+        colors = TextFieldDefaults.textFieldColors(
+             // Text color inside the text field
+            containerColor = Color.Transparent, // Background color (transparent if desired)
+            cursorColor = Color.Black, // Cursor color
+            focusedIndicatorColor = Color.Black, // Border color when focused
+            unfocusedIndicatorColor = Color.Black, // Border color when unfocused
+            focusedLabelColor = Color.White, // Label color when focused
+            unfocusedLabelColor = Color.Gray // Label color when unfocused
+        )
         )
     Spacer(modifier = Modifier.padding(10.dp))
     Row(){

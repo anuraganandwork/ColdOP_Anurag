@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.coldstorage.DataLayer.Api.BagSize
 import com.example.coldstorage.DataLayer.Api.ColdOpApi
 import com.example.coldstorage.DataLayer.Api.FarmerInfo
@@ -28,12 +29,14 @@ import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderRespon
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import com.example.coldstorage.DataLayer.Di.AuthInterceptor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -167,82 +170,101 @@ class FunctionStoreOwner @Inject constructor(
     }
 
 
+    private val _loading = MutableStateFlow<Boolean>(false)
+    val loading : StateFlow<Boolean> =  _loading.asStateFlow()
+  private val _orderResult = MutableStateFlow<Result<Unit>?>(null)
+    val orderResult = _orderResult.asStateFlow()
 
-
-    fun createIncomingOrder(){
+    fun createIncomingOrderForUi(){
         viewModelScope.launch {
-            Log.d("farmerAcc" , farmerAcc.value)
-            val incomingOrderData = IncomingOrderData(
-                coldStorageId = authIntercepter.getStore_id("store")!!,
-                //coldStorageId = "64f94fbb789b9f26bc3a1a20",
-                dateOfSubmission = "24.09.2024",
-                farmerId = farmerAcc.value,
-                orderDetails = listOf(
-                    OrderDetail(
-                        bagSizes = listOf(
-                            BagSize(
-                                quantity = Quantity(
-                                    currentQuantity = seedBags.value.toInt(),
-                                    initialQuantity = seedBags.value.toInt()
-                                ),
-                                size = "Seed"
-                            ),
-                            BagSize(
-                                quantity = Quantity(
-                                    currentQuantity = goli.value.toInt(),
-                                    initialQuantity = goli.value.toInt()
-                                ),
-                                size = "Goli"
-                            ),
-                            BagSize(
-                                quantity = Quantity(
-                                    currentQuantity = Ration.value.toInt(),
-                                    initialQuantity = Ration.value.toInt()
-                                ),
-                                size = "Ration"
-                            ),
-                            BagSize(
-                                quantity = Quantity(
-                                    currentQuantity = cuttok.value.toInt(),
-                                    initialQuantity = cuttok.value.toInt()
-                                ),
-                                size = "CutTok"
-                            ),
-                            BagSize(
-                                quantity = Quantity(
-                                    currentQuantity = twelveNumber.value.toInt(),
-                                    initialQuantity = twelveNumber.value.toInt()
-                                ),
-                                size = "12No."
-                            )
-                        ),
-                        location = Location(
-                            chamber =  chamber.value,
-                            floor = floor.value,
-                            row = row.value
-                        ),
-                        variety = variety.value
-                    )
-                ),
-                voucherNumber = 123322 // Replace with actual voucher number
-            )
+           val result = createIncomingOrder()
+            _orderResult.value = result
+        }
+    }
+    suspend fun createIncomingOrder(): Result<Unit> {
+        return withContext(Dispatchers.IO) {  // Use withContext for suspend function
             try {
-                val response = api.createIncomingOrder(incomingOrderData = incomingOrderData)
-                Log.d("Success", "Cold store id  "+authIntercepter.getStore_id("store"))
+                _loading.value = true
+                Log.d("farmerAcc", farmerAcc.value)
+                val incomingOrderData = IncomingOrderData(
+                    coldStorageId = authIntercepter.getStore_id("store")!!,
+                    dateOfSubmission = "24.09.2024",
+                    farmerId = farmerAcc.value,
+                    orderDetails = listOf(
+                        OrderDetail(
+                            bagSizes = listOf(
+                                BagSize(
+                                    quantity = Quantity(
+                                        currentQuantity = seedBags.value.toInt(),
+                                        initialQuantity = seedBags.value.toInt()
+                                    ),
+                                    size = "Seed"
+                                ),
+                                BagSize(
+                                    quantity = Quantity(
+                                        currentQuantity = goli.value.toInt(),
+                                        initialQuantity = goli.value.toInt()
+                                    ),
+                                    size = "Goli"
+                                ),
+                                BagSize(
+                                    quantity = Quantity(
+                                        currentQuantity = Ration.value.toInt(),
+                                        initialQuantity = Ration.value.toInt()
+                                    ),
+                                    size = "Ration"
+                                ),
+                                BagSize(
+                                    quantity = Quantity(
+                                        currentQuantity = cuttok.value.toInt(),
+                                        initialQuantity = cuttok.value.toInt()
+                                    ),
+                                    size = "CutTok"
+                                ),
+                                BagSize(
+                                    quantity = Quantity(
+                                        currentQuantity = twelveNumber.value.toInt(),
+                                        initialQuantity = twelveNumber.value.toInt()
+                                    ),
+                                    size = "12No."
+                                )
+                            ),
+                            location = Location(
+                                chamber = chamber.value,
+                                floor = floor.value,
+                                row = row.value
+                            ),
+                            variety = variety.value
+                        )
+                    ),
+                    voucherNumber = currentRecieptNum.value
+                )
 
-                if (response.isSuccessful){
-                    Log.d("Success", "order created successfully")
+                val response = api.createIncomingOrder(incomingOrderData = incomingOrderData)
+                Log.d("Success data", incomingOrderData.toString())
+                Log.d("Success", "Cold store id  " + authIntercepter.getStore_id("store"))
+
+                if (response.isSuccessful) {
+                    Log.d("Success", "Order created successfully")
+                    Result.success(Unit)
+                } else {
+                    Log.d("ErrorOrder",
+                        "Order not created successfully. Error: ${response.errorBody()?.string()} - ${response.message()}"
+                    )
+                    Result.failure(Exception("Failed to create order :("))
                 }
-                else{
-                    Log.d("ErrorOrder", "order not created successfully error: "+response)
-                }
-            } catch (e: Exception){
-                Log.d("ErrorLog", " Order in the catch block  "+e)
+            } catch (e: Exception) {
+                Log.d("ErrorLog", "Order in the catch block: $e")
+                Result.failure(e)
+            } finally {
+                _loading.value = false
             }
         }
     }
 
-
+    fun resetOrderResult() {
+        _orderResult.value = null
+    }
 
     //function for getting the recipts
 

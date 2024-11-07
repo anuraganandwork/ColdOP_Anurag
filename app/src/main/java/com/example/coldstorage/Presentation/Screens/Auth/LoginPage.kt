@@ -6,7 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,16 +27,41 @@ import com.example.coldstorage.DataLayer.Api.logInData
 import com.example.coldstorage.Presentation.Navigation.Sections
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
+import com.example.coldstorage.ui.theme.primeGreen
 
 @Composable
 fun CustomLoginPage(navController: NavController, viewModel: AuthViewmodel = hiltViewModel()) {
     var mobileNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val loadingLogIn  = viewModel.loadingLogIn.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     LaunchedEffect(Unit ){
 
     }
-   var sharedPreference =
+ //  var sharedPreference =
+    if (errorMessage != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissError() },
+            title = {
+                Text(
+                    text = "Login Failed",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            },
+            text = {
+                Text(errorMessage ?: "")
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.dismissError() }) {
+                    Text("OK")
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -45,6 +74,7 @@ fun CustomLoginPage(navController: NavController, viewModel: AuthViewmodel = hil
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+
             Text(
                 text = "Login",
                 fontSize = 32.sp,
@@ -86,10 +116,10 @@ fun CustomLoginPage(navController: NavController, viewModel: AuthViewmodel = hil
 
                     navController.navigate(Sections.StoreOwner.route)}
                     else{
-                        Log.d(".","Error in log in"+viewModel.logInStatus.value)
+                        Log.d("Loginerror"," "+viewModel.logInStatus.value)
                     }
 
-                          },
+                          },loadingLogIn = loadingLogIn.value ,
                 text = "Log In"
             )
         }
@@ -140,22 +170,35 @@ fun CustomTextField(
 @Composable
 fun CustomButton(
     onClick: () -> Unit,
-    text: String
+    text: String ,
+    loadingLogIn : Boolean
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(Color(0xFF3498DB))
+            .background(primeGreen)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Box(
+            contentAlignment = Alignment.Center, // Centers the content within the Box
+            modifier = Modifier.fillMaxSize()     // Ensures Box takes full size of Surface
+        ) {
+            if (loadingLogIn) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp), // Small size for the indicator
+                    color = Color.White
+                )
+            } else {
+                Text(
+                    text = text,
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                )
+            }
+        }
     }
 }
+//Launched effect mein navigation use krna hai , start outgoing

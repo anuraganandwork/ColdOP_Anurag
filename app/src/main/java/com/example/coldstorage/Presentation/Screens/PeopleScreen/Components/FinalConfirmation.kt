@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.coldstorage.ui.theme.primeGreen
 
 @Composable
 fun finalConfirmation(goBackToProfile: ()-> Unit){
@@ -41,10 +44,24 @@ fun finalConfirmation(goBackToProfile: ()-> Unit){
         Text(text = "Your response has been submitted successfully.", fontWeight = FontWeight.Bold)
        Spacer(modifier = Modifier.padding(20.dp))
        
-        Surface(){
-            Text(text = "Go back to profile" , modifier = Modifier
-                .border(1.dp, Color.Green, RoundedCornerShape(10.dp))
-                .background(Color.Green, RoundedCornerShape(10.dp))
+//        Surface(){
+//            Text(text = "Go back to  home" , modifier = Modifier
+//                .border(1.dp, Color.Green, RoundedCornerShape(10.dp))
+//                .background(Color.Green, RoundedCornerShape(10.dp))
+//                .padding(horizontal = 20.dp, vertical = 10.dp)
+//                .height(40.dp)
+//                .wrapContentSize(align = Alignment.Center)
+//                , style = TextStyle(textAlign = TextAlign.Center, textDirection = TextDirection.Content)
+//            )
+//        }
+
+        Button(onClick = { goBackToProfile() } , colors = ButtonDefaults.buttonColors(
+            containerColor = primeGreen,
+            contentColor = Color.White
+        )) {
+            Text(text = "Go back to  home" , modifier = Modifier
+                //.border(1.dp, Color.Green, RoundedCornerShape(10.dp))
+                //.background(Color.Green, RoundedCornerShape(10.dp))
                 .padding(horizontal = 20.dp, vertical = 10.dp)
                 .height(40.dp)
                 .wrapContentSize(align = Alignment.Center)
@@ -63,3 +80,5 @@ fun finalConfirmation(goBackToProfile: ()-> Unit){
         }
     }}
 }
+
+//808

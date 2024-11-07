@@ -18,6 +18,9 @@ import com.example.coldstorage.DataLayer.Api.sendOtpResponse
 import com.example.coldstorage.DataLayer.Auth.AuthManager
 import com.example.coldstorage.DataLayer.Di.AuthInterceptor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -34,8 +37,8 @@ class AuthViewmodel @Inject constructor(
     private val _verificationResult = MutableLiveData<Boolean>()
     val verificationResult: LiveData<Boolean> = _verificationResult
 
-    private val _logInStatus = mutableStateOf("");
-    val logInStatus:MutableState<String> = _logInStatus
+    private val _logInStatus = MutableStateFlow<String>("")
+    val logInStatus: StateFlow<String> = _logInStatus.asStateFlow()
     fun sendOtp(mobileNumber: String) {
         viewModelScope.launch {
             try {
@@ -109,11 +112,23 @@ class AuthViewmodel @Inject constructor(
 
     }
 
+    private  val _loadingLogIn = MutableStateFlow<Boolean>(false)
+    val loadingLogIn: StateFlow<Boolean> = _loadingLogIn.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+//    private val _logInStatusLoader = MutableStateFlow<Boolean>(false)
+//    val logInStatusLoader: StateFlow<Boolean> = _logInStatusLoader.asStateFlow()
     @SuppressLint("SuspiciousIndentation")
     fun  logInStoreOwner(logInData: logInData){
-        viewModelScope.launch {
+    if (_loadingLogIn.value) return
+
+    viewModelScope.launch {
             try {
-              val response=   api.logInStoreOwner(logInData)
+                _loadingLogIn.value = true
+                _errorMessage.value = null // Clear any previous errors
+
+                val response=   api.logInStoreOwner(logInData)
                 if(response.isSuccessful){
                    val token = response.body()?.data?.token
                     val store_id = response.body()?.data?._id//
@@ -129,22 +144,35 @@ class AuthViewmodel @Inject constructor(
                         Log.d("SuccessfullLOG", "Login successful, store_id saved!.")
 
                     }
-                     _logInStatus.value = response.body()?.status!!;
+                     _logInStatus.value = "Success";
                     Log.d("SuccessfullLOG", "Successfully logged in: ${_logInStatus.value}"+"fg${logInStatus.value}")
 
                     Log.d("SuccessfullLOG", "Successfully logged in: ${response.body()?.status}")
                     Log.d("SuccessfullLOG","Success Logged in"+response.body())}
                 else{
                     val errorBody = response.errorBody()?.string()
+                    _errorMessage.value = errorBody ?: "Login failed. Please try again."
+
                     Log.d("ErrorLOG", "Status code ${response.code()}, Else code Logged in: $errorBody")
+                    _logInStatus.value = "Fail"
             }
             }
             catch (e:Exception){
-                Log.d("SuccessfullLOG", "falied in the viemodel")
+                _errorMessage.value = "An error occurred: ${e.message}"
 
+                Log.d("SuccessfullLOG", "falied in the viemodel" +e)
+                _logInStatus.value = "Fail"
+
+            } finally {
+
+                _loadingLogIn.value = false
             }
         }
 
+    }
+
+    fun dismissError() {
+        _errorMessage.value = null
     }
 
 

@@ -91,7 +91,7 @@ fun bottomNav(){
         NavHost(navController = navHostController, startDestination = AllScreens.Dashboard.name , modifier = Modifier.padding(it) ){
 
             composable(route = AllScreens.Dashboard.name){
-                Dashboard()
+                Dashboard(navHostController)
             }
 
             composable(route = AllScreens.People.name ){
