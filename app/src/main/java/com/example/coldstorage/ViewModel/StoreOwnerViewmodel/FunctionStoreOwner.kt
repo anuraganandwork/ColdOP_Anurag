@@ -56,19 +56,19 @@ class FunctionStoreOwner @Inject constructor(
     private val _lotSize = MutableStateFlow<String>("")
     val lotsize :StateFlow<String> = _lotSize.asStateFlow()
 
-    private val _Ration = MutableStateFlow<String>("")
+    private val _Ration = MutableStateFlow<String>("0")
     val Ration:StateFlow<String> = _Ration.asStateFlow()
 
-    private val _seedBags = MutableStateFlow<String>("")
+    private val _seedBags = MutableStateFlow<String>("0")
     val seedBags :StateFlow<String> = _seedBags.asStateFlow()
 
-    private val _goli  = MutableStateFlow<String>("")
+    private val _goli  = MutableStateFlow<String>("0")
     val goli :StateFlow<String> = _goli.asStateFlow()
 
-    private val _twelveNumber = MutableStateFlow<String>("")
+    private val _twelveNumber = MutableStateFlow<String>("0")
     val twelveNumber :StateFlow<String> = _twelveNumber.asStateFlow()
 
-    private val _cuttok = MutableStateFlow<String>("")
+    private val _cuttok = MutableStateFlow<String>("0")
     val cuttok :StateFlow<String> = _cuttok.asStateFlow()
 
     private val _chamber =  MutableStateFlow<String>("")
@@ -367,12 +367,34 @@ class FunctionStoreOwner @Inject constructor(
     fun updateBagUpdates(newBagUpdates: List<BagUpdate>) {
         outgoingItemState.value = outgoingItemState.value.copy(bagUpdates = newBagUpdates)
     }
+
+    private  val _quantityToRemoveGoli = MutableStateFlow<Int>(0)
+    val quantityToRemoveGoli :StateFlow<Int> = _quantityToRemoveGoli.asStateFlow()
+
+    private val __quantityToRemoveRation = MutableStateFlow<Int>(0)
+    val quantityToRemoveRation :StateFlow<Int> = __quantityToRemoveRation.asStateFlow()
+
+    private val __quantityToRemoveSeed = MutableStateFlow<Int>(0)
+    val quantityToRemoveSeed :StateFlow<Int> = __quantityToRemoveSeed.asStateFlow()
+
+    private val __quantityToRemoveCuttok = MutableStateFlow<Int>(0)
+    val quantityToRemoveCuttok :StateFlow<Int> = __quantityToRemoveCuttok.asStateFlow()
+
+    private val __quantityToRemoveNo12 = MutableStateFlow<Int>(0)
+    val quantityToRemoveNo12 :StateFlow<Int> = __quantityToRemoveNo12.asStateFlow()
     fun confirmOutgoingOrder(farmerId : String  ){
         //val outgoingOrderData =
         viewModelScope.launch {
 
-            val bagUpdates = listOf(BagUpdate( "Goli", 10))
-            val orderItems = listOf(OutgoingDataClassItem( "6713fb4f8082c69227ec72dc", "Pukhraj",bagUpdates))
+            //val bagUpdates = listOf(BagUpdate( "Goli", 10))
+            val orderItems =
+                listOf(OutgoingDataClassItem( "6713fb4f8082c69227ec72dc", "Pukhraj",
+                    listOf(BagUpdate( "Goli", quantityToRemoveGoli.value),
+                        BagUpdate("Ration" , quantityToRemoveRation.value) ,
+                        BagUpdate("Seed" , quantityToRemoveSeed.value) ,
+                        BagUpdate("Cut-tok" , quantityToRemoveCuttok.value) ,
+                        BagUpdate("Number-12" , quantityToRemoveNo12.value)
+                    )))
            // val outgoingData = OutgoingDataClassBody(orderItems)
             Log.d("OutgoingSuccess" , orderItems.toString())
             try {
@@ -401,7 +423,7 @@ class FunctionStoreOwner @Inject constructor(
 
 
     fun onSearchQuery( query :String){
-        if(query.length > 3){
+        if(query.length > 1){
             searchJob?.cancel()
             searchJob = viewModelScope.launch {
                 delay(300)
