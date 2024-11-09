@@ -1,6 +1,8 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing
 
+import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 
@@ -17,6 +19,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +29,7 @@ import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
@@ -35,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,15 +47,18 @@ import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Location
+import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.forSecondOutgoingPage
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.getAllReciptsResponse
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.mapDataForSecondOutgoingPage
+import com.example.coldstorage.ui.theme.primeGreen
+import com.example.coldstorage.ui.theme.primeRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OutgoingSecondScreen(viewmodel: FunctionStoreOwner , navController: NavController) {
+fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navController: NavController) {
     var seedBags by remember { mutableStateOf("0") }
     var rationBags by remember { mutableStateOf("0") }
     var no12Bags by remember { mutableStateOf("0") }
@@ -98,17 +106,18 @@ fun OutgoingSecondScreen(viewmodel: FunctionStoreOwner , navController: NavContr
                 .fillMaxWidth()
                 .weight(1.25f) // This makes the table take the remaining space
         ) {
-            StockTablee(viewmodel)
+            StockTablee(accNum ,viewmodel)
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
                 Log.d("OutgoingSuccess" , "Pressed button")
-                showBottomSheet.value = true
-                viewmodel.confirmOutgoingOrder("66eab1db10eb613c2efca385" )
-                      viewmodel.clearSelectedCells()},
-            modifier = Modifier.align(Alignment.End)
+               // showBottomSheet.value = true
+               //  viewmodel.confirmOutgoingOrder(accNum )
+                viewmodel.clearSelectedCellData()
+                viewmodel.clearSelectedCells()},
+            modifier = Modifier.align(Alignment.End) , colors = ButtonDefaults.buttonColors(containerColor = primeGreen , contentColor = Color.White)
         ) {
             Text("Proceed")
         }
@@ -127,7 +136,7 @@ fun OutgoingSecondScreen(viewmodel: FunctionStoreOwner , navController: NavContr
 
         ){
             finalConfirmation {
-
+                  //navController.navigate(AllScreens.Dashboard.name)
             }
         }
 
@@ -166,20 +175,30 @@ fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
     
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
-fun StockTablee(viewmodel: FunctionStoreOwner) {
+fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
     val transactionHistory = viewmodel.transactionHistory.collectAsState()
     val outgoingItem by viewmodel.outgoingItemState
 
     LaunchedEffect(Unit){
 
-        viewmodel.getAllRecipts("66eab1db10eb613c2efca385")
+        viewmodel.getAllRecipts(accNum)
+        viewmodel.retrieveSelectedCellData()
 
         Log.d("OutgoingSh" , viewmodel.getTheSelectedStock().toString())
         Log.d("OutgoingSh" , viewmodel.getTheSelectedIndex().toString())
+//        selectedCellData?.let {
+//            // Use the retrieved data
+//            Log.d("SelectedDataaaaa", "Order ID: ${it.orderId}, Voucher Number: ${it.voucherNumber} , size: ${it.size}")
+//        } ?: run {
+//            Log.d("SelectedDataaaaa", "No selected data found.")
+//        }
 
     }
 
+  val retrievedData by viewmodel.retrievedSelectedData.collectAsState()
+    Log.d("SelectedCellData" , retrievedData.toString())
     val SelectedVoucherNumber = viewmodel.getTheSelectedStock()
     Log.d("SelectedVoucher" ,SelectedVoucherNumber.toString())
     val selectedColumns = viewmodel.getTheSelectedIndex()
@@ -196,15 +215,17 @@ fun StockTablee(viewmodel: FunctionStoreOwner) {
 //    }
     when(val state = transactionHistory.value){
         is getAllReciptsResponse.success ->{
+            Log.d("StateRecipt" , state.reciptData.toString())
             val filteredData = state.reciptData.filter { recipt ->
-                recipt.voucher.voucherNumber.toString() in SelectedVoucherNumber
+                Log.d("VoucherNumber", recipt.voucher.voucherNumber.toString())
+                SelectedVoucherNumber.any { it.toInt() == recipt.voucher.voucherNumber }
             }
-            Log.d("FilteredId" , filteredData.toString())
+            Log.d("SelectedVoucherFiltered" , filteredData.toString())
             rows = mapDataForSecondOutgoingPage(filteredData)
             Log.d("roowa" , rows.toString())
         }
         else ->{
-            Log.d("Outgoing second " , "XXXXXX")
+            Log.d("OutgoingsecondFiltered " , "XXXXXX")
         }
     }
     val voucherBagSizePairs = rows.flatMap { row ->
@@ -229,7 +250,7 @@ fun StockTablee(viewmodel: FunctionStoreOwner) {
     }
 
 
-    val headers = listOf("Dated", "Address", "Bag Type", "Current bags", "Quantity Reqd.")
+    val headers = listOf("V No.", "Address", "Bag Type", "Curr bags", "Quantity Req.")
     val data = listOf(
         listOf("1/05/23", "A-3-21", "Seed", "50", "0"),
         listOf("3/05/23", "A-5-89", "Seed", "50", "0"),
@@ -372,8 +393,9 @@ fun StockTablee(viewmodel: FunctionStoreOwner) {
 //                }
 //            }
 //        }
+        if(retrievedData != null){
         LazyColumn {
-            items(voucherBagSizePairs) { pair ->
+            items(retrievedData!!) { pair ->
                 Log.d("Rowwww" ,voucherBagSizePairs.toString())
                 Row(
                     modifier = Modifier
@@ -383,55 +405,82 @@ fun StockTablee(viewmodel: FunctionStoreOwner) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = pair.date,
-                        modifier = Modifier.weight(1f),
-                        fontSize = 12.sp
+                        text = pair.voucherNumber.toString(),
+                        modifier = Modifier.width(35.dp)
+                           // .background(primeRed)
+                        ,
+                        fontSize = 11.sp,
+                        textAlign = TextAlign.Center
+
                     )
                     Text(
                         text = "${pair.address.chamber}-${pair.address.floor}-${pair.address.row}",
-                        modifier = Modifier.weight(1f),
-                        fontSize = 12.sp
+                        //text = pair.address,
+                        modifier = Modifier.width(60.dp)
+                            //.background(primeGreen)
+                        ,
+                        fontSize = 11.sp,
+                        textAlign = TextAlign.Center
+
                     )
-                    Text(
-                        text = pair.bagSize,
-                        modifier = Modifier.weight(1f),
-                        fontSize = 12.sp
-                    )
+                    pair.size?.let {
+                        Text(
+                            text = it,
+                            modifier = Modifier.width(90.dp)
+                                //.background(primeRed)
+                            ,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                     Text(
                         text = pair.currentQuantity.toString(),
-                        modifier = Modifier.weight(1f),
-                        fontSize = 12.sp
+                        modifier = Modifier.width(50.dp)
+                          //  .background(primeGreen)
+                        ,
+                        fontSize = 11.sp,
+                        textAlign = TextAlign.Center
+
                     )
-                    BasicTextField(
-                        value = quantityValues[pair.voucherNum to pair.bagSize] ?: "",
-                        onValueChange = { newValue ->
-                            quantityValues = quantityValues.toMutableMap().apply {
-                                put(pair.voucherNum to pair.bagSize, newValue)
-                            }
-                        },
-                        modifier = Modifier
-                            .width(80.dp)
-                            .height(40.dp)
-                            .border(1.dp, Color.Gray, RoundedCornerShape(5.dp)),
-                        textStyle = TextStyle(
-                            textAlign = TextAlign.Center,
-                            fontSize = 12.sp
-                        ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        maxLines = 1,
-                        decorationBox = { innerTextField ->
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                innerTextField()
-                            }
-                        }
-                    )
+//                    BasicTextField(
+//                        value = quantityValues[pair to pair.bagSize] ?: "",
+//                        onValueChange = { newValue ->
+//                            quantityValues = quantityValues.toMutableMap().apply {
+//                                put(pair.voucherNum to pair.bagSize, newValue)
+//                            }
+//                        },
+//                        modifier = Modifier
+//                            .width(80.dp)
+//                            .height(40.dp)
+//                            .border(1.dp, Color.Gray, RoundedCornerShape(5.dp)),
+//                        textStyle = TextStyle(
+//                            textAlign = TextAlign.Center,
+//                            fontSize = 12.sp
+//                        ),
+//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                        maxLines = 1,
+//                        decorationBox = { innerTextField ->
+//                            Box(
+//                                contentAlignment = Alignment.Center,
+//                                modifier = Modifier.fillMaxSize()
+//                            ) {
+//                                innerTextField()
+//                            }
+//                        }
+//                    )
+
+                    var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
+                    BasicTextField(value = textFieldValue , onValueChange = {
+                        newValue -> textFieldValue = newValue
+                    })
                 }
 
-    }
-}}}
+    }}
+}
+
+
+
+    }}
 
 data class VoucherBagSizePair(
     val orderId : String,

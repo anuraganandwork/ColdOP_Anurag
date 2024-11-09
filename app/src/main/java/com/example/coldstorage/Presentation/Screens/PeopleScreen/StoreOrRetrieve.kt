@@ -129,9 +129,15 @@ fun storeOrRetrieve(accNumber: String, navController: NavHostController, viewmod
 //755
     LaunchedEffect(Unit) {
         viewmodel.updateFarmerAcc(accNumber)
+        Log.d("currentfarmer" , "Account number is"+accNumber)
+
         viewmodel.getAllRecipts("66eab27610eb613c2efca3bc")
 
         //
+    }
+
+    LaunchedEffect( accNumber){
+        Log.d("current farmer" , "Account number is"+accNumber)
     }
     Log.d("TransactionhistoryUI", transactionHistory.value.toString())
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -356,7 +362,7 @@ fun storeOrRetrieve(accNumber: String, navController: NavHostController, viewmod
                 Surface(
                     modifier = Modifier
                         .padding()
-                        .clickable { navController.navigate(AllScreens.OutgoingStockScreen.name) }
+                        .clickable { navController.navigate(AllScreens.OutgoingStockScreen.name+ "/${accNumber}") }
                 ) {
                     Text(
                         text = "Outgoing", modifier = Modifier
@@ -601,7 +607,8 @@ fun storeOrRetrieve(accNumber: String, navController: NavHostController, viewmod
 
             ) {
             finalConfirmation {
-
+                   viewmodel.getTheSelectedStock()
+                   viewmodel.getTheSelectedIndex()
             }
         }
 

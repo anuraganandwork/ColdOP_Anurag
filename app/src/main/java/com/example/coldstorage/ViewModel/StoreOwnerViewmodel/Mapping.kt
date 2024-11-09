@@ -2,15 +2,26 @@ package com.example.coldstorage.ViewModel.StoreOwnerViewmodel
 
 import android.util.Log
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.BagSize
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Location
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Order
-import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Quantity
 
+
+data class SelectedCellData(
+    val orderId: String,
+    val voucherNumber: Int,
+    val variety: String,
+    val size: String?,
+    val address: Location,
+    val dateOfSubmission: String,
+    val currentQuantity: String)
 
 data class ReceiptRow(
-    val orderId : String ,
+    val orderId: String,
     val voucherNumber: Int,
-    val variety : String,
-    val size :  List<BagSize> ,
+    val variety: String,
+    val size:  List<BagSize>,
+    val address: Location,
+    val dateOfSubmission: String
 //    val currentQuantity: Int ,
 //    val initialQuantity: Int
 )
@@ -22,10 +33,14 @@ Log.d("OutgoingRR" , receipts.toString())
 
             rows.add(
                 ReceiptRow(
-                    orderId=receipt._id ,
+                    orderId =receipt._id ,
                     voucherNumber = receipt.voucher.voucherNumber ?: 0,
                     variety = orderDetail.variety ?: "Unknown",
                     size = orderDetail.bagSizes,
+                    address = orderDetail.location ,
+                    dateOfSubmission =receipt.dateOfSubmission,
+
+
 //                    currentQuantity = bagSize.quantity.currentQuantity ,
 //                    initialQuantity = bagSize.quantity.initialQuantity
                 )

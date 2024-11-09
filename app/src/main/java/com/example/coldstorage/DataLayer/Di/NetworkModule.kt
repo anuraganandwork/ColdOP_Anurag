@@ -5,6 +5,9 @@ import android.content.Context
 import android.util.Log
 import com.example.coldstorage.DataLayer.Api.ColdOpApi
 import com.example.coldstorage.DataLayer.Auth.AuthManager
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.SelectedCellData
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -109,7 +112,7 @@ class AuthInterceptor @Inject constructor( @ApplicationContext private  val cont
         if(sharedPrefSelectedStock.getString("voucher_number" , "DEFAULT") != null){
             val concatenatedValues = sharedPrefSelectedStock.getString("voucher_number", "DEFAULT")
             val myValues = concatenatedValues?.split(",") ?: listOf()
-            Log.d("XXXX" , myValues.toString())
+            Log.d("XXXXSelectedStock" , myValues.toString())
             return myValues
         }
         else {
@@ -122,7 +125,7 @@ class AuthInterceptor @Inject constructor( @ApplicationContext private  val cont
             val concatenatedValues = sharedPrefSelectedStock.getString("indexSelected", "DEFAULT")
 
             val myValues = concatenatedValues?.split(",") ?: listOf()
-            Log.d("XXXXndexI" , myValues.toString())
+            Log.d("XXXXSelectedIndex" , myValues.toString())
 
             return myValues
         }
@@ -134,6 +137,43 @@ class AuthInterceptor @Inject constructor( @ApplicationContext private  val cont
 
     public fun clearSelectedCell(){
         sharedPrefSelectedStock.edit().clear().apply()
+    }
+    public fun saveSelectedCellData(selectedCellData: List<SelectedCellData>) {
+        val sharedPref = context.getSharedPreferences("SelectedCellData", Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        //
+        // Convert SelectedCellData to JSON string
+        val gson = Gson()
+        val json = gson.toJson(selectedCellData)
+
+        // Save JSON string in SharedPreferences
+        editor.putString("selected_cell_data", json)
+        //Log.d("sasasasasas" , json)
+        editor.apply()
+    }
+
+    fun getSelectedCellData(): List<SelectedCellData> {
+        val sharedPref = context.getSharedPreferences("SelectedCellData", Context.MODE_PRIVATE)
+        val json = sharedPref.getString("selected_cell_data", null)
+
+        if (json != null) {
+            val gson = Gson()
+            val type = object : TypeToken<List<SelectedCellData>>() {}.type
+            return gson.fromJson(json, type)
+        }
+
+        // Return an empty list if no data is found
+        return emptyList()
+    }
+
+
+    fun clearSelectedCellData() {
+        val sharedPref = context.getSharedPreferences("SelectedCellData", Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+
+        // Remove the selected cell data key
+        editor.remove("selected_cell_data")
+        editor.apply()
     }
 }
 
@@ -189,4 +229,10 @@ class NetworkModule {
 
 }
 
-//710
+//1220
+// galti save selected order mein ho rhi
+//clean the list of selected
+// outgoing data set on the final call just like incoming
+// bs row is select ho rha and uss row k saare columns aa rhe hai
+// outgoing data set
+// dynamic number of textfields

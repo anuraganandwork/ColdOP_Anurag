@@ -2,19 +2,14 @@ package com.example.coldstorage.ViewModel.StoreOwnerViewmodel
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.coldstorage.DataLayer.Api.BagSize
+
 import com.example.coldstorage.DataLayer.Api.ColdOpApi
 import com.example.coldstorage.DataLayer.Api.FarmerInfo
 import com.example.coldstorage.DataLayer.Api.IncomingOrderData
@@ -24,7 +19,6 @@ import com.example.coldstorage.DataLayer.Api.OutgoingData.BagUpdate
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.PopulatedFarmer
 import com.example.coldstorage.DataLayer.Api.Quantity
-import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Order
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import com.example.coldstorage.DataLayer.Di.AuthInterceptor
@@ -37,8 +31,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -219,14 +211,14 @@ class FunctionStoreOwner @Inject constructor(
                                         currentQuantity = cuttok.value.toInt(),
                                         initialQuantity = cuttok.value.toInt()
                                     ),
-                                    size = "CutTok"
+                                    size = "Cut-tok"
                                 ),
                                 BagSize(
                                     quantity = Quantity(
                                         currentQuantity = twelveNumber.value.toInt(),
                                         initialQuantity = twelveNumber.value.toInt()
                                     ),
-                                    size = "12No."
+                                    size = "Number-12"
                                 )
                             ),
                             location = Location(
@@ -295,6 +287,38 @@ class FunctionStoreOwner @Inject constructor(
 
         }
     }
+    fun saveSelectedCellData(
+        selectedCellsList : List<SelectedCellData>
+    ) {
+        // Create a SelectedCellData object with provided data
+//        val selectedCellData = SelectedCellData(
+//            orderId = orderId,
+//            voucherNumber = voucherNumber,
+//            variety = variety,
+//            size = size,
+//            address = address,
+//            dateOfSubmission = dateOfSubmission,
+//            currentQuantity = currentQuantity
+//        )
+        if (selectedCellsList != null){
+        Log.d("sdsdsdsds" , selectedCellsList.toString())}
+        if(selectedCellsList == null) {
+            Log.d("Selelle" , "is null")}
+
+
+        // Save the data through AuthInterceptor
+        authIntercepter.saveSelectedCellData(selectedCellsList)
+    }
+     private val _retrievedSelectedData = MutableStateFlow<List<SelectedCellData>?>(emptyList())
+    val retrievedSelectedData: StateFlow<List<SelectedCellData>?> = _retrievedSelectedData.asStateFlow()
+    fun retrieveSelectedCellData() {
+        _retrievedSelectedData.value = authIntercepter.getSelectedCellData()
+        Log.d("rerererr" , retrievedSelectedData.value.toString())
+    }
+
+    fun clearSelectedCellData (){
+        authIntercepter.clearSelectedCellData()
+    }
 
 
     fun proceedToNextOutgoing(voucherNumber: List<String> , Index : List<String>){
@@ -344,6 +368,7 @@ class FunctionStoreOwner @Inject constructor(
         outgoingItemState.value = outgoingItemState.value.copy(bagUpdates = newBagUpdates)
     }
     fun confirmOutgoingOrder(farmerId : String  ){
+        //val outgoingOrderData =
         viewModelScope.launch {
 
             val bagUpdates = listOf(BagUpdate( "Goli", 10))

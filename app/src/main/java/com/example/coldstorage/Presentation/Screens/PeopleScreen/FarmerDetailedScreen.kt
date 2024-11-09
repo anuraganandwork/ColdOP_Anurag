@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
@@ -47,6 +49,7 @@ import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.Assi
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ManageStocks
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FarmerApiState
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
+import com.example.coldstorage.ui.theme.primeGreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,10 +109,8 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween){
-                Surface(modifier = Modifier
-                    .width(160.dp)
-
-                    .clickable { when(farmerData){
+                Button(onClick =  {
+                    when(farmerData){
                         is FarmerApiState.success ->{
                             val farmerInfoAtui = (farmerData as FarmerApiState.success)?.farmerInfo
 
@@ -117,28 +118,41 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                         else ->{
                             Log.d("Errrr","erererere")
                         }
-                    } } ,
-                    shape = RoundedCornerShape(13.dp)) {
+                    }
+                }, modifier = Modifier
+                    .fillMaxWidth()
+
+//                    .clickable { when(farmerData){
+//                        is FarmerApiState.success ->{
+//                            val farmerInfoAtui = (farmerData as FarmerApiState.success)?.farmerInfo
+//
+//                            navController.navigate(route = AllScreens.StoreOrRetrieve.name + "/${farmerInfoAtui?._id}")}
+//                        else ->{
+//                            Log.d("Errrr","erererere")
+//                        }
+//                    } }
+                    ,
+                    shape = RoundedCornerShape(13.dp) ,
+                    colors = ButtonDefaults.buttonColors(contentColor = Color.White , containerColor = primeGreen)) {
 
                         Text(
-                            text = "Manage \n stocks",
+                            text = "Manage stocks",
                             color = Color.Black, // Text color
                             maxLines = 2, // Ensure text can wrap to two lines
                             overflow = TextOverflow.Ellipsis, // Handle overflow
                             modifier = Modifier
-                                .background(Color.Green)
                                 .padding(horizontal = 15.dp, vertical = 15.dp) // Padding around the text
                         )
                                    }
-                Surface(modifier = Modifier
-                    .width(160.dp)
-
-                    .clickable { } ,
-                    shape = RoundedCornerShape(13.dp)) {
-                    Text(text = "Manage payments", modifier = Modifier
-                        .background(Color.Green)
-                        .padding(horizontal = 15.dp, vertical = 15.dp))
-                }
+//                Surface(modifier = Modifier
+//                    .width(160.dp)
+//
+//                    .clickable { } ,
+//                    shape = RoundedCornerShape(13.dp)) {
+//                    Text(text = "Manage payments", modifier = Modifier
+//                        .background(Color.Green)
+//                        .padding(horizontal = 15.dp, vertical = 15.dp))
+//                }
             }
 
 

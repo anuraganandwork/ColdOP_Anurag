@@ -5,9 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -30,17 +28,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Order
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ClickableBlock
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.ReceiptRow
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.SelectedCellData
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.getAllReciptsResponse
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.mapReceiptsToRows
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OutgoingStockScreen(viewmodel: FunctionStoreOwner = hiltViewModel() ,navController: NavController) {
+fun OutgoingStockScreen(accNum: String ,viewmodel: FunctionStoreOwner = hiltViewModel() ,navController: NavController) {
     var selectedVariety by remember { mutableStateOf("") }
     var selectedBagSize by remember { mutableStateOf("") }
 
@@ -89,7 +87,7 @@ fun OutgoingStockScreen(viewmodel: FunctionStoreOwner = hiltViewModel() ,navCont
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                StockTable( viewmodel, navController)
+                StockTable(accNum, viewmodel, navController)
             }
 
 
@@ -135,23 +133,27 @@ fun DropdownMenu_(
 }
 
 @Composable
-fun StockTable(viewmodel: FunctionStoreOwner  , navController: NavController) {
-    val headers = listOf("Voucher", "Variety", "Seed", "No.12", "Ration","Goli", "Cut&Tok", "Total")
+fun StockTable(accNum: String,viewmodel: FunctionStoreOwner  , navController: NavController) {
+    val headers = listOf("V No.", "Variety", "Seed", "Goli", "Ration","Cut&Tok", "No.12", "Total")
     val selectedBlock =  remember { mutableStateOf(Color.White) }
    val selectedCells  = remember {
-       mutableStateMapOf<Pair<Int , Int> , Boolean>()
+       mutableStateMapOf<Pair<Int , Int
+               > , Boolean>()
    }
     val transactionAllHistory = viewmodel.transactionHistory.collectAsState() // to learn
   LaunchedEffect(Unit){
-      viewmodel.getAllRecipts("66eab1db10eb613c2efca385")
+      viewmodel.getAllRecipts(accNum)
   }
+
+    val selectedCellsList = remember { mutableStateListOf<SelectedCellData>() }
+
 
     var rows by mutableStateOf<List<ReceiptRow>>(emptyList())
 
     when(val state = transactionAllHistory.value) {
         is getAllReciptsResponse.success -> {
             rows  = mapReceiptsToRows(state.reciptData)
-            Log.d("OutgoingTable" , rows.toString())
+            Log.d("OutgoingTableeeeee" , rows.toString())
             Log.d("OutgoingTable" , "XXxxxxxxxxxxxxxxxx1123456789")
 
         }
@@ -161,7 +163,10 @@ fun StockTable(viewmodel: FunctionStoreOwner  , navController: NavController) {
     }
     Log.d("OutgoingTable" , rows.toString())
 
+    fun saveInTheList(cellData : SelectedCellData){
 
+
+    }
 Column(modifier = Modifier
     .fillMaxHeight()
     ) {
@@ -189,14 +194,17 @@ Column(modifier = Modifier
 
         items(rows.size) { rowIndex ->
             val row = rows[rowIndex]
-            Log.d("Outgoing", row.toString())
+            Log.d("Outgoingggrgrgrgrgrgrgr", row.toString())
 
             Row(Modifier.fillMaxWidth()) {
                 Text(
                     text = row.voucherNumber.toString(), // First column - voucher number
                     modifier = Modifier
                         .padding(start = 3.dp)
-                        .width(30.dp)
+                        .width(15.dp)
+                       // .background(primeRed)
+                    ,                    fontSize = 11.sp
+
                 )
 
                 Text(
@@ -220,45 +228,168 @@ Column(modifier = Modifier
 //                }
                 ClickableBlock(
                     cell = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0",
+                    cellTwo = row.size.getOrNull(0)?.quantity?.initialQuantity?.toString() ?: "0",
+
                     isSelected = selectedCells[Pair(rowIndex, 2)]
                         ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
                         selectedCells[Pair(rowIndex, 2)] = isSelected
+                    } ,saveSelected = {
+                        if(selectedCells[Pair(rowIndex, 2)] == true){
+                             selectedCellsList.add(
+                                 SelectedCellData(
+                                     orderId = row.orderId,
+                                     voucherNumber = row.voucherNumber,
+                                     variety = row.variety,
+                                     size = row.size.getOrNull(0)?.size?.toString(),
+                                     address = row.address,
+                                     dateOfSubmission = row.dateOfSubmission,
+                                     currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                             )
+                             )
+                        }
+
                     }
                 )
 
                 ClickableBlock(
                     cell = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0",
+                    cellTwo = row.size.getOrNull(1)?.quantity?.initialQuantity?.toString() ?: "0",
+
                     isSelected = selectedCells[Pair(rowIndex, 3)]
                         ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
                         selectedCells[Pair(rowIndex, 3)] = isSelected
+                    },
+                    saveSelected = {
+                        if(selectedCells[Pair(rowIndex, 3)] == true){
+                            selectedCellsList.add(
+                                SelectedCellData(
+                                    orderId = row.orderId,
+                                    voucherNumber = row.voucherNumber,
+                                    variety = row.variety,
+                                    size = row.size.getOrNull(1)?.size?.toString(),
+                                    address = row.address,
+                                    dateOfSubmission = row.dateOfSubmission,
+                                    currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                )
+                            )
+                        }
+                        Log.d("PressedBUttonXX" , "!@#$%^&*()")
+//                        viewmodel.saveSelectedCellData(
+//                            orderId = row.orderId,
+//                            voucherNumber = row.voucherNumber,
+//                            variety = row.variety,
+//                            size = row.size.getOrNull(1)?.size?.toString() ,
+//                            address = row.address,
+//                            dateOfSubmission = row.dateOfSubmission,
+//                            currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
+//
+//                        )
                     }
                 )
                 ClickableBlock(
                     cell = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0",
+                    cellTwo = row.size.getOrNull(2)?.quantity?.initialQuantity?.toString() ?: "0",
+
                     isSelected = selectedCells[Pair(rowIndex, 4)]
                         ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
                         selectedCells[Pair(rowIndex, 4)] = isSelected
+                    },
+                    saveSelected = {
+
+                        if(selectedCells[Pair(rowIndex, 4)] == true){
+                            selectedCellsList.add(
+                                SelectedCellData(
+                                    orderId = row.orderId,
+                                    voucherNumber = row.voucherNumber,
+                                    variety = row.variety,
+                                    size = row.size.getOrNull(2)?.size?.toString(),
+                                    address = row.address,
+                                    dateOfSubmission = row.dateOfSubmission,
+                                    currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                )
+                            )
+                        }
+//
                     }
                 )
                 ClickableBlock(
                     cell = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0",
+                    cellTwo = row.size.getOrNull(3)?.quantity?.initialQuantity?.toString() ?: "0",
+
                     isSelected = selectedCells[Pair(rowIndex, 5)]
                         ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
                         selectedCells[Pair(rowIndex, 5)] = isSelected
+                    },
+                    saveSelected = {
+
+                        if(selectedCells[Pair(rowIndex, 5)] == true){
+                            selectedCellsList.add(
+                                SelectedCellData(
+                                    orderId = row.orderId,
+                                    voucherNumber = row.voucherNumber,
+                                    variety = row.variety,
+                                    size = row.size.getOrNull(3)?.size?.toString(),
+                                    address = row.address,
+                                    dateOfSubmission = row.dateOfSubmission,
+                                    currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                )
+                            )
+                        }
+//                        viewmodel.saveSelectedCellData(
+//                            orderId = row.orderId,
+//                            voucherNumber = row.voucherNumber,
+//                            variety = row.variety,
+//                            size = row.size.getOrNull(3)?.size?.toString(),
+//                            address = row.address,
+//                            dateOfSubmission = row.dateOfSubmission,
+//                            currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
+//
+//                        )
                     }
                 )
-                Spacer(modifier = Modifier.padding(start = 3.dp))
+                //Spacer(modifier = Modifier.padding(start = 3.dp))
 
                 ClickableBlock(
                     cell = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0",
+                    cellTwo = row.size.getOrNull(4)?.quantity?.initialQuantity?.toString() ?: "0",
                     isSelected = selectedCells[Pair(rowIndex, 6)]
                         ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
                         selectedCells[Pair(rowIndex, 6)] = isSelected
+                    },saveSelected = {
+
+                        if(selectedCells[Pair(rowIndex, 6)] == true){
+                            selectedCellsList.add(
+                                SelectedCellData(
+                                    orderId = row.orderId,
+                                    voucherNumber = row.voucherNumber,
+                                    variety = row.variety,
+                                    size = row.size.getOrNull(4)?.size?.toString(),
+                                    address = row.address,
+                                    dateOfSubmission = row.dateOfSubmission,
+                                    currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                )
+                            )
+                        }
+//                        viewmodel.saveSelectedCellData(
+//                            orderId = row.orderId,
+//                            voucherNumber = row.voucherNumber,
+//                            variety = row.variety,
+//                            size = row.size.getOrNull(4)?.size?.toString(),
+//                            address = row.address,
+//                            dateOfSubmission = row.dateOfSubmission,
+//                            currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
+//
+//                        )
                     }
                 )
                 val totalQuantity = row.size
@@ -266,14 +397,31 @@ Column(modifier = Modifier
                     .sumOf {
                         it.quantity?.currentQuantity ?: 0
                     } // Safely access currentQuantity and sum them
-
-                Spacer(modifier = Modifier.padding(start = 10.dp))
+                val totalQuantityTwo = row.size
+                    .take(5) // Take the first 5 elements or fewer if the list is smaller
+                    .sumOf {
+                        it.quantity?.initialQuantity ?: 0
+                    }
+               // Spacer(modifier = Modifier.padding(start = 10.dp))
                 ClickableBlock(
                     cell = totalQuantity.toString(),
+                    cellTwo = totalQuantityTwo.toString(),
+
                     isSelected = selectedCells[Pair(rowIndex, 7)]
                         ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
                         selectedCells[Pair(rowIndex, 7)] = isSelected
+                    },saveSelected = {
+//                        viewmodel.saveSelectedCellData(
+//                            orderId = row.orderId,
+//                            voucherNumber = row.voucherNumber,
+//                            variety = row.variety,
+//                            size = "",
+//                            address = row.address,
+//                            dateOfSubmission = row.dateOfSubmission,
+//                            currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
+//
+//                        )
                     }
                 )
 
@@ -293,7 +441,10 @@ Column(modifier = Modifier
                 val finalVouchers =
                     firstKeys.map { itt -> rows[itt.toInt()].voucherNumber.toString() }
                 viewmodel.proceedToNextOutgoing(finalVouchers, secondKeys)
-                navController.navigate(AllScreens.OutgoingSecondScreen.name)
+                Log.d("Next" , "finalvouchers "+finalVouchers+ "second keys "+secondKeys)
+                //Log.d("SelectedCellListttt",selectedCellsList)
+                viewmodel.saveSelectedCellData(selectedCellsList)
+                navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${accNum}")
             }
 
             , shape = RoundedCornerShape(5.dp) , color =Color(0xFF23C45E) ){
@@ -323,3 +474,5 @@ fun getSeparateKeys(selectedCells: MutableMap<Pair<Int, Int>, Boolean>): Pair<Li
     // Return the two lists as separate lists
     return Pair(firstKeyList, secondKeyList)
 }
+
+

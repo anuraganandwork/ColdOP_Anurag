@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.example.coldstorage.ui.theme.primeGreen
 
 @Composable
-fun finalConfirmation(goBackToProfile: ()-> Unit){
+fun finalConfirmation(goBackToProfile: ()-> Unit ){
     Box(modifier = Modifier
         .fillMaxHeight() ){
     Column(modifier = Modifier
