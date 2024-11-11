@@ -5,9 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -84,7 +87,21 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
              keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
              keyboardActions = KeyboardActions(onDone ={keyboardController?.hide()})
              ,
-             modifier = Modifier.fillMaxWidth()
+             modifier = Modifier.fillMaxWidth() ,
+             colors = TextFieldDefaults.textFieldColors(
+                 focusedTextColor = Color.Black, // Text color inside the TextField
+                 disabledTextColor = Color.Gray,
+                 cursorColor = Color.Blue, // Cursor color
+                 errorCursorColor = Color.Red, // Cursor color in error state
+                 focusedIndicatorColor = Color.Green, // Border color when focused
+                 unfocusedIndicatorColor = Color.Gray, // Border color when not focused
+                 errorIndicatorColor = Color.Red, // Border color in error state
+                 focusedLeadingIconColor = Color.Black,
+                 focusedTrailingIconColor = Color.Black,
+                 focusedLabelColor = Color.Green, // Label color when focused
+                 unfocusedLabelColor = Color.Gray, // Label color when not focused
+                 errorLabelColor = Color.Red // Label color in error state
+             )
          )
          Spacer(modifier = Modifier.padding(10.dp))
 
@@ -121,12 +138,20 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                               BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
                               shape = MaterialTheme.shapes.small
                           )
-                          .padding(horizontal = 5.dp)
+                          .padding(horizontal = 5.dp , vertical = 2.dp)
                           .width(134.dp)
                           .height(40.dp),
                       singleLine = true,
                       maxLines = 1,
-                      textStyle = TextStyle(fontSize = 24.sp)
+                      textStyle = TextStyle(fontSize = 24.sp),
+                      decorationBox = { innerTextField ->
+                          Box(
+                              contentAlignment = Alignment.Center,
+                              modifier = Modifier.fillMaxSize()
+                          ) {
+                              innerTextField()
+                          }
+                      }
                   )
           }
          Spacer(modifier = Modifier.padding(10.dp))
@@ -144,12 +169,20 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                          BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
                          shape = MaterialTheme.shapes.small
                      )
-                     .padding(horizontal = 5.dp)
+                     .padding(horizontal = 5.dp , vertical = 2.dp)
                      .width(134.dp)
                      .height(40.dp),
                  singleLine = true,
                  maxLines = 1,
-                 textStyle = TextStyle(fontSize = 24.sp)
+                 textStyle = TextStyle(fontSize = 24.sp),
+                 decorationBox = { innerTextField ->
+                     Box(
+                         contentAlignment = Alignment.Center,
+                         modifier = Modifier.fillMaxSize()
+                     ) {
+                         innerTextField()
+                     }
+                 }
              )
          }
          Spacer(modifier = Modifier.padding(10.dp))
@@ -167,12 +200,20 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                          BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
                          shape = MaterialTheme.shapes.small
                      )
-                     .padding(horizontal = 5.dp)
+                     .padding(horizontal = 5.dp , vertical = 2.dp)
                      .width(134.dp)
                      .height(40.dp),
                  singleLine = true,
                  maxLines = 1,
-                 textStyle = TextStyle(fontSize = 24.sp)
+                 textStyle = TextStyle(fontSize = 24.sp),
+                 decorationBox = { innerTextField ->
+                     Box(
+                         contentAlignment = Alignment.Center,
+                         modifier = Modifier.fillMaxSize()
+                     ) {
+                         innerTextField()
+                     }
+                 }
              )
          }
          Spacer(modifier = Modifier.padding(10.dp))
@@ -191,12 +232,20 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                          BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
                          shape = MaterialTheme.shapes.small
                      )
-                     .padding(horizontal = 5.dp)
+                     .padding(horizontal = 5.dp , vertical = 2.dp)
                      .width(134.dp)
                      .height(40.dp),
                  singleLine = true,
                  maxLines = 1,
-                 textStyle = TextStyle(fontSize = 24.sp)
+                 textStyle = TextStyle(fontSize = 24.sp),
+                 decorationBox = { innerTextField ->
+                     Box(
+                         contentAlignment = Alignment.Center,
+                         modifier = Modifier.fillMaxSize()
+                     ) {
+                         innerTextField()
+                     }
+                 }
              )
          }
          Spacer(modifier = Modifier.padding(10.dp))
@@ -214,12 +263,20 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                          BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
                          shape = MaterialTheme.shapes.small
                      )
-                     .padding(horizontal = 5.dp)
+                     .padding(horizontal = 5.dp , vertical = 2.dp)
                      .width(134.dp)
                      .height(40.dp),
                  singleLine = true,
                  maxLines = 1,
-                 textStyle = TextStyle(fontSize = 24.sp)
+                 textStyle = TextStyle(fontSize = 24.sp),
+                 decorationBox = { innerTextField ->
+                     Box(
+                         contentAlignment = Alignment.Center,
+                         modifier = Modifier.fillMaxSize()
+                     ) {
+                         innerTextField()
+                     }
+                 }
              )
          }
          Spacer(modifier = Modifier.padding(20.dp))

@@ -2,6 +2,7 @@ package com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -54,6 +56,7 @@ import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.forSecondOutgoingPa
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.getAllReciptsResponse
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.mapDataForSecondOutgoingPage
 import com.example.coldstorage.ui.theme.primeGreen
+import com.example.coldstorage.ui.theme.primeRed
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -291,6 +294,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
     val field  = remember{
         mutableStateOf("")
     }
+    val context = LocalContext.current
 
     Column {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -426,7 +430,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
                     Text(
                         text = pair.voucherNumber.toString(),
                         modifier = Modifier.width(35.dp)
-                           // .background(primeRed)
+                        // .background(primeRed)
                         ,
                         fontSize = 11.sp,
                         textAlign = TextAlign.Center
@@ -436,7 +440,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
                         text = "${pair.address.chamber}-${pair.address.floor}-${pair.address.row}",
                         //text = pair.address,
                         modifier = Modifier.width(60.dp)
-                            //.background(primeGreen)
+                        //.background(primeGreen)
                         ,
                         fontSize = 11.sp,
                         textAlign = TextAlign.Center
@@ -446,7 +450,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
                         Text(
                             text = it,
                             modifier = Modifier.width(90.dp)
-                                //.background(primeRed)
+                            //.background(primeRed)
                             ,
                             fontSize = 11.sp,
                             textAlign = TextAlign.Center
@@ -455,7 +459,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
                     Text(
                         text = pair.currentQuantity.toString(),
                         modifier = Modifier.width(50.dp)
-                          //  .background(primeGreen)
+                        //  .background(primeGreen)
                         ,
                         fontSize = 11.sp,
                         textAlign = TextAlign.Center
@@ -489,35 +493,56 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
 //                    )
 
                     var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
-                    BasicTextField(value = textFieldValue , onValueChange = {
-                        newValue -> textFieldValue = newValue
+
+                    Column {
+                        if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! > pair.currentQuantity.toInt()) {
+                            Text(text = "*Error", color = primeRed, fontSize = 11.sp)
+                        }
+
+
+                    BasicTextField(value = textFieldValue, onValueChange = { newValue ->
+                        textFieldValue = newValue
                     },
-                        textStyle = TextStyle(fontSize = 14.sp , fontWeight = FontWeight.Bold , textAlign = TextAlign.Center),
-                         // Set font size to 11.sp
+                        textStyle = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        ),
+                        // Set font size to 11.sp
 
 
-                        modifier = Modifier.border( 1.dp  , Color.Gray , RoundedCornerShape(10.dp)  )
+                        modifier = Modifier
+                            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
                             .width(134.dp)
                             .height(40.dp)
-                            .padding(vertical = 2.dp)
-                        ,
+                            .padding(vertical = 2.dp),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done
                         ),
                         keyboardActions = KeyboardActions(
                             onDone = {
-                                keyboardController?.hide()
-                                outgoingResponseBody.add(
-                                    OutgoingDataClassItem(
-                                     orderId = pair.orderId,
-                                        variety = pair.variety,
-                                        bagUpdates = listOf(pair.size?.let { BagUpdate(it, textFieldValue.text.toInt()) })
-                                    )
-                                )
+                                if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! < pair.currentQuantity.toInt()) {
 
+                                    keyboardController?.hide()
+                                    outgoingResponseBody.add(
+                                        OutgoingDataClassItem(
+                                            orderId = pair.orderId,
+                                            variety = pair.variety,
+                                            bagUpdates = listOf(pair.size?.let {
+                                                BagUpdate(
+                                                    it,
+                                                    textFieldValue.text.toInt()
+                                                )
+                                            })
+                                        )
+                                    )
+                                } else{
+                                    Toast.makeText(context, "Please a enter a value less than ${pair.currentQuantity.toInt()+1}!", Toast.LENGTH_SHORT).show()
+
+                                }
                             }
-                        )     , singleLine = true  ,
+                        ), singleLine = true,
                         decorationBox = { innerTextField ->
                             Box(
                                 contentAlignment = Alignment.Center,
@@ -526,6 +551,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
                                 innerTextField()
                             }
                         })
+                }
 
                     var lastChangeTime by remember { mutableStateOf(System.currentTimeMillis()) }
                     val typingTimeout = 300L // Timeout in milliseconds

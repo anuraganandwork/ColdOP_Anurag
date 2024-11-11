@@ -56,7 +56,7 @@ interface ColdOpApi {
 
 
  @POST("api/store-admin/farmers/{id}/outgoing") //create new outgoing order
- suspend fun confirmOutgoingOrder(@Path("id") farmerId: String ,  @Body requestBody :  List<OutgoingDataClassItem>) : Response<OutgoingResponse>
+ suspend fun confirmOutgoingOrder(@Path("id") farmerId: String ,  @Body requestBody :  List<OutgoingDataClassItem>) : Response<Any>
 
 
   @GET("api/store-admin/66e1f22d782bbd67d3446805/farmers/search")

@@ -400,7 +400,8 @@ class FunctionStoreOwner @Inject constructor(
                 val response = api.confirmOutgoingOrder(farmerId, outgoingRequestBody)
                 Log.d("Oututut" , "intry")
                 if (response.isSuccessful) {
-                    response.body()?.message?.let { Log.d("OutgoingSuccesssss" , it) }
+                   // response.body()?.message?.let { Log.d("OutgoingSuccesssss" , it) }
+                    Log.d("OutgoingSuccesssss" , "Outgoing order created successfully!")
                 } else {
                     // Handle failure (e.g., log or show error message)
                     Log.d("OutgoingSuccesssd" , "Errororrr"+ response.errorBody()?.string() + response.code() )

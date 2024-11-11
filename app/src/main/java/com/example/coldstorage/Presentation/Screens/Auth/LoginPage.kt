@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -153,23 +154,42 @@ fun CustomTextField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp),
             textStyle = androidx.compose.ui.text.TextStyle(
                 color = Color(0xFF2C3E50),
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                textAlign = TextAlign.Start
             ),
             visualTransformation = visualTransformation ?: androidx.compose.ui.text.input.VisualTransformation.None,
             keyboardOptions = keyboardOptions,
-            decorationBox = { innerTextField ->
-                if (value.isEmpty()) {
-                    Text(
-                        text = placeholder,
+           // decorationBox = { innerTextField ->
+//                if (value.isEmpty()) {
+//                    Text(
+//                        text = placeholder,
+//                        color = Color(0xFFBDC3C7),
+//                        fontSize = 16.sp
+//                    )
+//                }
+//                innerTextField()
+                decorationBox = { innerTextField ->
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxHeight()
+                    ) {
+                        if (value.isEmpty()) {
+                            Text(
+                       text = placeholder,
+                                modifier = Modifier.fillMaxWidth(),
                         color = Color(0xFFBDC3C7),
-                        fontSize = 16.sp
-                    )
+                     fontSize = 16.sp,
+                                textAlign = TextAlign.Start
+                   )
                 }
-                innerTextField()
-            }
+                        innerTextField()
+                    }
+
+            },
+            singleLine = true
         )
     }
 }

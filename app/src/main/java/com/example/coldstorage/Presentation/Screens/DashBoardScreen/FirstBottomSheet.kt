@@ -26,10 +26,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -58,6 +60,7 @@ import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.primeGreen
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
     var query by remember {
@@ -131,7 +134,22 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
                     viewmodel.onSearchQuery(query)
                 },
                 label = { Text("Search farmers") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedTextColor = Color.Black, // Text color inside the TextField
+                    disabledTextColor = Color.Gray,
+                    cursorColor = Color.Black, // Cursor color
+                    containerColor = Color.Transparent ,
+                    errorCursorColor = Color.Red, // Cursor color in error state
+                    focusedIndicatorColor = primeGreen, // Border color when focused
+                    unfocusedIndicatorColor = Color.Gray, // Border color when not focused
+                    errorIndicatorColor = Color.Red, // Border color in error state
+                    focusedLeadingIconColor = Color.Black,
+                    focusedTrailingIconColor = Color.Black,
+                    focusedLabelColor = primeGreen, // Label color when focused
+                    unfocusedLabelColor = Color.Gray, // Label color when not focused
+                    errorLabelColor = Color.Red // Label color in error state
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -164,7 +182,22 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
                     viewmodel.updateVariety(it)
                 },
                 label = { Text("Enter Variety") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth() ,
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedTextColor = Color.Black, // Text color inside the TextField
+                    disabledTextColor = Color.Gray,
+                    cursorColor = Color.Black, // Cursor color
+                    containerColor = Color.Transparent ,
+                    errorCursorColor = Color.Red, // Cursor color in error state
+                    focusedIndicatorColor = primeGreen, // Border color when focused
+                    unfocusedIndicatorColor = Color.Gray, // Border color when not focused
+                    errorIndicatorColor = Color.Red, // Border color in error state
+                    focusedLeadingIconColor = Color.Black,
+                    focusedTrailingIconColor = Color.Black,
+                    focusedLabelColor = primeGreen, // Label color when focused
+                    unfocusedLabelColor = Color.Gray, // Label color when not focused
+                    errorLabelColor = Color.Red // Label color in error state
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -282,6 +315,7 @@ private fun QuantityInputField(
             singleLine = true,
             maxLines = 1,
             textStyle = TextStyle(fontSize = 18.sp, textAlign = TextAlign.Center , ),
+
 
         )
     }
