@@ -122,6 +122,13 @@ fun CustomLoginPage(navController: NavController, viewModel: AuthViewmodel = hil
                           },loadingLogIn = loadingLogIn.value ,
                 text = "Log In"
             )
+            Row(){
+                Text("New user ? ")
+                Text("Register" , modifier = Modifier.clickable {
+                    navController.navigate(AllScreens.StoreAdminRegistrationForm.name)
+                }, color = primeGreen)
+
+            }
         }
     }
 }

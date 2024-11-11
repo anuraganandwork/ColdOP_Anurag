@@ -6,7 +6,7 @@ import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderRespon
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Order
 
 
-data class SelectedCellData(
+data class  SelectedCellData(
     val orderId: String,
     val voucherNumber: Int,
     val variety: String,

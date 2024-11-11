@@ -144,7 +144,7 @@ class AuthViewmodel @Inject constructor(
                         Log.d("SuccessfullLOG", "Login successful, store_id saved!.")
 
                     }
-                     _logInStatus.value = "Success";
+                     _logInStatus.value = "Success"
                     Log.d("SuccessfullLOG", "Successfully logged in: ${_logInStatus.value}"+"fg${logInStatus.value}")
 
                     Log.d("SuccessfullLOG", "Successfully logged in: ${response.body()?.status}")

@@ -2,7 +2,7 @@ package com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 
@@ -11,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -23,38 +23,38 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.SecureFlagPolicy
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.coldstorage.DataLayer.Api.OutgoingData.BagUpdate
+import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Location
-import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.forSecondOutgoingPage
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.getAllReciptsResponse
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.mapDataForSecondOutgoingPage
 import com.example.coldstorage.ui.theme.primeGreen
-import com.example.coldstorage.ui.theme.primeRed
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -110,17 +110,17 @@ fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navCo
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                Log.d("OutgoingSuccess" , "Pressed button")
-               // showBottomSheet.value = true
-               //  viewmodel.confirmOutgoingOrder(accNum )
-                viewmodel.clearSelectedCellData()
-                viewmodel.clearSelectedCells()},
-            modifier = Modifier.align(Alignment.End) , colors = ButtonDefaults.buttonColors(containerColor = primeGreen , contentColor = Color.White)
-        ) {
-            Text("Proceed")
-        }
+//        Button(
+//            onClick = {
+//                Log.d("OutgoingSuccess" , "Pressed button")
+//               // showBottomSheet.value = true
+//               //  viewmodel.confirmOutgoingOrder(accNum )
+//                viewmodel.clearSelectedCellData()
+//                viewmodel.clearSelectedCells()},
+//            modifier = Modifier.align(Alignment.End) , colors = ButtonDefaults.buttonColors(containerColor = primeGreen , contentColor = Color.White)
+//        ) {
+//            Text("Proceed")
+//        }
     }
     if(showBottomSheet.value){
 
@@ -197,6 +197,8 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
 
     }
 
+
+
   val retrievedData by viewmodel.retrievedSelectedData.collectAsState()
     Log.d("SelectedCellData" , retrievedData.toString())
     val SelectedVoucherNumber = viewmodel.getTheSelectedStock()
@@ -213,6 +215,21 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
 //    var quantityValues by remember {
 //        mutableStateOf(uniqueVoucherSizePairs.map { "" })
 //    }
+    var mutableStateArray = remember { mutableStateListOf<MutableState<String>>() }
+
+   val outgoingResponseBody = remember {
+       mutableListOf<OutgoingDataClassItem>()
+   }
+    LaunchedEffect(retrievedData) {
+        mutableStateArray.clear()
+
+        retrievedData?.forEach { data ->
+            mutableStateArray.add(mutableStateOf(""))
+        }
+    }
+
+
+
     when(val state = transactionHistory.value){
         is getAllReciptsResponse.success ->{
             Log.d("StateRecipt" , state.reciptData.toString())
@@ -397,6 +414,8 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
         LazyColumn {
             items(retrievedData!!) { pair ->
                 Log.d("Rowwww" ,voucherBagSizePairs.toString())
+
+                val keyboardController = LocalSoftwareKeyboardController.current
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -472,10 +491,76 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
                     var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
                     BasicTextField(value = textFieldValue , onValueChange = {
                         newValue -> textFieldValue = newValue
-                    })
+                    },
+                        textStyle = TextStyle(fontSize = 14.sp , fontWeight = FontWeight.Bold , textAlign = TextAlign.Center),
+                         // Set font size to 11.sp
+
+
+                        modifier = Modifier.border( 1.dp  , Color.Gray , RoundedCornerShape(10.dp)  )
+                            .width(134.dp)
+                            .height(40.dp)
+                            .padding(vertical = 2.dp)
+                        ,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboardController?.hide()
+                                outgoingResponseBody.add(
+                                    OutgoingDataClassItem(
+                                     orderId = pair.orderId,
+                                        variety = pair.variety,
+                                        bagUpdates = listOf(pair.size?.let { BagUpdate(it, textFieldValue.text.toInt()) })
+                                    )
+                                )
+
+                            }
+                        )     , singleLine = true  ,
+                        decorationBox = { innerTextField ->
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                innerTextField()
+                            }
+                        })
+
+                    var lastChangeTime by remember { mutableStateOf(System.currentTimeMillis()) }
+                    val typingTimeout = 300L // Timeout in milliseconds
+//                    LaunchedEffect(textFieldValue ){
+//                        lastChangeTime = System.currentTimeMillis()
+//                    }
+//                    LaunchedEffect(lastChangeTime) {
+//                        delay(typingTimeout)
+//                        if (System.currentTimeMillis() >= lastChangeTime + typingTimeout) {
+//                            outgoingResponseBody.add(
+//                                OutgoingDataClassItem(
+//                                    orderId = pair.orderId,
+//                                    variety = pair.variety,
+//                                    bagUpdates = listOf(pair.size?.let { BagUpdate(it, textFieldValue.text.toInt()) })
+//                                )
+//                            )                        }
+//                    }
+
+
                 }
 
     }}
+            Button(
+                onClick = {
+                    Log.d("OutgoingSuccess" , "Pressed button")
+                    Log.d("Outtttt" , outgoingResponseBody.toString())
+                    // showBottomSheet.value = true
+                     viewmodel.confirmOutgoingOrder(accNum ,outgoingResponseBody  )
+
+                    viewmodel.clearSelectedCellData()
+                    viewmodel.clearSelectedCells()},
+                modifier = Modifier.align(Alignment.End) , colors = ButtonDefaults.buttonColors(containerColor = primeGreen , contentColor = Color.White)
+            ) {
+                Text("Proceed")
+            }
 }
 
 

@@ -382,7 +382,7 @@ class FunctionStoreOwner @Inject constructor(
 
     private val __quantityToRemoveNo12 = MutableStateFlow<Int>(0)
     val quantityToRemoveNo12 :StateFlow<Int> = __quantityToRemoveNo12.asStateFlow()
-    fun confirmOutgoingOrder(farmerId : String  ){
+    fun confirmOutgoingOrder( farmerId: String ,outgoingRequestBody: List<OutgoingDataClassItem>  ){
         //val outgoingOrderData =
         viewModelScope.launch {
 
@@ -396,14 +396,14 @@ class FunctionStoreOwner @Inject constructor(
                         BagUpdate("Number-12" , quantityToRemoveNo12.value)
                     )))
            // val outgoingData = OutgoingDataClassBody(orderItems)
-            Log.d("OutgoingSuccess" , orderItems.toString())
             try {
-                val response = api.confirmOutgoingOrder(farmerId, orderItems)
+                val response = api.confirmOutgoingOrder(farmerId, outgoingRequestBody)
+                Log.d("Oututut" , "intry")
                 if (response.isSuccessful) {
-                    response.body()?.message?.let { Log.d("OutgoingSuccess" , it) }
+                    response.body()?.message?.let { Log.d("OutgoingSuccesssss" , it) }
                 } else {
                     // Handle failure (e.g., log or show error message)
-                    Log.d("OutgoingSuccess" , "Errororrr "+ response.errorBody()?.string() + response.code() )
+                    Log.d("OutgoingSuccesssd" , "Errororrr"+ response.errorBody()?.string() + response.code() )
                 }
             }
             catch (e : Exception){

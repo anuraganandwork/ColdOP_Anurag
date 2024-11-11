@@ -229,7 +229,7 @@ class NetworkModule {
 
 }
 
-//605
+//1140
 // galti save selected order mein ho rhi
 //clean the list of selected
 // outgoing data set on the final call just like incoming
@@ -237,3 +237,7 @@ class NetworkModule {
 // outgoing data set
 // dynamic number of textfields
 // make cards with filtering
+
+//check that quant to remove is less than currr on clicking Proceed and show on ui,
+// solve people wala incoming
+// solve bhar wala outgoing
