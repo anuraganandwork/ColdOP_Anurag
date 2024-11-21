@@ -127,14 +127,18 @@ fun bottomNav(){
                 storeOrRetrieve(accNum!! , navHostController)
             }
 
-            composable(route = AllScreens.OutgoingStockScreen.name+"/{accountNumber}" ,
-                arguments = listOf(navArgument("accountNumber"){
-                    type = NavType.StringType
-                })
-            ){
-                val accNum = it.arguments!!.getString("accountNumber")
-                OutgoingStockScreen(accNum!! ,viewmodel ,navHostController)
+            composable(
+                route = AllScreens.OutgoingStockScreen.name + "/{fromDaybook}/{accountNumber}",
+                arguments = listOf(
+                    navArgument("fromDaybook") { type = NavType.BoolType },
+                    navArgument("accountNumber") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val fromDaybook = backStackEntry.arguments?.getBoolean("fromDaybook") ?: false
+                val accNum = backStackEntry.arguments?.getString("accountNumber") ?: ""
+                OutgoingStockScreen(fromDaybook = fromDaybook, accNum = accNum, viewmodel = viewmodel, navController = navHostController)
             }
+
 
             composable(route = AllScreens.OutgoingSecondScreen.name + "/{accountNumber}" ,
                 arguments = listOf(navArgument("accountNumber"){

@@ -209,7 +209,7 @@ fun storeOrRetrieve(accNumber: String, navController: NavHostController, viewmod
     var selectedGroupBy = remember { mutableStateOf("Group by") }
     var expandedSortBy = remember { mutableStateOf(false) }
     var selectedSortBy = remember { mutableStateOf("Sort by Date") }
-
+    val fromDaybookValue = false
     Column(modifier = Modifier.verticalScroll(enabled = true, state = rememberScrollState(),)) {
         Column(
             modifier = Modifier
@@ -362,7 +362,12 @@ fun storeOrRetrieve(accNumber: String, navController: NavHostController, viewmod
                 Surface(
                     modifier = Modifier
                         .padding()
-                        .clickable { navController.navigate(AllScreens.OutgoingStockScreen.name+ "/${accNumber}") }
+                        .clickable {
+                           // navController.navigate(AllScreens.OutgoingStockScreen.name+ "/${accNumber}")
+                            navController.navigate("outgoing_stock_screen/$fromDaybookValue/$accNumber")
+
+
+                        }
                 ) {
                     Text(
                         text = "Outgoing", modifier = Modifier

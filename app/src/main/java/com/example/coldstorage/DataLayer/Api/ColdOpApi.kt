@@ -3,6 +3,7 @@ package com.example.coldstorage.DataLayer.Api
 import com.example.coldstorage.DataLayer.Api.GetRecieptNumberdata.RecieptNumData
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingResponse
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseDayBook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.IncomingOrderResponse
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
@@ -64,6 +65,14 @@ interface ColdOpApi {
 
   @GET("api/store-admin/receipt-number")
   suspend fun getRecieptNum():Response<RecieptNumData>
+
+@GET("api/store-admin/daybook/orders")
+  suspend fun getOrdersDayBook(
+      @Query("type") type :String,
+      @Query("sortBy") sortBy: String,
+      @Query("page") page: Int,
+      @Query("limit") limit: Int
+  ):Response<ApiResponseDayBook>
 
 }
 

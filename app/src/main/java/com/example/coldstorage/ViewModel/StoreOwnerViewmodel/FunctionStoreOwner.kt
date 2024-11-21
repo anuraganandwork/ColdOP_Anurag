@@ -19,6 +19,7 @@ import com.example.coldstorage.DataLayer.Api.OutgoingData.BagUpdate
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.PopulatedFarmer
 import com.example.coldstorage.DataLayer.Api.Quantity
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseDayBook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Order
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import com.example.coldstorage.DataLayer.Di.AuthInterceptor
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -467,7 +469,37 @@ class FunctionStoreOwner @Inject constructor(
         }
     }
 
+   //daybook orders
 
+    private  val _dayBookOrdersData = MutableStateFlow<ApiStateDaybook>(ApiStateDaybook.Loading)
+    val dayBookOrdersData : StateFlow<ApiStateDaybook> = _dayBookOrdersData
+    fun getOrdersDayBook(type: String, sortBy: String, page: Int, limit: Int){
+        viewModelScope.launch {
+            try {
+                // API call
+                val response: Response<ApiResponseDayBook> = api.getOrdersDayBook(type, sortBy, page, limit)
+
+                if (response.isSuccessful) {
+                    // Emit success state with data
+                    _dayBookOrdersData.value = ApiStateDaybook.success(response.body())
+                } else {
+                    // Emit error state with error message
+                    _dayBookOrdersData.value = ApiStateDaybook.Error("Error: ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                // Emit error state with exception message
+                _dayBookOrdersData.value = ApiStateDaybook.Error("Exception: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    sealed class ApiStateDaybook{
+        object Loading : ApiStateDaybook()
+        data class success(val data : ApiResponseDayBook?):ApiStateDaybook()
+
+        data class Error(val message: String) : ApiStateDaybook()
+
+    }
 
 
 }

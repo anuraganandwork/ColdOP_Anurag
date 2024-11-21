@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -15,9 +16,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -35,12 +38,18 @@ import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.ReceiptRow
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.SelectedCellData
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.getAllReciptsResponse
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.mapReceiptsToRows
+import com.example.coldstorage.ui.theme.primeGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OutgoingStockScreen(accNum: String ,viewmodel: FunctionStoreOwner = hiltViewModel() ,navController: NavController) {
+fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: FunctionStoreOwner = hiltViewModel() ,navController: NavController) {
     var selectedVariety by remember { mutableStateOf("") }
     var selectedBagSize by remember { mutableStateOf("") }
+    var query by remember {
+        mutableStateOf("")
+    }
+    val isNameSelected = remember { mutableStateOf(false) }
+
 
     Scaffold(
         topBar = {
@@ -61,6 +70,57 @@ fun OutgoingStockScreen(accNum: String ,viewmodel: FunctionStoreOwner = hiltView
                 .padding(16.dp)
 
         ) {
+
+            if(fromDaybook){
+                Text(text = "Enter Account Name (search and select)")
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = {
+                        query = it
+                        viewmodel.onSearchQuery(query)
+                    },
+                    label = { Text("Search farmers") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedTextColor = Color.Black, // Text color inside the TextField
+                        disabledTextColor = Color.Gray,
+                        cursorColor = Color.Black, // Cursor color
+                        containerColor = Color.Transparent ,
+                        errorCursorColor = Color.Red, // Cursor color in error state
+                        focusedIndicatorColor = primeGreen, // Border color when focused
+                        unfocusedIndicatorColor = Color.Gray, // Border color when not focused
+                        errorIndicatorColor = Color.Red, // Border color in error state
+                        focusedLeadingIconColor = Color.Black,
+                        focusedTrailingIconColor = Color.Black,
+                        focusedLabelColor = primeGreen, // Label color when focused
+                        unfocusedLabelColor = Color.Gray, // Label color when not focused
+                        errorLabelColor = Color.Red // Label color in error state
+                    )
+                )
+
+
+            LazyColumn(){
+                if (!isNameSelected.value) {
+                    items(viewmodel.searchResults) { result ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    query = result.name
+                                    isNameSelected.value = true
+                                    viewmodel.updateFarmerAcc(result._id)
+                                }
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Text(text = result.name)
+                            Text(text = result.mobileNumber)
+                        }
+                    }
+                }
+
+            }}
+
+
 
             DropdownMenu_(
                 label = "Which variety would you like to take?",
@@ -87,7 +147,7 @@ fun OutgoingStockScreen(accNum: String ,viewmodel: FunctionStoreOwner = hiltView
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                StockTable(accNum, viewmodel, navController)
+                StockTable(fromDaybook, accNum, viewmodel, navController)
             }
 
 
@@ -133,7 +193,7 @@ fun DropdownMenu_(
 }
 
 @Composable
-fun StockTable(accNum: String,viewmodel: FunctionStoreOwner  , navController: NavController) {
+fun StockTable(fromDaybook: Boolean,accNum: String,viewmodel: FunctionStoreOwner  , navController: NavController) {
     val headers = listOf("V No.", "Variety", "Seed", "Goli", "Ration","Cut&Tok", "No.12", "Total")
     val selectedBlock =  remember { mutableStateOf(Color.White) }
    val selectedCells  = remember {
@@ -142,7 +202,13 @@ fun StockTable(accNum: String,viewmodel: FunctionStoreOwner  , navController: Na
    }
     val transactionAllHistory = viewmodel.transactionHistory.collectAsState() // to learn
   LaunchedEffect(Unit){
-      viewmodel.getAllRecipts(accNum)
+
+      if(fromDaybook){
+          viewmodel.getAllRecipts(viewmodel.farmerAcc.value)
+      } else{
+          viewmodel.getAllRecipts(accNum)
+
+      }
   }
 
     val selectedCellsList = remember { mutableStateListOf<SelectedCellData>() }
@@ -441,11 +507,16 @@ Column(modifier = Modifier
                 val finalVouchers =
                     firstKeys.map { itt -> rows[itt.toInt()].voucherNumber.toString() }
                 viewmodel.proceedToNextOutgoing(finalVouchers, secondKeys)
-                Log.d("Next" , "finalvouchers "+finalVouchers+ "second keys "+secondKeys)
+                Log.d("Next", "finalvouchers " + finalVouchers + "second keys " + secondKeys)
                 //Log.d("SelectedCellListttt",selectedCellsList)
                 viewmodel.saveSelectedCellData(selectedCellsList)
-                navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${accNum}")
-            }
+
+                if(fromDaybook){
+                    navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${viewmodel.farmerAcc.value}")
+
+                } else {
+                    navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${accNum}")
+                }   }
 
             , shape = RoundedCornerShape(5.dp) , color =Color(0xFF23C45E) ){
             Text(text = "Proceed" ,modifier = Modifier

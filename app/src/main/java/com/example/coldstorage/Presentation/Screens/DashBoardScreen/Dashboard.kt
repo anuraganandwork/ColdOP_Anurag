@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -36,6 +37,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,6 +86,10 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
     val thirdSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(Unit ){
+        viewmodel.getOrdersDayBook("all" , "oldest" , 1,5)
+    }
+    val state by viewmodel.dayBookOrdersData.collectAsState()
 
     val hideFirstBottomSheet: () -> Unit = {
         scope.launch {
@@ -119,7 +126,7 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
 
     Scaffold(topBar = { TopAppBar(title = { Text(text = "Daybook" , fontWeight = FontWeight.Bold) } , scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior() ) }) {
     Column(modifier = Modifier.padding(it)) {
-        Column() {
+        Column {
 
 
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -144,7 +151,10 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 10.dp)
-                    .clickable { },
+                    .clickable {
+
+
+                    },
             ) {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -166,6 +176,32 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
         }
 
         Text(text = "Transactions", fontWeight = FontWeight.Bold , fontSize = 20.sp ,  modifier = Modifier.padding(horizontal = 15.dp , vertical = 10.dp))
+
+            when (state) {
+                is FunctionStoreOwner.ApiStateDaybook.Loading -> {
+                    // Show a loading indicator
+                    CircularProgressIndicator()
+                }
+                is FunctionStoreOwner.ApiStateDaybook.success -> {
+                    val data = (state as FunctionStoreOwner.ApiStateDaybook.success).data
+                    // Render the data
+                    //Text("Data: $data")
+                    LazyColumn(){
+                        if (data != null) {
+                            items(data.data){
+                                CardComponentDaybook(it)
+
+                            }
+                        }
+                    }
+
+                }
+                is FunctionStoreOwner.ApiStateDaybook.Error -> {
+                    val errorMessage = (state as FunctionStoreOwner.ApiStateDaybook.Error).message
+                    // Show error message
+                    Text("Error: $errorMessage")
+                }
+            }
     } }
 
     if(showBottomSheetOnDaybook.value) {

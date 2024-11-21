@@ -229,7 +229,7 @@ class NetworkModule {
 
 }
 
-//1140
+//920 , 35 mins
 // galti save selected order mein ho rhi
 //clean the list of selected
 // outgoing data set on the final call just like incoming
@@ -241,3 +241,5 @@ class NetworkModule {
 //check that quant to remove is less than currr on clicking Proceed and show on ui,
 // solve people wala incoming
 // solve bhar wala outgoing
+
+//make accNUm a optional arguemnt or any other solution
