@@ -1,5 +1,7 @@
 package com.example.coldstorage.Presentation.Navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -19,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,11 +38,13 @@ import com.example.coldstorage.Presentation.Screens.PeopleScreen.People
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.farmerDetailedScreen
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.storeOrRetrieve
 import com.example.coldstorage.Presentation.Screens.SettingScreen.Setting
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun bottomNav(){
+fun bottomNav(navControllerMain: NavController){
 /// because it is a different section , it will have  a different navcontroller
     val navHostController = rememberNavController()
    val  viewmodel: FunctionStoreOwner = hiltViewModel()
@@ -103,7 +108,7 @@ fun bottomNav(){
             }
 
             composable(route= AllScreens.Setting.name){
-                Setting()
+                Setting(navControllerMain)
             }
 
             composable(route = AllScreens.FarmerDetailedScreen.name+"/{accountNumber}",
@@ -130,8 +135,11 @@ fun bottomNav(){
             composable(
                 route = AllScreens.OutgoingStockScreen.name + "/{fromDaybook}/{accountNumber}",
                 arguments = listOf(
-                    navArgument("fromDaybook") { type = NavType.BoolType },
-                    navArgument("accountNumber") { type = NavType.StringType }
+                    navArgument("fromDaybook") {
+                        type = NavType.BoolType
+                       },
+                    navArgument("accountNumber") { type = NavType.StringType
+                       }
                 )
             ) { backStackEntry ->
                 val fromDaybook = backStackEntry.arguments?.getBoolean("fromDaybook") ?: false

@@ -9,7 +9,7 @@ data class OrderDaybook(
     val voucher: VoucherDaybook,
     val _id: String,
     val coldStorageId: String,
-    val farmerId: String,
+    val farmerId: FarmerInfo,
     val dateOfSubmission: String? = null, // Nullable as some objects may use dateOfExtraction
     val dateOfExtraction: String? = null,
     val orderDetails: List<OrderDetailDaybook>
@@ -18,6 +18,12 @@ data class OrderDaybook(
 data class VoucherDaybook(
     val type: String,
     val voucherNumber: Int
+)
+
+data class FarmerInfo(
+     val _id : String,
+    val name :String
+
 )
 
 data class OrderDetailDaybook(

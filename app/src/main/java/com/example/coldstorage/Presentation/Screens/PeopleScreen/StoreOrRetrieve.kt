@@ -20,8 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -57,7 +55,6 @@ import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.Conf
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.EmailFilterDropdowns
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.LotDetailsDialogWrapper
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ManageStocks
-import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.OrderCard
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.AddressDetails
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.OtherDetails
@@ -123,21 +120,21 @@ val dummyTransactions = listOf(
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun storeOrRetrieve(accNumber: String, navController: NavHostController, viewmodel: FunctionStoreOwner = hiltViewModel()) {
+fun storeOrRetrieve(accountNumber: String, navController: NavHostController, viewmodel: FunctionStoreOwner = hiltViewModel()) {
     //variables for bottom sheet
     val transactionHistory = viewmodel.transactionHistory.collectAsState() // to learn
 //755
     LaunchedEffect(Unit) {
-        viewmodel.updateFarmerAcc(accNumber)
-        Log.d("currentfarmer" , "Account number is"+accNumber)
+        viewmodel.updateFarmerAcc(accountNumber)
+        Log.d("currentfarmer" , "Account number is"+accountNumber)
 
         viewmodel.getAllRecipts("66eab27610eb613c2efca3bc")
 
         //
     }
 
-    LaunchedEffect( accNumber){
-        Log.d("current farmer" , "Account number is"+accNumber)
+    LaunchedEffect( accountNumber){
+        Log.d("current farmer" , "Account number is"+accountNumber)
     }
     Log.d("TransactionhistoryUI", transactionHistory.value.toString())
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -364,7 +361,8 @@ fun storeOrRetrieve(accNumber: String, navController: NavHostController, viewmod
                         .padding()
                         .clickable {
                            // navController.navigate(AllScreens.OutgoingStockScreen.name+ "/${accNumber}")
-                            navController.navigate("outgoing_stock_screen/$fromDaybookValue/$accNumber")
+                            val fromDaybook = false
+                            navController.navigate(AllScreens.OutgoingStockScreen.name + "/$fromDaybook/$accountNumber")
 
 
                         }

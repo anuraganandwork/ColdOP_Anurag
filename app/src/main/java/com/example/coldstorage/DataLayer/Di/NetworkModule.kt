@@ -26,12 +26,15 @@ import javax.inject.Singleton
 
 class AuthInterceptor @Inject constructor( @ApplicationContext private  val context: Context) : Interceptor {
 
+    val sharedPreference = context.getSharedPreferences("AuthToken" , Context.MODE_PRIVATE)
 
-
+companion object{
+    private val Is_LoggedIn = "isLoggedIn"
+}
     @SuppressLint("LongLogTag")
     override fun intercept(chain: Interceptor.Chain): Response {
 
-        val sharedPreference = context.getSharedPreferences("AuthToken" , Context.MODE_PRIVATE)
+//        val sharedPreference = context.getSharedPreferences("AuthToken" , Context.MODE_PRIVATE)
 
         val originalRequest = chain.request()
         val token = sharedPreference.getString("auth_token", null)
@@ -68,11 +71,21 @@ class AuthInterceptor @Inject constructor( @ApplicationContext private  val cont
     @SuppressLint("SuspiciousIndentation")
     public fun saveToken(token: String) {
         //val prefs = context.getSharedPreferences("CookiePrefs", Context.MODE_PRIVATE)
-        val sharedPreference = context.getSharedPreferences("AuthToken" , Context.MODE_PRIVATE)
+        //val sharedPreference = context.getSharedPreferences("AuthToken" , Context.MODE_PRIVATE)
 
         val editor = sharedPreference.edit()
             editor.putString("auth_token", token)
+            editor.putBoolean(Is_LoggedIn , true)
+            editor.apply()
+    }
 
+    fun isLoggedIn():Boolean{
+     return sharedPreference.getBoolean(Is_LoggedIn , false)
+    }
+
+    fun clearLogInSession(){
+        val editor = sharedPreference.edit()
+        editor.clear()
         editor.apply()
     }
     val sharedPrefStoreId = context.getSharedPreferences("ColdStore_ID", Context.MODE_PRIVATE)

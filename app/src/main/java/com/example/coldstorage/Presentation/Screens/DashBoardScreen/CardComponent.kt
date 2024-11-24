@@ -150,6 +150,9 @@ fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook
                     .padding(bottom = 8.dp)
             )
 
+            if(orderDaybook.voucher.type == "RECEIPT"){
+
+
             // Stock Table Row
             StockTableRow(
                 orderDaybook,
@@ -175,9 +178,12 @@ fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook
                 // Farmer Data
                 Column {
                     DetailRow("Farmer data", "")
-                    DetailRow("Name", "Gourish Narang")
-                    DetailRow("Acc No", "01")
+                    DetailRow("Name", orderDaybook.farmerId.name)
+                    DetailRow("Acc No", orderDaybook.farmerId._id.trim())
                 }
+            }} else{
+                OutgoingCard(orderDaybook)
+
             }
         }
     }
@@ -198,19 +204,19 @@ fun StockTableRow(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, Color.Black)
+            //.border(1.dp, Color.Black)
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             headers.forEach { header ->
                 Text(
-                    text = header.size,
-                    fontSize = 12.sp,
+                    text = if(header.size =="Number-12") "No.12" else header.size,
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     modifier = Modifier
                         .weight(1f)
                         .padding(4.dp)
-                        .border(0.5.dp, Color.Black)
+                        //.border(0.5.dp, Color.Black)
                 )
             }
         }
@@ -220,12 +226,12 @@ fun StockTableRow(
                 //                        Text(text = if(orderDaybook.voucher.type == "RECEIPT") incomingSum.value.toString() else outgoingSum.value.toString())
                 Text(
                     text = if(orderDaybook.voucher.type == "RECEIPT") value.quantity?.currentQuantity.toString() else value.quantityRemoved.toString() ,
-                    fontSize = 12.sp,
+                    fontSize = 10.sp,
                     color = Color.Black,
                     modifier = Modifier
                         .weight(1f)
                         .padding(4.dp)
-                        .border(0.5.dp, Color.Black)
+                       // .border(0.5.dp, Color.Black)
                 )
             }
         }
@@ -299,4 +305,4 @@ fun DetailRow(label: String, value: String) {
 //fun prevCard(){
 //    CardComponentDaybook()
 //}
-//140
+//155

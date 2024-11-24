@@ -87,7 +87,7 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit ){
-        viewmodel.getOrdersDayBook("all" , "oldest" , 1,5)
+        viewmodel.getOrdersDayBook("incoming" , "oldest" , 1,5)
     }
     val state by viewmodel.dayBookOrdersData.collectAsState()
 
@@ -153,7 +153,9 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
                     .padding(horizontal = 10.dp)
                     .clickable {
 
-
+                        val fromDaybook = true
+                        val accountNumber = "12"
+                        navController.navigate(AllScreens.OutgoingStockScreen.name + "/$fromDaybook/$accountNumber")
                     },
             ) {
                 Row(
@@ -180,7 +182,14 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
             when (state) {
                 is FunctionStoreOwner.ApiStateDaybook.Loading -> {
                     // Show a loading indicator
-                    CircularProgressIndicator()
+                    Column(modifier = Modifier.fillMaxSize() ,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        CircularProgressIndicator(
+                            color= primeGreen
+                        )
+
+                    }
                 }
                 is FunctionStoreOwner.ApiStateDaybook.success -> {
                     val data = (state as FunctionStoreOwner.ApiStateDaybook.success).data

@@ -1,6 +1,10 @@
 package com.example.coldstorage.Presentation.Navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -10,10 +14,14 @@ import com.example.coldstorage.Presentation.Screens.Auth.CustomLoginPage
 import com.example.coldstorage.Presentation.Screens.Auth.FarmerQuickAddInputForm
 import com.example.coldstorage.Presentation.Screens.Auth.StoreAdminRegistrationForm
 import com.example.coldstorage.Presentation.Screens.OnboardingScreens.pickYourRole
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Nav(navHostContorller : NavHostController){
- NavHost(navController = navHostContorller, startDestination = Sections.roleSelectionScreen.route ){
+    val authViewmodel : AuthViewmodel = hiltViewModel()
+   val isLoggedIn= authViewmodel.isLoggedIn.collectAsState()
+    NavHost(navController = navHostContorller, startDestination = if(isLoggedIn.value) Sections.StoreOwner.route else Sections.roleSelectionScreen.route ){
 
      composable(route = Sections.roleSelectionScreen.route){
          pickYourRole{roles ->
@@ -27,7 +35,7 @@ fun Nav(navHostContorller : NavHostController){
 
      composable(route= Sections.StoreOwner.route){
 
-            bottomNav()
+            bottomNav(navHostContorller)
 
 
      }

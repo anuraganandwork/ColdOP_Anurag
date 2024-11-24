@@ -119,6 +119,14 @@ class AuthViewmodel @Inject constructor(
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 //    private val _logInStatusLoader = MutableStateFlow<Boolean>(false)
 //    val logInStatusLoader: StateFlow<Boolean> = _logInStatusLoader.asStateFlow()
+
+    private val _isLoggedIn = MutableStateFlow(false)
+    val isLoggedIn :StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+    init {
+
+        _isLoggedIn.value = authIntercepter.isLoggedIn()
+    }
+
     @SuppressLint("SuspiciousIndentation")
     fun  logInStoreOwner(logInData: logInData){
     if (_loadingLogIn.value) return
@@ -136,7 +144,7 @@ class AuthViewmodel @Inject constructor(
                   authIntercepter.clearStore_id()
                     if (token != null) {
                         authIntercepter.saveToken(token)
-
+                        _isLoggedIn.value = true
                        Log.d("SuccessfullLOG", "Login successful, token saved.")
                     }
                     if(store_id!= null){
@@ -171,6 +179,10 @@ class AuthViewmodel @Inject constructor(
 
     }
 
+   fun logOutStoreOwner(){
+       authIntercepter.clearLogInSession()
+       _isLoggedIn.value = false
+   }
     fun dismissError() {
         _errorMessage.value = null
     }
