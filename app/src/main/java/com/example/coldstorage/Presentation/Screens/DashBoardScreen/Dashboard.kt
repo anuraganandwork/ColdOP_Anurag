@@ -87,7 +87,7 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit ){
-        viewmodel.getOrdersDayBook("incoming" , "oldest" , 1,5)
+        viewmodel.getOrdersDayBook("incoming" , "latest" , 1,50)
     }
     val state by viewmodel.dayBookOrdersData.collectAsState()
 
@@ -186,7 +186,7 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center) {
                         CircularProgressIndicator(
-                            color= primeGreen
+                            color= Color.Gray
                         )
 
                     }

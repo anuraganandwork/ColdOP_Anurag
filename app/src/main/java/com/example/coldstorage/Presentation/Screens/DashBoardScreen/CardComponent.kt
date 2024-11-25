@@ -2,6 +2,14 @@ package com.example.coldstorage.Presentation.Screens.DashBoardScreen
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -52,8 +62,9 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
 
 
     Card(
-        modifier = Modifier.padding(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        modifier = Modifier.animateContentSize().padding( horizontal = 6.dp , vertical = 10.dp)
+            ,
+        elevation = CardDefaults.cardElevation(defaultElevation = 9.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
         )
@@ -72,28 +83,47 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
 
         Column(
             modifier = Modifier
-                .padding(10.dp)
+                .padding(10.dp).clickable {                                    expanded = !expanded
+                }
         ){
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween) {
-                  Row() {
-                      Text(text = orderDaybook.voucher.type)
-                      Text(text = orderDaybook.voucher.voucherNumber.toString())
+                  Row(modifier = Modifier.weight(1f)) {
+                      Text(text = orderDaybook.voucher.type+" : " , fontSize = 13.sp , fontWeight = FontWeight.Bold)
+                      Text(text = orderDaybook.voucher.voucherNumber.toString() , fontSize = 13.sp , fontWeight = FontWeight.Bold)
                   }
                     
-                   Row {
-                       Text(text = orderDaybook.orderDetails[0].variety)
+                   Row(modifier = Modifier.weight(.5f),verticalAlignment = Alignment.CenterVertically,
+                       horizontalArrangement = Arrangement.SpaceBetween) {
+                       Text(text = orderDaybook.orderDetails[0].variety , fontSize = 13.sp , fontWeight = FontWeight.Bold)
                        //Icon(imageVector = Icon)
+                       Spacer(modifier = Modifier.padding( start = 8.dp))
+//                     if(expanded){
+//                       Icon(painter = painterResource(id = R.drawable.upload), contentDescription = "Drop down icon" ,
+//                           modifier = Modifier
+//                               .width(17.dp)
+//                               .height(17.dp)
+//                               .clickable {
+//                                   expanded = !expanded
+//                               })
+//                     } else{
 
+                       val rotationAngle by animateFloatAsState(
+                           targetValue = if (expanded) 180f else 0f,
+                           animationSpec = tween(durationMillis = 300)
+                       )
 
-                       Icon(painter = painterResource(id = R.drawable.down), contentDescription = "Drop down icon" ,
+                       Icon(
+                           painter = painterResource(id = R.drawable.down),
+                           contentDescription = "Drop down icon",
                            modifier = Modifier
-                               .width(14.dp)
-                               .height(14.dp)
-                               .clickable {
-                                   expanded = !expanded
-                               })
+                               .size(17.dp)
+                               .graphicsLayer(rotationZ = rotationAngle) // Rotate the icon
+                               .clickable { expanded = !expanded }
+                       )
+
+                       // }
 
 
                    } 
@@ -105,19 +135,40 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
 
                 Row(modifier = Modifier.fillMaxWidth() ,
                     horizontalArrangement = Arrangement.SpaceBetween) {
-                    Row {
-                        Text(text = "Dated :")
-                        Text(text = if(orderDaybook.voucher.type == "RECEIPT") orderDaybook.dateOfSubmission.toString() else orderDaybook.dateOfExtraction.toString())
+                    Row(modifier = Modifier.weight(1f)) {
+                        Text(text = "Dated : ", fontSize = 13.sp , fontWeight = FontWeight.Medium)
+                        Text(text = if(orderDaybook.voucher.type == "RECEIPT") orderDaybook.dateOfSubmission.toString() else orderDaybook.dateOfExtraction.toString() , fontSize = 13.sp , fontWeight = FontWeight.Medium)
                     }
-                    Row {
-                        Text(text = "Lot No:")
-                        Text(text = if(orderDaybook.voucher.type == "RECEIPT") incomingSum.value.toString() else outgoingSum.value.toString())
+                    Row(modifier = Modifier.weight(.5f) ,
+                        horizontalArrangement = Arrangement.Start) {
+                        Text(text = "Lot No : " , fontSize = 13.sp , fontWeight = FontWeight.Medium)
+                        Text(text = if(orderDaybook.voucher.type == "RECEIPT") incomingSum.value.toString() else outgoingSum.value.toString() , fontSize = 13.sp , fontWeight = FontWeight.Medium)
 
                     }
                 }
                 if(expanded){
                     //make this a lazyrow with bagsizes
-                StockDetailsScreen(orderDaybook , orderDaybook.orderDetails[0].bagSizes )}
+                //StockDetailsScreen(orderDaybook , orderDaybook.orderDetails[0].bagSizes )
+                    AnimatedVisibility(
+                        visible = expanded,
+                        enter = fadeIn(animationSpec = tween(300)) + expandVertically(animationSpec = tween(300)),
+                        exit = fadeOut(animationSpec = tween(300)) + shrinkVertically(animationSpec = tween(300))
+                    ) {
+                        StockDetailsScreen(
+                            orderDaybook = orderDaybook,
+                            bagsizes = orderDaybook.orderDetails[0].bagSizes
+                        )
+                    }
+
+
+
+
+
+
+                }
+
+
+
             }
         }
 
@@ -130,25 +181,27 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
 fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook>) {
     Surface(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .border(1.dp, Color.Black)
+            .fillMaxWidth() ,
+        color = Color.White
+            //.padding(16.dp)
+            //.border(1.dp, Color.Black)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(vertical = 8.dp)
         ) {
             // Header Text
-            Text(
-                text = "Stock Details",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 8.dp)
-            )
+            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start) {
+                Text(
+                    text = "Stock Details",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier
+                )
+            }
+
 
             if(orderDaybook.voucher.type == "RECEIPT"){
 
@@ -169,7 +222,7 @@ fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook
             ) {
                 // Location Details
                 Column {
-                    DetailRow("Location", "")
+                    Text(text = "Location" , fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     orderDaybook.orderDetails[0].location?.let { DetailRow("Chamber", it.chamber) }
                     orderDaybook.orderDetails[0].location?.let { DetailRow("Floor", it.floor) }
                     orderDaybook.orderDetails[0].location?.let { DetailRow("Row", it.row) }
@@ -177,9 +230,9 @@ fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook
 
                 // Farmer Data
                 Column {
-                    DetailRow("Farmer data", "")
+                    Text(text = "Farmer Data" , fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     DetailRow("Name", orderDaybook.farmerId.name)
-                    DetailRow("Acc No", orderDaybook.farmerId._id.trim())
+                    DetailRow("Acc No", orderDaybook.farmerId._id.take(3))
                 }
             }} else{
                 OutgoingCard(orderDaybook)
@@ -210,7 +263,7 @@ fun StockTableRow(
             headers.forEach { header ->
                 Text(
                     text = if(header.size =="Number-12") "No.12" else header.size,
-                    fontSize = 10.sp,
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     modifier = Modifier
@@ -226,7 +279,7 @@ fun StockTableRow(
                 //                        Text(text = if(orderDaybook.voucher.type == "RECEIPT") incomingSum.value.toString() else outgoingSum.value.toString())
                 Text(
                     text = if(orderDaybook.voucher.type == "RECEIPT") value.quantity?.currentQuantity.toString() else value.quantityRemoved.toString() ,
-                    fontSize = 10.sp,
+                    fontSize = 11.sp,
                     color = Color.Black,
                     modifier = Modifier
                         .weight(1f)
@@ -288,14 +341,14 @@ fun DetailRow(label: String, value: String) {
     ) {
         Text(
             text = "$label :",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Medium,
             color = Color.Black,
             modifier = Modifier.padding(end = 4.dp)
         )
         Text(
             text = value,
-            fontSize = 12.sp,
+            fontSize = 11.sp,
             color = Color.Black
         )
     }
