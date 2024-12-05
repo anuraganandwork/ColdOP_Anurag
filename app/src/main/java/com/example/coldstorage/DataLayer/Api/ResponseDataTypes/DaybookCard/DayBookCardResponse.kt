@@ -28,7 +28,7 @@ data class FarmerInfo(
 
 data class OrderDetailDaybook(
     val location: LocationDaybook? = null, // Nullable as some orders may not have location details
-    val incomingOrder: String? = null, // Nullable as not all orders have this field
+    val incomingOrder: IncomingOrderSnapOutgoing? = null, // Nullable as not all orders have this field
     val variety: String,
     val bagSizes: List<BagSizeDaybook>
 )
@@ -48,4 +48,33 @@ data class BagSizeDaybook(
 data class QuantityDaybook(
     val initialQuantity: Int,
     val currentQuantity: Int
+)
+
+//data class IncomingOrderResponse(
+//    val incomingOrder: IncomingOrder
+//)
+
+data class IncomingOrderSnapOutgoing(
+    val location: LocationIncomingDaybook,
+    val voucher: VoucherIncomingDaybook,
+    val _id: String,
+    val incomingBagSizes: List<IncomingBagSizeDaybook>
+)
+
+data class LocationIncomingDaybook(
+    val floor: String,
+    val row: String,
+    val chamber: String
+)
+
+data class VoucherIncomingDaybook(
+    val type: String,
+    val voucherNumber: Int
+)
+
+data class IncomingBagSizeDaybook(
+    val size: String,
+    val currentQuantity: Int,
+    val initialQuantity: Int,
+    val _id: String
 )

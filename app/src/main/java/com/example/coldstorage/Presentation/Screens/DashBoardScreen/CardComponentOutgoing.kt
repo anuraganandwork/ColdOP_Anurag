@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.LocationIncomingDaybook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDetailDaybook
 
@@ -31,9 +33,10 @@ data class RationRate(
 
 data class OutgoingCardRowData(
     val Bagtype : String,
-    val Address : String ,
+    val Address : LocationIncomingDaybook ,
     val voucherNum : Int ,
-    val QtyIssued:Int
+    val QtyIssued:Int,
+    val availableQty : Int
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -46,44 +49,54 @@ fun OutgoingCard(orderDaybook: OrderDaybook) {
     val totalSeed = totalBags(orderDaybook, "Seed")
     val totalCut = totalBags(orderDaybook, "Cut-tok")
     val totalNumber = totalBags(orderDaybook, "Number-12")
-
+val totalBagsNumber = totalCut+totalGoli+totalRation+totalSeed+totalNumber
 //    val listOfBags= mutableStateOf<List<OutgoingCardRowData>>(emptyList())
 //    listOfBags.value = mapDataForOutgoingRow(orderDaybook)
     val listOfBags = mapDataForOutgoingRow(orderDaybook)
-
+Log.d("OutgoingCardDar=",listOfBags.toString())
     val rationRates = listOf<RationRate>(
-        RationRate("Goli", totalGoli),
-        RationRate("Ration", totalRation),
-        RationRate("Seed", totalSeed),
-        RationRate("Cut-tok", totalCut),
-        RationRate("No.12", totalNumber)
+        RationRate("Goli", totalGoli.toString()),
+        RationRate("Ration", totalRation.toString()),
+        RationRate("Seed", totalSeed.toString()),
+        RationRate("Cut-tok", totalCut.toString()),
+        RationRate("No.12", totalNumber.toString())
 
 
     )
 
-
+ val headers = listOf<String>("Bag Type" ,"Address","R. Rec","Avl. Qty.","Issued")
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, Color.Gray)
     ) {
         rationRates.forEach { rate ->
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(8.dp),
+                    .padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = rate.type,
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.sp
                 )
                 Text(
                     text = rate.rate,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 11.sp
                 )
             }
+        }
+        Column(modifier = Modifier .weight(1f)
+            .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "Total" ,  style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp)
+            Text(text = totalBagsNumber.toString() , style = MaterialTheme.typography.bodySmall,
+                fontSize = 11.sp)
         }
     }
 //    LazyColumn(
@@ -143,6 +156,14 @@ fun OutgoingCard(orderDaybook: OrderDaybook) {
 //
 //
 //    }
+   Row( modifier = Modifier
+       .fillMaxWidth()
+       .padding(vertical = 8.dp, horizontal = 8.dp)) {
+       headers.forEach { 
+           Text(text = it , fontSize = 11.sp, fontWeight = FontWeight.Bold,  modifier = Modifier.weight(1f)
+           )
+       }
+   }
 
     listOfBags.forEach {item->
         Row(
@@ -152,26 +173,47 @@ fun OutgoingCard(orderDaybook: OrderDaybook) {
             ) {
                 Text(
                     text = item.Bagtype,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = item.Address,
-                    modifier = Modifier.weight(1f)
+                    text = item.Address.chamber+"-"+item.Address.floor+"-"+item.Address.row,
+                    modifier = Modifier.weight(1f),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
                 )
                 Text(
                     text = item.voucherNum.toString(),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
                 )
+            Text(
+                text = item.availableQty.toString(),
+                modifier = Modifier.weight(1f),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Medium,
+            )
                 Text(
                     text = item.QtyIssued.toString(),
                     color = Color.Red,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
                 )
 
             }
     }
+
+
+    Column(modifier = Modifier.padding(top = 10.dp)) {
+        Text(text = "Farmer Data" , fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        DetailRow("Name", orderDaybook.farmerId.name)
+        DetailRow("Acc No", orderDaybook.farmerId._id.take(5))
+    }
 }
-fun totalBags(orderDaybook: OrderDaybook , size:String):String{
+fun totalBags(orderDaybook: OrderDaybook , size:String):Int{
     var total = 0;
     val sum = orderDaybook.orderDetails.forEach{
        it.bagSizes.forEach {si->
@@ -180,27 +222,43 @@ fun totalBags(orderDaybook: OrderDaybook , size:String):String{
        }
     }
 }
-return total.toString()
+return total
 
 }
 
 fun mapDataForOutgoingRow(orderDaybook: OrderDaybook ):List<OutgoingCardRowData>{
     // add the returned data in a list and use that in the list
     var listData = mutableListOf<OutgoingCardRowData>()
-    orderDaybook.orderDetails.forEach {order->
-     order.bagSizes.forEach{
-         var dataaa =
-             it.quantityRemoved?.let { it1 ->
-                 OutgoingCardRowData(Bagtype = it.size , Address = order.location?.chamber
-                         +"-"+order.location?.floor+"-"+order.location?.row ,
-                     voucherNum = orderDaybook.voucher.voucherNumber, QtyIssued = it1
-                 )
-             }
 
-         if(dataaa!= null){
-             listData.add(dataaa)
-         }
-     }}
+    orderDaybook.orderDetails.forEach { order->
+        order.incomingOrder?.incomingBagSizes?.forEach { incomingBag->
+            order.bagSizes.forEach { bagSize->
+
+                if(incomingBag.size == bagSize.size){
+                var dataForOutgoingCard = bagSize.quantityRemoved?.let {
+                    OutgoingCardRowData(
+                        Bagtype = incomingBag.size,
+                        Address = order.incomingOrder.location,
+                        voucherNum = order.incomingOrder.voucher.voucherNumber,
+                        QtyIssued = it,
+                        availableQty = incomingBag.currentQuantity
+                    )
+                }
+                    if(dataForOutgoingCard != null){
+                        listData.add(dataForOutgoingCard)
+                    }
+
+
+                }
+
+
+            }
+
+
+        }
+
+    }
+
 
    return  listData
 
@@ -227,3 +285,5 @@ fun mapDataForOutgoingRow(orderDaybook: OrderDaybook ):List<OutgoingCardRowData>
 //        }
 //    }
 //}
+
+//435

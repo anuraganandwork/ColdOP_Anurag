@@ -202,6 +202,15 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
             showFourthBottomSheet.value = true
         }
     }
+
+    val hidefourthBottomSheet:()->Unit = {
+        scope.launch {
+            fourthSheetState.hide()
+        }.invokeOnCompletion {
+            if (!fourthSheetState.isVisible) {
+                showFourthBottomSheet.value = false
+            }}
+    }
     var expandedGroupBy = remember { mutableStateOf(false) }
     var selectedGroupBy = remember { mutableStateOf("Group by") }
     var expandedSortBy = remember { mutableStateOf(false) }
@@ -418,8 +427,8 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
 
                 is getAllReciptsResponse.success -> {
                     Log.d("Succ", state.reciptData.toString())
-                    Text(text = "HI")
-                    Text(text = state.reciptData.toString())
+//                    Text(text = "HI")
+//                    Text(text = state.reciptData.toString())
                 }
             }
 //            Column {
@@ -610,7 +619,9 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
 
             ) {
             finalConfirmation {
-                   viewmodel.getTheSelectedStock()
+
+                hidefourthBottomSheet()
+                viewmodel.getTheSelectedStock()
                    viewmodel.getTheSelectedIndex()
             }
         }

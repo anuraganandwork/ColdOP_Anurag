@@ -80,7 +80,7 @@ Column(modifier = Modifier.padding(horizontal = 10.dp)) {
                 .padding(20.dp)
                 .background(Color.Red)
                 .clickable {
-                   // viewModel.createIncomingOrder()
+                   viewModel.createIncomingOrderForUi()
 
                     onContinue() }) {
                 Text(text = "Confirm" , modifier = Modifier

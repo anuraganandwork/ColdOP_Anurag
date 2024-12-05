@@ -337,7 +337,7 @@ fun StockTableRow(
 fun DetailRow(label: String, value: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp)
+        modifier = Modifier.padding(vertical = 2.dp)
     ) {
         Text(
             text = "$label :",

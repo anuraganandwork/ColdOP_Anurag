@@ -44,9 +44,8 @@ fun ClickableBlock(cell: String , cellTwo:String ,  isSelected: Boolean,
         .clickable {
 
             onToggle(!isSelected)
-            if (!isSelected) {
                 saveSelected()
-            }
+
 //yhi pe dikkat hai
 
         } ,
@@ -63,9 +62,10 @@ fun ClickableBlock(cell: String , cellTwo:String ,  isSelected: Boolean,
                 )
                 .border(
                     width = 1.dp,
-                    color = Color.Green,
+                    color = if (cell.toInt() > 0) Color.Green else Color.Gray, // Provide a valid color
                     shape = RoundedCornerShape(4.dp)
                 )
+
 
         ) {
             Box(

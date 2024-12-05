@@ -18,7 +18,7 @@ import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 import com.example.coldstorage.ui.theme.primeGreen
 
 @Composable
-fun Setting(navController: NavController){
+fun Setting(navController:NavController){
     val authViewmodel:AuthViewmodel= hiltViewModel()
     Column(modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.Center , horizontalAlignment = Alignment.CenterHorizontally) {
         Button(onClick = {

@@ -56,7 +56,7 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
             TopAppBar(
                 title = { Text("Outgoing Stock") },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back navigation */ }) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
@@ -301,20 +301,43 @@ Column(modifier = Modifier
                     onToggle = { isSelected ->
                         selectedCells[Pair(rowIndex, 2)] = isSelected
                     } ,saveSelected = {
-                        if(selectedCells[Pair(rowIndex, 2)] == true){
-                             selectedCellsList.add(
-                                 SelectedCellData(
-                                     orderId = row.orderId,
-                                     voucherNumber = row.voucherNumber,
-                                     variety = row.variety,
-                                     size = row.size.getOrNull(0)?.size?.toString(),
-                                     address = row.address,
-                                     dateOfSubmission = row.dateOfSubmission,
-                                     currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
+                       // if(selectedCells[Pair(rowIndex, 2)] == true){
+                            if(selectedCellsList.contains( SelectedCellData(
+                                    orderId = row.orderId,
+                                    voucherNumber = row.voucherNumber,
+                                    variety = row.variety,
+                                    size = row.size.getOrNull(0)?.size?.toString(),
+                                    address = row.address,
+                                    dateOfSubmission = row.dateOfSubmission,
+                                    currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
 
-                             )
-                             )
-                        }
+                                ))){
+                                selectedCellsList.remove(SelectedCellData(
+                                    orderId = row.orderId,
+                                    voucherNumber = row.voucherNumber,
+                                    variety = row.variety,
+                                    size = row.size.getOrNull(0)?.size?.toString(),
+                                    address = row.address,
+                                    dateOfSubmission = row.dateOfSubmission,
+                                    currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                ))
+                                } else{
+                                selectedCellsList.add(
+                                    SelectedCellData(
+                                        orderId = row.orderId,
+                                        voucherNumber = row.voucherNumber,
+                                        variety = row.variety,
+                                        size = row.size.getOrNull(0)?.size?.toString(),
+                                        address = row.address,
+                                        dateOfSubmission = row.dateOfSubmission,
+                                        currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                    )
+                                )
+                                }
+
+                      //  }
 
                     }
                 )
@@ -328,10 +351,9 @@ Column(modifier = Modifier
                     onToggle = { isSelected ->
                         selectedCells[Pair(rowIndex, 3)] = isSelected
                     },
-                    saveSelected = {
-                        if(selectedCells[Pair(rowIndex, 3)] == true){
-                            selectedCellsList.add(
-                                SelectedCellData(
+                    saveSelected =  {
+                      //  if(selectedCells[Pair(rowIndex, 3)] == true){
+                            if(selectedCellsList.contains( SelectedCellData(
                                     orderId = row.orderId,
                                     voucherNumber = row.voucherNumber,
                                     variety = row.variety,
@@ -340,20 +362,34 @@ Column(modifier = Modifier
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
 
+                                ))){
+                                selectedCellsList.remove(SelectedCellData(
+                                    orderId = row.orderId,
+                                    voucherNumber = row.voucherNumber,
+                                    variety = row.variety,
+                                    size = row.size.getOrNull(1)?.size?.toString(),
+                                    address = row.address,
+                                    dateOfSubmission = row.dateOfSubmission,
+                                    currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                ))
+                            } else{
+                                selectedCellsList.add(
+                                    SelectedCellData(
+                                        orderId = row.orderId,
+                                        voucherNumber = row.voucherNumber,
+                                        variety = row.variety,
+                                        size = row.size.getOrNull(1)?.size?.toString(),
+                                        address = row.address,
+                                        dateOfSubmission = row.dateOfSubmission,
+                                        currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                    )
                                 )
-                            )
-                        }
-                        Log.d("PressedBUttonXX" , "!@#$%^&*()")
-//                        viewmodel.saveSelectedCellData(
-//                            orderId = row.orderId,
-//                            voucherNumber = row.voucherNumber,
-//                            variety = row.variety,
-//                            size = row.size.getOrNull(1)?.size?.toString() ,
-//                            address = row.address,
-//                            dateOfSubmission = row.dateOfSubmission,
-//                            currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
-//
-//                        )
+                            }
+
+                       // }
+
                     }
                 )
                 ClickableBlock(
@@ -366,10 +402,8 @@ Column(modifier = Modifier
                         selectedCells[Pair(rowIndex, 4)] = isSelected
                     },
                     saveSelected = {
-
-                        if(selectedCells[Pair(rowIndex, 4)] == true){
-                            selectedCellsList.add(
-                                SelectedCellData(
+                       // if(selectedCells[Pair(rowIndex, 4)] == true){
+                            if(selectedCellsList.contains( SelectedCellData(
                                     orderId = row.orderId,
                                     voucherNumber = row.voucherNumber,
                                     variety = row.variety,
@@ -378,10 +412,34 @@ Column(modifier = Modifier
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
 
+                                ))){
+                                selectedCellsList.remove(SelectedCellData(
+                                    orderId = row.orderId,
+                                    voucherNumber = row.voucherNumber,
+                                    variety = row.variety,
+                                    size = row.size.getOrNull(2)?.size?.toString(),
+                                    address = row.address,
+                                    dateOfSubmission = row.dateOfSubmission,
+                                    currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                ))
+                            } else{
+                                selectedCellsList.add(
+                                    SelectedCellData(
+                                        orderId = row.orderId,
+                                        voucherNumber = row.voucherNumber,
+                                        variety = row.variety,
+                                        size = row.size.getOrNull(2)?.size?.toString(),
+                                        address = row.address,
+                                        dateOfSubmission = row.dateOfSubmission,
+                                        currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                    )
                                 )
-                            )
-                        }
-//
+                            }
+
+                       // }
+
                     }
                 )
                 ClickableBlock(
@@ -394,10 +452,8 @@ Column(modifier = Modifier
                         selectedCells[Pair(rowIndex, 5)] = isSelected
                     },
                     saveSelected = {
-
-                        if(selectedCells[Pair(rowIndex, 5)] == true){
-                            selectedCellsList.add(
-                                SelectedCellData(
+                       // if(selectedCells[Pair(rowIndex, 5)] == true){
+                            if(selectedCellsList.contains( SelectedCellData(
                                     orderId = row.orderId,
                                     voucherNumber = row.voucherNumber,
                                     variety = row.variety,
@@ -406,19 +462,34 @@ Column(modifier = Modifier
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
 
+                                ))){
+                                selectedCellsList.remove(SelectedCellData(
+                                    orderId = row.orderId,
+                                    voucherNumber = row.voucherNumber,
+                                    variety = row.variety,
+                                    size = row.size.getOrNull(3)?.size?.toString(),
+                                    address = row.address,
+                                    dateOfSubmission = row.dateOfSubmission,
+                                    currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                ))
+                            } else{
+                                selectedCellsList.add(
+                                    SelectedCellData(
+                                        orderId = row.orderId,
+                                        voucherNumber = row.voucherNumber,
+                                        variety = row.variety,
+                                        size = row.size.getOrNull(3)?.size?.toString(),
+                                        address = row.address,
+                                        dateOfSubmission = row.dateOfSubmission,
+                                        currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                    )
                                 )
-                            )
-                        }
-//                        viewmodel.saveSelectedCellData(
-//                            orderId = row.orderId,
-//                            voucherNumber = row.voucherNumber,
-//                            variety = row.variety,
-//                            size = row.size.getOrNull(3)?.size?.toString(),
-//                            address = row.address,
-//                            dateOfSubmission = row.dateOfSubmission,
-//                            currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
-//
-//                        )
+                            }
+
+                       // }
+
                     }
                 )
                 //Spacer(modifier = Modifier.padding(start = 3.dp))
@@ -430,11 +501,9 @@ Column(modifier = Modifier
                         ?: false, // Use +2 to skip the first two columns
                     onToggle = { isSelected ->
                         selectedCells[Pair(rowIndex, 6)] = isSelected
-                    },saveSelected = {
-
-                        if(selectedCells[Pair(rowIndex, 6)] == true){
-                            selectedCellsList.add(
-                                SelectedCellData(
+                    },saveSelected =  {
+                       // if(selectedCells[Pair(rowIndex, 6)] == true){
+                            if(selectedCellsList.contains( SelectedCellData(
                                     orderId = row.orderId,
                                     voucherNumber = row.voucherNumber,
                                     variety = row.variety,
@@ -443,19 +512,34 @@ Column(modifier = Modifier
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
 
+                                ))){
+                                selectedCellsList.remove(SelectedCellData(
+                                    orderId = row.orderId,
+                                    voucherNumber = row.voucherNumber,
+                                    variety = row.variety,
+                                    size = row.size.getOrNull(4)?.size?.toString(),
+                                    address = row.address,
+                                    dateOfSubmission = row.dateOfSubmission,
+                                    currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                ))
+                            } else{
+                                selectedCellsList.add(
+                                    SelectedCellData(
+                                        orderId = row.orderId,
+                                        voucherNumber = row.voucherNumber,
+                                        variety = row.variety,
+                                        size = row.size.getOrNull(4)?.size?.toString(),
+                                        address = row.address,
+                                        dateOfSubmission = row.dateOfSubmission,
+                                        currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
+
+                                    )
                                 )
-                            )
-                        }
-//                        viewmodel.saveSelectedCellData(
-//                            orderId = row.orderId,
-//                            voucherNumber = row.voucherNumber,
-//                            variety = row.variety,
-//                            size = row.size.getOrNull(4)?.size?.toString(),
-//                            address = row.address,
-//                            dateOfSubmission = row.dateOfSubmission,
-//                            currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
-//
-//                        )
+                            }
+
+                       // }
+
                     }
                 )
                 val totalQuantity = row.size

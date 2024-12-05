@@ -87,7 +87,7 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit ){
-        viewmodel.getOrdersDayBook("incoming" , "latest" , 1,50)
+        viewmodel.getOrdersDayBook("all" , "latest" , 1,50)
     }
     val state by viewmodel.dayBookOrdersData.collectAsState()
 
@@ -195,6 +195,7 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
                     val data = (state as FunctionStoreOwner.ApiStateDaybook.success).data
                     // Render the data
                     //Text("Data: $data")
+                    if(data!= null){
                     LazyColumn(){
                         if (data != null) {
                             items(data.data){
@@ -202,6 +203,8 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
 
                             }
                         }
+                    }} else{
+                        Text(text = "No transactions!")
                     }
 
                 }

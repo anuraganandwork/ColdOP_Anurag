@@ -13,6 +13,7 @@ enum class AllScreens {
     LogIn,
     SignUp,
     OutgoingStockScreen,
-    OutgoingSecondScreen
+    OutgoingSecondScreen,
+    OutgoingScreenSuccess
 
 }

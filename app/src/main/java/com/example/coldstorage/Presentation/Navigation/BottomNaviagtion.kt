@@ -2,6 +2,9 @@ package com.example.coldstorage.Presentation.Navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -32,6 +35,7 @@ import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.Auth.FarmerQuickAddInputForm
 import com.example.coldstorage.Presentation.Screens.DashBoardScreen.Dashboard
 import com.example.coldstorage.Presentation.Screens.OfflineScreen.Offline
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing.OutgoingOrderSuccess
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing.OutgoingSecondScreen
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing.OutgoingStockScreen
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.People
@@ -50,7 +54,7 @@ fun bottomNav(navControllerMain: NavController){
    val  viewmodel: FunctionStoreOwner = hiltViewModel()
     val items = listOf(
         NavigationItem(
-            label = "Dashboard",
+            label = "Home",
             icon = Icons.Default.Home,
             route = AllScreens.Dashboard.name,
             number =  0
@@ -62,7 +66,7 @@ fun bottomNav(navControllerMain: NavController){
             number = 1
         ),
         NavigationItem(
-            label = "Offline",
+            label = "Dashboard",
             icon = Icons.Default.Warning,
             route = AllScreens.Offline.name,
             number = 2
@@ -157,6 +161,21 @@ fun bottomNav(navControllerMain: NavController){
 
                 OutgoingSecondScreen(accNum!! , viewmodel, navHostController)
             }
+
+            composable(route = AllScreens.OutgoingScreenSuccess.name,
+                enterTransition = { slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth },
+                    animationSpec = tween(durationMillis = 500) // Adjust duration to make it slower
+                ) },
+                exitTransition = { slideOutHorizontally { fullWidth -> -fullWidth } },
+                popEnterTransition = { slideInHorizontally(
+                    initialOffsetX = { fullWidth -> -fullWidth },
+                    animationSpec = tween(durationMillis = 500)
+                ) },
+                popExitTransition = { slideOutHorizontally { fullWidth -> fullWidth } }){
+                OutgoingOrderSuccess(viewmodel = viewmodel , navHostController)
+            }
+
 
 
 

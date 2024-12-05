@@ -384,36 +384,78 @@ class FunctionStoreOwner @Inject constructor(
 
     private val __quantityToRemoveNo12 = MutableStateFlow<Int>(0)
     val quantityToRemoveNo12 :StateFlow<Int> = __quantityToRemoveNo12.asStateFlow()
-    fun confirmOutgoingOrder( farmerId: String ,outgoingRequestBody: List<OutgoingDataClassItem>  ){
-        //val outgoingOrderData =
-        viewModelScope.launch {
 
-            //val bagUpdates = listOf(BagUpdate( "Goli", 10))
-            val orderItems =
-                listOf(OutgoingDataClassItem( "6713fb4f8082c69227ec72dc", "Pukhraj",
-                    listOf(BagUpdate( "Goli", quantityToRemoveGoli.value),
-                        BagUpdate("Ration" , quantityToRemoveRation.value) ,
-                        BagUpdate("Seed" , quantityToRemoveSeed.value) ,
-                        BagUpdate("Cut-tok" , quantityToRemoveCuttok.value) ,
-                        BagUpdate("Number-12" , quantityToRemoveNo12.value)
-                    )))
-           // val outgoingData = OutgoingDataClassBody(orderItems)
+    private  val _outgoingOrderLoader = MutableStateFlow<Boolean>(false)
+    val outgoingOrderLoader : StateFlow<Boolean> = _outgoingOrderLoader.asStateFlow()
+    private  val _outgoingOrderStatus = MutableStateFlow<Boolean>(false)
+    val outgoingOrderStatus : StateFlow<Boolean> = _outgoingOrderStatus.asStateFlow()
+    private val _orderOutgoingResult = MutableStateFlow<Result<Unit>?>(null)
+    val orderOutgoingResult: StateFlow<Result<Unit>?> = _orderOutgoingResult.asStateFlow()
+
+    fun confirmOutgoingOrderForUi(farmerId: String ,outgoingRequestBody: List<OutgoingDataClassItem>){
+        viewModelScope.launch {
+            val result = confirmOutgoingOrder(farmerId,outgoingRequestBody)
+            _orderOutgoingResult.value = result
+        }
+    }
+     suspend fun confirmOutgoingOrder(farmerId: String ,outgoingRequestBody: List<OutgoingDataClassItem>  ) :Result<Unit>{
+        //val outgoingOrderData =
+        return withContext(Dispatchers.IO) {
             try {
+
+                _outgoingOrderLoader.value = true
+                //val bagUpdates = listOf(BagUpdate( "Goli", 10))
+                val orderItems =
+                    listOf(
+                        OutgoingDataClassItem(
+                            "6713fb4f8082c69227ec72dc", "Pukhraj",
+                            listOf(
+                                BagUpdate("Goli", quantityToRemoveGoli.value),
+                                BagUpdate("Ration", quantityToRemoveRation.value),
+                                BagUpdate("Seed", quantityToRemoveSeed.value),
+                                BagUpdate("Cut-tok", quantityToRemoveCuttok.value),
+                                BagUpdate("Number-12", quantityToRemoveNo12.value)
+                            )
+                        )
+                    )
+                // val outgoingData = OutgoingDataClassBody(orderItems)
+
                 val response = api.confirmOutgoingOrder(farmerId, outgoingRequestBody)
-                Log.d("Oututut" , "intry")
+                Log.d("Oututut", "intry")
                 if (response.isSuccessful) {
-                   // response.body()?.message?.let { Log.d("OutgoingSuccesssss" , it) }
-                    Log.d("OutgoingSuccesssss" , "Outgoing order created successfully!")
+                    //_outgoingOrderLoader.value = false
+                    Log.d("qwertyuiB4", "this is running " + _outgoingOrderStatus.value.toString())
+
+                    _outgoingOrderStatus.value = true
+                    Result.success(Unit)
+                 //   Log.d("qwertyui", "this is running " + _outgoingOrderStatus.value.toString())
+//                    withContext(Dispatchers.Main) {
+//                        onApiSuccess()
+//
                 } else {
                     // Handle failure (e.g., log or show error message)
-                    Log.d("OutgoingSuccesssd" , "Errororrr"+ response.errorBody()?.string() + response.code() )
-                }
-            }
-            catch (e : Exception){
-                Log.d("OutgoingSuccess" , "In the catch block "+e.message)
+                   // _outgoingOrderStatus.value = false
+                    //_outgoingOrderLoader.value = false
+                    Result.failure(Exception("Error in creating outgoing order"))
 
+
+
+
+
+
+                }}
+             catch (e: Exception) {
+                // _outgoingOrderLoader.value = false
+                 Result.failure(Exception("Error in creating outgoing order"))
+
+            }finally {
+                _outgoingOrderLoader.value = false
             }
-        }
+
+        }}
+
+    fun resetOrderOtgoingResult() {
+        _outgoingOrderStatus.value = false
     }
 
 

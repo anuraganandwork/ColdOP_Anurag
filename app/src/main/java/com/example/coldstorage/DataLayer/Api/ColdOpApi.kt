@@ -6,6 +6,7 @@ import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseDayBook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.IncomingOrderResponse
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.OutgoingApiCallResponse.OutgoingOrderApiResponse
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import retrofit2.Response
 import retrofit2.http.Body
@@ -57,7 +58,7 @@ interface ColdOpApi {
 
 
  @POST("api/store-admin/farmers/{id}/outgoing") //create new outgoing order
- suspend fun confirmOutgoingOrder(@Path("id") farmerId: String ,  @Body requestBody :  List<OutgoingDataClassItem>) : Response<Any>
+ suspend fun confirmOutgoingOrder(@Path("id") farmerId: String ,  @Body requestBody :  List<OutgoingDataClassItem>) : Response<OutgoingOrderApiResponse>
 
 
   @GET("api/store-admin/66e1f22d782bbd67d3446805/farmers/search")

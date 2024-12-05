@@ -19,8 +19,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +30,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
@@ -50,6 +53,7 @@ import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.OutgoingData.BagUpdate
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Location
+import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.forSecondOutgoingPage
@@ -57,7 +61,9 @@ import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.getAllReciptsRespon
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.mapDataForSecondOutgoingPage
 import com.example.coldstorage.ui.theme.primeGreen
 import com.example.coldstorage.ui.theme.primeRed
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +78,19 @@ fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navCo
     val showBottomSheet = remember {
       mutableStateOf(false)
     }
+    val showAlertConfirmation = remember {
+        mutableStateOf(false)
+    }
+    val onApiSuccess: () -> Unit = {
+        Log.d("OnnApiSuccess" , showBottomSheet.value.toString())
+        //showAlertConfirmation.value = true
+       // navController.navigate(AllScreens.Dashboard.name)
+        Log.d("OnnApiSuccessAfter" , showBottomSheet.value.toString())
+
+    }
+    val orderOutgoingResult by viewmodel.orderOutgoingResult.collectAsState()
+
+
 
 
     Scaffold(
@@ -109,10 +128,16 @@ fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navCo
                 .fillMaxWidth()
                 .weight(1.25f) // This makes the table take the remaining space
         ) {
-            StockTablee(accNum ,viewmodel)
+            StockTablee(accNum ,viewmodel , navController)
         }
         Spacer(modifier = Modifier.height(16.dp))
+       if(showAlertConfirmation.value){
+//           AlertDialog(onDismissRequest = { /*TODO*/ }, confirmButton = { /*TODO*/ } ,
+//               text = {Text("Outgoing success")
+//               })
+         Log.d("cxcxcxcxcxcx" , "cxcxcxcxcxcxcxcxcxcx")
 
+       }
 //        Button(
 //            onClick = {
 //                Log.d("OutgoingSuccess" , "Pressed button")
@@ -125,6 +150,7 @@ fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navCo
 //            Text("Proceed")
 //        }
     }
+        Log.d("sdsdsdsd123456789" , showBottomSheet.value.toString())
     if(showBottomSheet.value){
 
         ModalBottomSheet(
@@ -139,7 +165,7 @@ fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navCo
 
         ){
             finalConfirmation {
-                  //navController.navigate(AllScreens.Dashboard.name)
+                  navController.navigate(AllScreens.Dashboard.name)
             }
         }
 
@@ -180,7 +206,7 @@ fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
+fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: NavController) {
     val transactionHistory = viewmodel.transactionHistory.collectAsState()
     val outgoingItem by viewmodel.outgoingItemState
 
@@ -200,9 +226,40 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
 
     }
 
+    val OutgoingOrderLoader by viewmodel.outgoingOrderLoader.collectAsState()
+    val OutgoingOrderStatus by viewmodel.outgoingOrderStatus.collectAsState()
+    val orderOutgoingResult by viewmodel.orderOutgoingResult.collectAsState()
+
+//    LaunchedEffect(orderOutgoingResult) {
+//        //1230
+//        orderOutgoingResult?.let { result ->
+//            if (result.isSuccess) {
+//                val data = result.getOrNull() // Extract the successful result
+//               // navController.navigate(AllScreens.Dashboard.name)
+//                Log.d("1x1x1x1xx1x1",data.toString())
+//                viewmodel.resetOrderOtgoingResult()
+//                // Handle success, e.g., navigate to another page
+//            } else if (result.isFailure) {
+//                val error = result.exceptionOrNull() // Extract the exception
+//              Log.d("123456789" ,error.toString())
+//                viewmodel.resetOrderOtgoingResult()
+//               // Handle failure, e.g., show an error message
+//            }
+//        }
+//    }
 
 
-  val retrievedData by viewmodel.retrievedSelectedData.collectAsState()
+//    LaunchedEffect(Unit) {
+//        viewmodel.outgoingOrderLoader.collect { isLoading ->
+//            Log.d("LoaderDebug", "Loading: $isLoading")
+//        }
+//    }
+
+
+
+
+
+    val retrievedData by viewmodel.retrievedSelectedData.collectAsState()
     Log.d("SelectedCellData" , retrievedData.toString())
     val SelectedVoucherNumber = viewmodel.getTheSelectedStock()
     Log.d("SelectedVoucher" ,SelectedVoucherNumber.toString())
@@ -230,8 +287,21 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
             mutableStateArray.add(mutableStateOf(""))
         }
     }
+    var showDialog by remember { mutableStateOf(false) }
 
+    // Update the dialog state when OutgoingOrderStatus changes
+//    LaunchedEffect(OutgoingOrderStatus) {
+//        if (OutgoingOrderStatus) {
+//            Log.d("wertyu","123456789")
+//            showDialog = true
+//        }
+//    }
 
+//   LaunchedEffect(OutgoingOrderStatus ){
+//       Log.d("gfdgdfgdfg" , OutgoingOrderStatus.toString())
+//       if(OutgoingOrderStatus == true){
+//           openConfirmSheet(true)
+//       }   }
 
     when(val state = transactionHistory.value){
         is getAllReciptsResponse.success ->{
@@ -290,6 +360,12 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
 //        editableValues.addAll(List(data.size) { "" })
 //    }
 
+    LaunchedEffect(OutgoingOrderStatus ){
+        if(OutgoingOrderStatus){
+            navController.navigate(AllScreens.OutgoingScreenSuccess.name)
+            viewmodel.resetOrderOtgoingResult()
+        }
+    }
 
     val field  = remember{
         mutableStateOf("")
@@ -420,6 +496,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
                 Log.d("Rowwww" ,voucherBagSizePairs.toString())
 
                 val keyboardController = LocalSoftwareKeyboardController.current
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -491,7 +568,8 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
 //                            }
 //                        }
 //                    )
-
+                    val coroutineScope = rememberCoroutineScope()
+                    var debounceJob by remember { mutableStateOf<Job?>(null) }
                     var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
 
                     Column {
@@ -502,6 +580,48 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
 
                     BasicTextField(value = textFieldValue, onValueChange = { newValue ->
                         textFieldValue = newValue
+
+                        debounceJob?.cancel()
+                        debounceJob = coroutineScope.launch {
+                            delay(600)
+                            if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! < pair.currentQuantity.toInt()) {
+
+                                keyboardController?.hide()
+                                val existingItem =      outgoingResponseBody.find {it.orderId == pair.orderId}
+
+                                if(existingItem!= null){
+                                    val updatedBagUpdates =     existingItem.bagUpdates.toMutableList().apply {
+                                        this.add(pair.size?.let { BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt() ) })
+//                                    pair.size?.let {
+//                                        add(BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt()))
+//                                    }
+
+                                    }
+
+                                    val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
+                                    val index = outgoingResponseBody.indexOf(existingItem)
+                                    outgoingResponseBody[index] = updatedElement
+                                }else{
+                                    outgoingResponseBody.add(
+                                        OutgoingDataClassItem(
+                                            orderId = pair.orderId,
+                                            variety = pair.variety,
+                                            bagUpdates = listOf(pair.size?.let {
+                                                BagUpdate(
+                                                    it,
+                                                    textFieldValue.text.toInt()
+                                                )
+                                            })
+                                        )
+                                    )
+                                }
+
+
+                            } else{
+                                Toast.makeText(context, "Please a enter a value less than ${pair.currentQuantity.toInt()+1}!", Toast.LENGTH_SHORT).show()
+
+                            }
+                        }
                     },
                         textStyle = TextStyle(
                             fontSize = 14.sp,
@@ -525,6 +645,21 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
                                 if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! < pair.currentQuantity.toInt()) {
 
                                     keyboardController?.hide()
+                               val existingItem =      outgoingResponseBody.find {it.orderId == pair.orderId}
+
+                                if(existingItem!= null){
+                                val updatedBagUpdates =     existingItem.bagUpdates.toMutableList().apply {
+                                        this.add(pair.size?.let { BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt() ) })
+//                                    pair.size?.let {
+//                                        add(BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt()))
+//                                    }
+
+                                    }
+
+                                val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
+                                    val index = outgoingResponseBody.indexOf(existingItem)
+                                    outgoingResponseBody[index] = updatedElement
+                                }else{
                                     outgoingResponseBody.add(
                                         OutgoingDataClassItem(
                                             orderId = pair.orderId,
@@ -537,6 +672,9 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
                                             })
                                         )
                                     )
+                                }
+
+
                                 } else{
                                     Toast.makeText(context, "Please a enter a value less than ${pair.currentQuantity.toInt()+1}!", Toast.LENGTH_SHORT).show()
 
@@ -579,13 +717,41 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner) {
                     Log.d("OutgoingSuccess" , "Pressed button")
                     Log.d("Outtttt" , outgoingResponseBody.toString())
                     // showBottomSheet.value = true
-                     viewmodel.confirmOutgoingOrder(accNum ,outgoingResponseBody  )
+                    try{viewmodel.confirmOutgoingOrderForUi(accNum ,outgoingResponseBody)
 
-                    viewmodel.clearSelectedCellData()
-                    viewmodel.clearSelectedCells()},
-                modifier = Modifier.align(Alignment.End) , colors = ButtonDefaults.buttonColors(containerColor = primeGreen , contentColor = Color.White)
+                       viewmodel.clearSelectedCellData()
+                        //viewmodel.clearSelectedCells()
+                        Log.d("OutgoingInTry" , "Pressedsffd button")
+
+                    }catch (e:Exception){
+                            Log.d("innnnnn" , e.message.toString())
+                        }
+
+                 //   navController.navigate(AllScreens.OutgoingScreenSuccess.name)
+                   //  openConfirmSheet(true)
+                          },
+                modifier = Modifier.align(Alignment.End).
+                width(150.dp).
+                height(40.dp), colors = ButtonDefaults.buttonColors(containerColor = primeGreen , contentColor = Color.White)
             ) {
-                Text("Proceed")
+                Box(
+                    contentAlignment = Alignment.Center, // Centers the content within the Box
+                    modifier = Modifier.fillMaxSize(),
+                    // Ensures Box takes full size of Surface
+                ) {
+                    if (OutgoingOrderLoader) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp), // Small size for the indicator
+                            color = Color.Black
+                        )
+                    } else {
+                        Text(
+                            text = "Continue",
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 10.dp)
+                        )
+                   }
+                }
             }
 }
 
