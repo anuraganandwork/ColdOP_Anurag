@@ -74,7 +74,7 @@ Scaffold(modifier = Modifier.padding(10.dp), topBar = {
         Surface(modifier = Modifier.clickable {
             navController.navigate(AllScreens.QuickAddFarmer.name)
         }) {
-            Text(text = "Add")
+            Text(text = "Add" , fontWeight = FontWeight.Bold)
         }
     } })
 }) {
@@ -105,7 +105,8 @@ Column(modifier = Modifier.padding(
     //lazycolumn
     if(listOfFarmer.isNullOrEmpty()){
         Box(modifier = Modifier.fillMaxSize() , contentAlignment = Alignment.Center){
-            CircularProgressIndicator(modifier = Modifier.size(40.dp) , color = primeGreen)
+            CircularProgressIndicator(modifier = Modifier.size(40.dp) , color= Color.Gray
+            )
         }
     } else{
     LazyColumn(){

@@ -674,7 +674,7 @@ if(row!= null){
     }} else{
         Column(modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.Center) {
            // Spacer(modifier = Modifier.padding(200.dp))
-            Text(text = "Please select a size!" , modifier = Modifier.fillMaxWidth() , textAlign = TextAlign.Center)
+            Text(text = "Please select farmer and size!" , modifier = Modifier.fillMaxWidth() , textAlign = TextAlign.Center)
         }
 
     }

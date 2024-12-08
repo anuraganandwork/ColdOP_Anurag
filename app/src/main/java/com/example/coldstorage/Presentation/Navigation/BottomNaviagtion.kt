@@ -122,8 +122,18 @@ fun bottomNav(navControllerMain: NavController){
                 val accNum = it.arguments!!.getString("accountNumber")
                 farmerDetailedScreen(accNum!!, navHostController)
             }
-            composable(route = AllScreens.QuickAddFarmer.name){
-                FarmerQuickAddInputForm()
+            composable(route = AllScreens.QuickAddFarmer.name ,
+                enterTransition = { slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth },
+                    animationSpec = tween(durationMillis = 500) // Adjust duration to make it slower
+                ) },
+                exitTransition = { slideOutHorizontally { fullWidth -> -fullWidth } },
+                popEnterTransition = { slideInHorizontally(
+                    initialOffsetX = { fullWidth -> -fullWidth },
+                    animationSpec = tween(durationMillis = 500)
+                ) },
+                popExitTransition = { slideOutHorizontally { fullWidth -> fullWidth } }){
+                FarmerQuickAddInputForm(navHostController)
             }
 
             composable(route= AllScreens.StoreOrRetrieve.name+"/{accountNumber}" ,

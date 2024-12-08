@@ -113,15 +113,15 @@ fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navCo
     Column(modifier = Modifier
         .padding(horizontal = 14.dp, vertical = 8.dp)
         .padding(paddingValues = paddingValues)) {
-        Text("Select Quantities Required for : Pukhraj")
+        Text("Select Quantities Required for :")
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        InputField("Seed Bags", seedBags) { seedBags = it }
-        InputField("Ration Bags", rationBags) { rationBags = it }
-        InputField("No. 12 bags", no12Bags) { no12Bags = it }
-        InputField("Cut & Tok Bags", cutTokBags) { cutTokBags = it }
-        InputField("Goli Bags", goliBags) { goliBags = it }
+//        InputField("Seed Bags", seedBags) { seedBags = it }
+//        InputField("Ration Bags", rationBags) { rationBags = it }
+//        InputField("No. 12 bags", no12Bags) { no12Bags = it }
+//        InputField("Cut & Tok Bags", cutTokBags) { cutTokBags = it }
+//        InputField("Goli Bags", goliBags) { goliBags = it }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -585,35 +585,41 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
 
                         debounceJob?.cancel()
                         debounceJob = coroutineScope.launch {
-                            delay(600)
+                            delay(700)
                             if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! < pair.currentQuantity.toInt()) {
 
-                                keyboardController?.hide()
-                                val existingItem =      outgoingResponseBody.find {it.orderId == pair.orderId}
+                                val existingItem = outgoingResponseBody.find { it.orderId == pair.orderId }
 
-                                if(existingItem!= null){
-                                    val updatedBagUpdates =     existingItem.bagUpdates.toMutableList().apply {
-                                        this.add(pair.size?.let { BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt() ) })
-//                                    pair.size?.let {
-//                                        add(BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt()))
-//                                    }
+                                if (existingItem != null) {
+                                    val existingBagSize = existingItem.bagUpdates.find { it?.size == pair.size }
 
+                                    if (existingBagSize != null) {
+                                        val updatedBagWithOldBag = existingBagSize.copy(quantityToRemove = textFieldValue.text.toInt())
+                                        val updatedBagUpdates = existingItem.bagUpdates.toMutableList().apply {
+                                            val indexOfBag = indexOf(existingBagSize)
+                                            if (indexOfBag != -1) this[indexOfBag] = updatedBagWithOldBag
+                                        }
+                                        val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
+                                        val index = outgoingResponseBody.indexOf(existingItem)
+                                        if (index != -1) outgoingResponseBody[index] = updatedElement
+                                    } else {
+                                        val updatedBagUpdates = existingItem.bagUpdates.toMutableList().apply {
+                                            pair.size?.let { add(BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt())) }
+                                        }
+
+                                        val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
+                                        val index = outgoingResponseBody.indexOf(existingItem)
+                                        if (index != -1) outgoingResponseBody[index] = updatedElement
                                     }
-
-                                    val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
-                                    val index = outgoingResponseBody.indexOf(existingItem)
-                                    outgoingResponseBody[index] = updatedElement
-                                }else{
+                                } else {
+                                    // Add a new order with the bag size
                                     outgoingResponseBody.add(
                                         OutgoingDataClassItem(
                                             orderId = pair.orderId,
                                             variety = pair.variety,
-                                            bagUpdates = listOf(pair.size?.let {
-                                                BagUpdate(
-                                                    it,
-                                                    textFieldValue.text.toInt()
-                                                )
-                                            })
+                                            bagUpdates = listOf(
+                                                pair.size?.let { BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt()) }
+                                            )
                                         )
                                     )
                                 }
@@ -623,6 +629,8 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
                                 Toast.makeText(context, "Please a enter a value less than ${pair.currentQuantity.toInt()+1}!", Toast.LENGTH_SHORT).show()
 
                             }
+                            keyboardController?.hide()
+
                         }
                     },
                         textStyle = TextStyle(
@@ -714,6 +722,8 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
                 }
 
     }}
+            
+            Spacer(modifier = Modifier.padding(27.dp))
             Button(
                 onClick = {
                     Log.d("OutgoingSuccess" , "Pressed button")

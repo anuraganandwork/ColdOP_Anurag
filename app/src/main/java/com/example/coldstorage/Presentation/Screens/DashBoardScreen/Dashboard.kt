@@ -193,26 +193,36 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
                 }
                 is FunctionStoreOwner.ApiStateDaybook.success -> {
                     val data = (state as FunctionStoreOwner.ApiStateDaybook.success).data
-                    // Render the data
-                    //Text("Data: $data")
-                    if(data!= null){
-                    LazyColumn(){
-                        if (data != null) {
-                            Log.d("xvxvxv" , data.data.toString())
-                            items(data.data){
-                                CardComponentDaybook(it)
 
+                    if (data?.data.isNullOrEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "No transactions!", color = Color.Gray)
+                        }
+                    } else {
+                        LazyColumn {
+                            if (data!= null) {
+                                items(data.data) {
+                                    CardComponentDaybook(it)
+                                }
                             }
                         }
-                    }} else{
-                        Text(text = "No transactions!")
                     }
 
                 }
                 is FunctionStoreOwner.ApiStateDaybook.Error -> {
                     val errorMessage = (state as FunctionStoreOwner.ApiStateDaybook.Error).message
                     // Show error message
-                    Text("Error: $errorMessage")
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(text = "Error: $errorMessage :(", color = Color.Gray)
+                    }
                 }
             }
     } }

@@ -36,6 +36,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -187,7 +189,7 @@ class FunctionStoreOwner @Inject constructor(
                 Log.d("farmerAcc", farmerAcc.value)
                 val incomingOrderData = IncomingOrderData(
                     coldStorageId = authIntercepter.getStore_id("store")!!,
-                    dateOfSubmission = "24.09.2024",
+                    dateOfSubmission = getCurrentDate(),
                     farmerId = farmerAcc.value,
                     orderDetails = listOf(
                         OrderDetail(
@@ -669,4 +671,10 @@ sealed class singleFarmerTransactionApiState{
 
     data class error(val message:String):singleFarmerTransactionApiState();
 
+}
+
+
+fun getCurrentDate(): String {
+    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    return LocalDate.now().format(formatter)
 }

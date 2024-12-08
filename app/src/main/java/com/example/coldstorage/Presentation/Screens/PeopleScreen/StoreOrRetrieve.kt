@@ -441,6 +441,19 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                     Log.d("SuccessRedcipt", state.data.toString())
 //                    LazyColumn(){
 //                        items(state.data ){
+//
+//                            CardComponentDaybook(orderDaybook = it )
+//                        }
+//                    }
+                    if(state.data != null){
+                    state.data.forEach {
+                        CardComponentDaybook(orderDaybook = it )
+                    }} else {
+                        Text(text = "No previous transactions" )
+
+                    }
+//                    LazyColumn(){
+//                        items(state.data){
 //                            CardComponentDaybook(orderDaybook = it )
 //                        }
 //                    }

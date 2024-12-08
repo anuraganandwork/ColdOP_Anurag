@@ -88,13 +88,19 @@ class AuthViewmodel @Inject constructor(
         }
     }
 
+  private val _loadingAddFarmer = MutableStateFlow<Boolean>(false)
+   val loadingAddFarmer:StateFlow<Boolean> = _loadingAddFarmer.asStateFlow()
 
+    private val _farmerAddStatus = MutableStateFlow<Boolean>(false)
+    val farmerAddStatus = _farmerAddStatus.asStateFlow()
     @SuppressLint("SuspiciousIndentation")
     fun quickRegister(farmerData: FarmerData){
         viewModelScope.launch {
+            _loadingAddFarmer.value = true
             try{
                  val resposne = api.quickRegister(farmerData)
                 if(resposne.isSuccessful){
+                    _farmerAddStatus.value = true
                 Log.d("SuccessfullLOG","farmer added quikly"+resposne.body()?.status)}
                 else{
                     val errorBody = resposne.errorBody()?.string()
@@ -105,11 +111,17 @@ class AuthViewmodel @Inject constructor(
             } catch (e: Exception){
                 Log.d("SuccessfullLOG"," NOOOOOOOO farmer added quikly"+e)
 
+            }finally {
+
+                _loadingAddFarmer.value = false
             }
         }
 
 
 
+    }
+    fun resetAddFarmerStatus(){
+        _farmerAddStatus.value= false
     }
 
     private  val _loadingLogIn = MutableStateFlow<Boolean>(false)

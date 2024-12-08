@@ -293,7 +293,7 @@ fun StockTableRow(
 
                 //                        Text(text = if(orderDaybook.voucher.type == "RECEIPT") incomingSum.value.toString() else outgoingSum.value.toString())
                 Text(
-                    text = if(orderDaybook.voucher.type == "RECEIPT") value.quantity?.currentQuantity.toString() else value.quantityRemoved.toString() ,
+                    text = if(orderDaybook.voucher.type == "RECEIPT") value.quantity?.initialQuantity.toString() else value.quantityRemoved.toString() ,
                     fontSize = 11.sp,
                     color = Color.Black,
                     modifier = Modifier
@@ -381,10 +381,11 @@ fun DetailRow(label: String, value: String) {
 //}
 //155
 
+@SuppressLint("SuspiciousIndentation")
 fun totalIncomingBags(orderDaybook: OrderDaybook):Int{
     var totalBagsIn = 0;
         orderDaybook.orderDetails[0].bagSizes.forEach {
-            totalBagsIn += it.quantity?.currentQuantity!!
+            totalBagsIn += it.quantity?.initialQuantity!!
         }
 
     return totalBagsIn
