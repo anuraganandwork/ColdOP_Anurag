@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -49,7 +51,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
 import com.example.coldstorage.Presentation.Screens.AllScreens
+import com.example.coldstorage.Presentation.Screens.DashBoardScreen.CardComponentDaybook
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.AssignLocation
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ConfirmationPageForOrder
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.EmailFilterDropdowns
@@ -62,6 +66,7 @@ import com.example.coldstorage.Presentation.Screens.PeopleScreen.DataClass.Stock
 import com.example.coldstorage.R
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.getAllReciptsResponse
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.singleFarmerTransactionApiState
 import kotlinx.coroutines.launch
 
 data class Transaction(
@@ -122,13 +127,13 @@ val dummyTransactions = listOf(
 @Composable
 fun storeOrRetrieve(accountNumber: String, navController: NavHostController, viewmodel: FunctionStoreOwner = hiltViewModel()) {
     //variables for bottom sheet
-    val transactionHistory = viewmodel.transactionHistory.collectAsState() // to learn
+    val transactionHistory = viewmodel.singleFarmerCard.collectAsState() // to learn
 //755
     LaunchedEffect(Unit) {
         viewmodel.updateFarmerAcc(accountNumber)
         Log.d("currentfarmer" , "Account number is"+accountNumber)
-
-        viewmodel.getAllRecipts("66eab27610eb613c2efca3bc")
+        viewmodel.getSingleFarmerTransaction(accountNumber)
+        viewmodel.getAllRecipts(accountNumber)
 
         //
     }
@@ -187,10 +192,9 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
             if (!secondSheetState.isVisible) {
                 showSecondBottomSheet.value = false
             }
-            showThirdBottomSheet.value = true
+            showFourthBottomSheet.value = true
         }
     }
-
     //hiding the third bottom sheet
     val hideThirdBottomSheet: () -> Unit = {
         scope.launch {
@@ -216,6 +220,14 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
     var expandedSortBy = remember { mutableStateOf(false) }
     var selectedSortBy = remember { mutableStateOf("Sort by Date") }
     val fromDaybookValue = false
+
+
+    val stockSummary = viewmodel.stockSummary.collectAsState()
+    val loadingStockSummary = viewmodel.loadingStockSummary.collectAsState()
+    LaunchedEffect(Unit ){
+        viewmodel.getStockSummary(accountNumber)
+    }
+   val sum =  stockSummary.value.totalInitialQuantity-stockSummary.value.totalQuantityRemoved
     Column(modifier = Modifier.verticalScroll(enabled = true, state = rememberScrollState(),)) {
         Column(
             modifier = Modifier
@@ -283,11 +295,11 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                 )
                 Row() {
                     Text(text = "Total bags incoming", modifier = Modifier.weight(2f))
-                    Text(text = "1000", modifier = Modifier.weight(1f))
+                    Text(text = stockSummary.value.totalInitialQuantity.toString(), modifier = Modifier.weight(1f))
                 }
                 Row() {
                     Text(text = "Total bags outgoing", modifier = Modifier.weight(2f))
-                    Text(text = "40", modifier = Modifier.weight(1f))
+                    Text(text = stockSummary.value.totalQuantityRemoved.toString(), modifier = Modifier.weight(1f))
                 }
 
                 Box(
@@ -303,7 +315,7 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(2f)
                     )
-                    Text(text = "960", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    Text(text = sum.toString(), fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 }
 
                 Box(
@@ -369,7 +381,7 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                     modifier = Modifier
                         .padding()
                         .clickable {
-                           // navController.navigate(AllScreens.OutgoingStockScreen.name+ "/${accNumber}")
+                            // navController.navigate(AllScreens.OutgoingStockScreen.name+ "/${accNumber}")
                             val fromDaybook = false
                             navController.navigate(AllScreens.OutgoingStockScreen.name + "/$fromDaybook/$accountNumber")
 
@@ -417,19 +429,28 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
 
             when (val state = transactionHistory.value) {
 
-                is getAllReciptsResponse.idle -> {
-                    Text(text = "No previous history!")
-                }
-
-                is getAllReciptsResponse.loading -> {
+                is singleFarmerTransactionApiState.idle -> {
                     CircularProgressIndicator()
                 }
 
-                is getAllReciptsResponse.success -> {
-                    Log.d("Succ", state.reciptData.toString())
-//                    Text(text = "HI")
-//                    Text(text = state.reciptData.toString())
+
+
+                is singleFarmerTransactionApiState.success -> {
+
+
+                    Log.d("SuccessRedcipt", state.data.toString())
+//                    LazyColumn(){
+//                        items(state.data ){
+//                            CardComponentDaybook(orderDaybook = it )
+//                        }
+//                    }
                 }
+
+                is singleFarmerTransactionApiState.error->{
+                    Text(text = state.message)
+                }
+
+                else -> {Log.d("Else branch " , "transaction card in the farmer card")}
             }
 //            Column {
 //                Log.d("Dummy transactionnn", dummyTransactions.toString())
@@ -560,6 +581,8 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
 
         }
     }
+
+
     if (showSecondBottomSheet.value) {
         ModalBottomSheet(
             onDismissRequest = { showSecondBottomSheet.value = false },
@@ -576,7 +599,10 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState()), // fill maximum available height
             ) {
-                AssignLocation(onContinue = { hideSecondBottomSheet() }) {
+                AssignLocation(onContinue = {
+              hideSecondBottomSheet()
+
+                }) {
                     scope.launch { secondSheetState.hide() }.invokeOnCompletion {
                         if (!secondSheetState.isVisible) {
                             showSecondBottomSheet.value = false

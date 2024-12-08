@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -20,6 +21,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +33,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
+import com.example.coldstorage.ui.theme.primeGreen
 import kotlinx.coroutines.DisposableHandle
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,7 +72,10 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
 //        backgroundColor = Color.Transparent, // Set background color to transparent
 //        focusedIndicatorColor = Color.Transparent // Optional: Set focused indicator color
 //    )
-
+    val currentReceiptNum by viewmodel.currentRecieptNum.collectAsState(0)
+    LaunchedEffect(Unit){
+        viewmodel.getRecieptNumbers()
+    }
 
     Column(modifier = Modifier.padding(12.dp)) {
     Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween) {
@@ -77,7 +87,17 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
   Spacer(modifier = Modifier.padding(20.dp))
 
      Column {
-         Text(text = "Current Reciept Number : ", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+         Row(
+             horizontalArrangement = Arrangement.Start,
+             verticalAlignment = Alignment.CenterVertically
+         ) {
+             Text(text = "Current Reciept Number :")
+             if (currentReceiptNum != 0) {
+                 Text(text = currentReceiptNum.toString(), color = Color.Blue)
+             } else {
+                 CircularProgressIndicator(modifier = Modifier.size(20.dp))
+             }
+         }
          Spacer(modifier = Modifier.padding(10.dp))
 
          Text(text = "Enter variety ", fontSize = 14.sp, fontWeight = FontWeight.Medium)
@@ -91,16 +111,17 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
              colors = TextFieldDefaults.textFieldColors(
                  focusedTextColor = Color.Black, // Text color inside the TextField
                  disabledTextColor = Color.Gray,
-                 cursorColor = Color.Blue, // Cursor color
+                 cursorColor = Color.Black, // Cursor color
+                 containerColor = Color.Transparent ,
                  errorCursorColor = Color.Red, // Cursor color in error state
-                 focusedIndicatorColor = Color.Green, // Border color when focused
+                 focusedIndicatorColor = primeGreen, // Border color when focused
                  unfocusedIndicatorColor = Color.Gray, // Border color when not focused
                  errorIndicatorColor = Color.Red, // Border color in error state
                  focusedLeadingIconColor = Color.Black,
                  focusedTrailingIconColor = Color.Black,
-                 focusedLabelColor = Color.Green, // Label color when focused
+                 focusedLabelColor = primeGreen, // Label color when focused
                  unfocusedLabelColor = Color.Gray, // Label color when not focused
-                 errorLabelColor = Color.Red // Label color in error state
+                 errorLabelColor = Color.Red
              )
          )
          Spacer(modifier = Modifier.padding(10.dp))
@@ -143,7 +164,7 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                           .height(40.dp),
                       singleLine = true,
                       maxLines = 1,
-                      textStyle = TextStyle(fontSize = 24.sp),
+                      textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center),
                       decorationBox = { innerTextField ->
                           Box(
                               contentAlignment = Alignment.Center,
@@ -174,7 +195,7 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                      .height(40.dp),
                  singleLine = true,
                  maxLines = 1,
-                 textStyle = TextStyle(fontSize = 24.sp),
+                 textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center),
                  decorationBox = { innerTextField ->
                      Box(
                          contentAlignment = Alignment.Center,
@@ -205,7 +226,7 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                      .height(40.dp),
                  singleLine = true,
                  maxLines = 1,
-                 textStyle = TextStyle(fontSize = 24.sp),
+                 textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center),
                  decorationBox = { innerTextField ->
                      Box(
                          contentAlignment = Alignment.Center,
@@ -237,7 +258,7 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                      .height(40.dp),
                  singleLine = true,
                  maxLines = 1,
-                 textStyle = TextStyle(fontSize = 24.sp),
+                 textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center),
                  decorationBox = { innerTextField ->
                      Box(
                          contentAlignment = Alignment.Center,
@@ -268,7 +289,7 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                      .height(40.dp),
                  singleLine = true,
                  maxLines = 1,
-                 textStyle = TextStyle(fontSize = 24.sp),
+                 textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center),
                  decorationBox = { innerTextField ->
                      Box(
                          contentAlignment = Alignment.Center,
@@ -282,18 +303,25 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
          Spacer(modifier = Modifier.padding(20.dp))
 
          Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End){
-             Surface(modifier = Modifier
-                 .padding(10.dp)
-                 .background(Color.Green)
-                 .clickable {
-                     onContinue()
-                 }
-             ) {
+             Button(
+                 onClick= { onContinue() }
+                 ,
+                 modifier = Modifier
+                 .padding(horizontal =  10.dp)
+                  ,
+
+                 shape = RoundedCornerShape(10.dp),
+                 colors = ButtonColors(containerColor = primeGreen , contentColor = Color.Black,
+                     disabledContainerColor = primeGreen , disabledContentColor = Color.White)
+
+                 ) {
                  Text(text = "Continue" , modifier = Modifier
-                     .background(Color.Green)
-                     .padding(horizontal = 10.dp, vertical = 5.dp))
+                     .padding(horizontal = 20.dp, vertical = 5.dp))
              }
          }
+
+         Spacer(modifier = Modifier.height(216.dp))
+
 
      }
 

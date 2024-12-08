@@ -2,6 +2,7 @@ package com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard
 
 data class ApiResponseDayBook(
     val status: String,
+    val message: String? = null,
     val data: List<OrderDaybook>
 )
 
@@ -10,7 +11,7 @@ data class OrderDaybook(
     val _id: String,
     val coldStorageId: String,
     val farmerId: FarmerInfo,
-    val dateOfSubmission: String? = null, // Nullable as some objects may use dateOfExtraction
+    val dateOfSubmission: String? = null,
     val dateOfExtraction: String? = null,
     val orderDetails: List<OrderDetailDaybook>
 )
@@ -27,8 +28,8 @@ data class FarmerInfo(
 )
 
 data class OrderDetailDaybook(
-    val location: LocationDaybook? = null, // Nullable as some orders may not have location details
-    val incomingOrder: IncomingOrderSnapOutgoing? = null, // Nullable as not all orders have this field
+    val location: LocationDaybook? = null, // Nullable
+    val incomingOrder: IncomingOrderSnapOutgoing? = null, // Nullable
     val variety: String,
     val bagSizes: List<BagSizeDaybook>
 )
@@ -41,7 +42,7 @@ data class LocationDaybook(
 
 data class BagSizeDaybook(
     val size: String,
-    val quantity: QuantityDaybook? = null, // Nullable as some orders use quantityRemoved instead
+    val quantity: QuantityDaybook? = null, // Nullable
     val quantityRemoved: Int? = null
 )
 
@@ -50,9 +51,7 @@ data class QuantityDaybook(
     val currentQuantity: Int
 )
 
-//data class IncomingOrderResponse(
-//    val incomingOrder: IncomingOrder
-//)
+
 
 data class IncomingOrderSnapOutgoing(
     val location: LocationIncomingDaybook,

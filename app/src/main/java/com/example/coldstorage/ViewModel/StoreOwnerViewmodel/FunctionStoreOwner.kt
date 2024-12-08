@@ -20,7 +20,10 @@ import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.PopulatedFarmer
 import com.example.coldstorage.DataLayer.Api.Quantity
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseDayBook
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Order
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.ResponseVariety.ResponseVariety
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.ResponseStockSummary
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import com.example.coldstorage.DataLayer.Di.AuthInterceptor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -166,6 +169,8 @@ class FunctionStoreOwner @Inject constructor(
 
     private val _loading = MutableStateFlow<Boolean>(false)
     val loading : StateFlow<Boolean> =  _loading.asStateFlow()
+    private val _incomingOrderStatus = MutableStateFlow<Boolean>(false)
+    val incomingOrderStatus : StateFlow<Boolean> =  _incomingOrderStatus.asStateFlow()
   private val _orderResult = MutableStateFlow<Result<Unit>?>(null)
     val orderResult = _orderResult.asStateFlow()
 
@@ -240,6 +245,7 @@ class FunctionStoreOwner @Inject constructor(
 
                 if (response.isSuccessful) {
                     Log.d("Success", "Order created successfully")
+                    _incomingOrderStatus.value = true
                     Result.success(Unit)
                 } else {
                     Log.d("ErrorOrder",
@@ -255,6 +261,9 @@ class FunctionStoreOwner @Inject constructor(
             }
         }
     }
+  fun resetIncomingOrderStatus(){
+      _incomingOrderStatus.value = false
+  }
 
     fun resetOrderResult() {
         _orderResult.value = null
@@ -462,11 +471,14 @@ class FunctionStoreOwner @Inject constructor(
 
     // viewmodel function for searching farmers
 
-    var searchResults by mutableStateOf<List<SearchResultsData>>(emptyList<SearchResultsData>())
-
+    //var searchResults by mutableStateOf<List<SearchResultsData>>(emptyList<SearchResultsData>())
+    val _searchResults = MutableStateFlow<List<SearchResultsData>>(emptyList())
+    val searchResults :StateFlow<List<SearchResultsData>> = _searchResults.asStateFlow()
     private var searchJob : Job? = null
 
-
+   fun resetSearchResult(){
+       _searchResults.value = emptyList()
+   }
     fun onSearchQuery( query :String){
         if(query.length > 1){
             searchJob?.cancel()
@@ -475,14 +487,14 @@ class FunctionStoreOwner @Inject constructor(
                  searchFarmers(query)
             }
         } else{
-            searchResults = emptyList<SearchResultsData>()
+            _searchResults.value = emptyList<SearchResultsData>()
         }
     }
 
     private suspend fun searchFarmers(query:String){
      try{
         val response = api.searchFarmers(query)
-         searchResults = response
+         _searchResults.value = response
      } catch (e : Exception){
           Log.d("Searching" , "Error is "+e)
           //
@@ -524,6 +536,7 @@ class FunctionStoreOwner @Inject constructor(
                 if (response.isSuccessful) {
                     // Emit success state with data
                     _dayBookOrdersData.value = ApiStateDaybook.success(response.body())
+                    Log.d("xcxcxcxcx" , _dayBookOrdersData.value.toString())
                 } else {
                     // Emit error state with error message
                     _dayBookOrdersData.value = ApiStateDaybook.Error("Error: ${response.code()} - ${response.message()}")
@@ -544,6 +557,88 @@ class FunctionStoreOwner @Inject constructor(
     }
 
 
+   private val _singleFarmerCard = MutableStateFlow<singleFarmerTransactionApiState>(singleFarmerTransactionApiState.idle)
+   val singleFarmerCard : StateFlow<singleFarmerTransactionApiState>  = _singleFarmerCard.asStateFlow()
+    fun getSingleFarmerTransaction(farmerId: String){
+        viewModelScope.launch {
+            try {
+
+                val response = api.getSingleFarmerTransaction(farmerId)
+                if (response.isSuccessful){
+                    Log.d("sdfgh" , response.body().toString())
+//                    _singleFarmerCard.value = response.body()?.data
+//                        ?.let { singleFarmerTransactionApiState.success(it) }!!
+
+                    response.body()?.data?.let {
+                        _singleFarmerCard.value = singleFarmerTransactionApiState.success(it)
+                    } ?: run {
+                        _singleFarmerCard.value = singleFarmerTransactionApiState.error("No data available")
+                    }
+
+                }
+                else{
+                    _singleFarmerCard.value = singleFarmerTransactionApiState.error("Error from our side")
+                }
+            } catch (e:Exception){
+                _singleFarmerCard.value = singleFarmerTransactionApiState.error("Error from our side "+e.message.toString())
+
+            }
+        }
+    }
+
+
+
+    private val _stockSummary = MutableStateFlow<ResponseStockSummary>(ResponseStockSummary("",0,0))
+    val stockSummary = _stockSummary.asStateFlow()
+    private val _loadingStockSummary = MutableStateFlow<Boolean>(false)
+    val loadingStockSummary = _loadingStockSummary.asStateFlow()
+
+    fun getStockSummary(farmerId: String){
+        viewModelScope.launch {
+            _loadingStockSummary.value = true
+            try {
+                val response = api.getStockSummary(farmerId)
+                if(response.isSuccessful){
+                    _stockSummary.value = response.body()!!
+                } else{
+                    Log.d("cvcvcv", "failed")
+                    _stockSummary.value = ResponseStockSummary("",0,0,"No Internet")
+                }
+            }catch (e:Exception){
+                Log.d("erererer","failed in the catch block")
+                _stockSummary.value = ResponseStockSummary("",0,0,e.message)
+
+            }
+            finally {
+                _loadingStockSummary.value = false
+            }
+        }
+    }
+
+
+    private  val _allVarieties = MutableStateFlow<ResponseVariety>(ResponseVariety("", listOf("") ,""))
+    val allVarieties:StateFlow<ResponseVariety> = _allVarieties.asStateFlow()
+    private val _loadingVarieties = MutableStateFlow<Boolean>(false)
+    val loadingVarieties = _loadingVarieties.asStateFlow()
+
+    fun getAllVarieties(farmerId: String){
+        viewModelScope.launch {
+            try {
+               val response = api.getVarietyList(farmerId)
+                if (response.isSuccessful){
+                    _allVarieties.value = response.body()!!
+                }
+                else{
+                    _allVarieties.value = ResponseVariety("", listOf(""),"No Internet")
+
+                }            }catch (e:Exception){
+                _allVarieties.value = ResponseVariety("", listOf(""),"Error from our side : "+e.message.toString())
+
+
+            }
+        }
+    }
+
 }
 
 //learnt new thing
@@ -563,5 +658,15 @@ sealed class getAllReciptsResponse{
 
     data class success(val reciptData: List<Order>) : getAllReciptsResponse()
 
+
+}
+
+sealed class singleFarmerTransactionApiState{
+
+    object idle : singleFarmerTransactionApiState();
+
+    data class success(val data: List<OrderDaybook>) : singleFarmerTransactionApiState()
+
+    data class error(val message:String):singleFarmerTransactionApiState();
 
 }

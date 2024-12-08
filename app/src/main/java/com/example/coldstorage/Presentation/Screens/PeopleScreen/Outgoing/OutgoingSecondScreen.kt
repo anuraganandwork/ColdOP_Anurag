@@ -91,6 +91,8 @@ fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navCo
     val orderOutgoingResult by viewmodel.orderOutgoingResult.collectAsState()
 
 
+    val totalSeedBags = mutableStateOf<String>("")
+
 
 
     Scaffold(
@@ -372,7 +374,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
     }
     val context = LocalContext.current
 
-    Column {
+    Column() {
         Row(modifier = Modifier.fillMaxWidth()) {
             headers.forEach { header ->
                 Text(
@@ -730,9 +732,10 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
                  //   navController.navigate(AllScreens.OutgoingScreenSuccess.name)
                    //  openConfirmSheet(true)
                           },
-                modifier = Modifier.align(Alignment.End).
-                width(150.dp).
-                height(40.dp), colors = ButtonDefaults.buttonColors(containerColor = primeGreen , contentColor = Color.White)
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .width(150.dp)
+                    .height(40.dp), colors = ButtonDefaults.buttonColors(containerColor = primeGreen , contentColor = Color.White)
             ) {
                 Box(
                     contentAlignment = Alignment.Center, // Centers the content within the Box
@@ -755,7 +758,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
             }
 }
 
-
+        Spacer(modifier = Modifier.height(350.dp))
 
     }}
 

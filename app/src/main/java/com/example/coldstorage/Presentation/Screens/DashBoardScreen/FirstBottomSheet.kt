@@ -92,6 +92,8 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
     LaunchedEffect(Unit) {
         viewmodel.getRecieptNumbers()
     }
+    val searchResults = viewmodel.searchResults.collectAsState()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -156,7 +158,7 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
 
         // Search Results
         if (!isNameSelected.value) {
-            items(viewmodel.searchResults) { result ->
+            items(searchResults.value) { result ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()

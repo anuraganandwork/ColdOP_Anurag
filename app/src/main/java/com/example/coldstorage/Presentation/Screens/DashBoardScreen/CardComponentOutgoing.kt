@@ -1,5 +1,6 @@
 package com.example.coldstorage.Presentation.Screens.DashBoardScreen
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -39,6 +40,7 @@ data class OutgoingCardRowData(
     val availableQty : Int
 )
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OutgoingCard(orderDaybook: OrderDaybook) {
@@ -49,7 +51,7 @@ fun OutgoingCard(orderDaybook: OrderDaybook) {
     val totalSeed = totalBags(orderDaybook, "Seed")
     val totalCut = totalBags(orderDaybook, "Cut-tok")
     val totalNumber = totalBags(orderDaybook, "Number-12")
-val totalBagsNumber = totalCut+totalGoli+totalRation+totalSeed+totalNumber
+    val totalBagsNumber = totalCut+totalGoli+totalRation+totalSeed+totalNumber
 //    val listOfBags= mutableStateOf<List<OutgoingCardRowData>>(emptyList())
 //    listOfBags.value = mapDataForOutgoingRow(orderDaybook)
     val listOfBags = mapDataForOutgoingRow(orderDaybook)

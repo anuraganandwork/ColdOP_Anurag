@@ -50,7 +50,12 @@ import com.example.coldstorage.R
 fun CardComponentDaybook(orderDaybook: OrderDaybook){
     var incomingSum = mutableStateOf(0)
     var outgoingSum = mutableStateOf(0)
-
+//    val totalGoli = totalBags(orderDaybook, "Goli")
+//    val totalRation = totalBags(orderDaybook, "Ration")
+//    val totalSeed = totalBags(orderDaybook, "Seed")
+//    val totalCut = totalBags(orderDaybook, "Cut-tok")
+//    val totalNumber = totalBags(orderDaybook, "Number-12")
+//    val totalBagsNumber = totalCut+totalGoli+totalRation+totalSeed+totalNumber
 
 //           orderDaybook.orderDetails[0].bagSizes.forEach {
 //                   bag->
@@ -62,7 +67,9 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
 
 
     Card(
-        modifier = Modifier.animateContentSize().padding( horizontal = 6.dp , vertical = 10.dp)
+        modifier = Modifier
+            .animateContentSize()
+            .padding(horizontal = 6.dp, vertical = 10.dp)
             ,
         elevation = CardDefaults.cardElevation(defaultElevation = 9.dp),
         colors = CardDefaults.cardColors(
@@ -83,7 +90,9 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
 
         Column(
             modifier = Modifier
-                .padding(10.dp).clickable {                                    expanded = !expanded
+                .padding(10.dp)
+                .clickable {
+                    expanded = !expanded
                 }
         ){
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -142,7 +151,7 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
                     Row(modifier = Modifier.weight(.5f) ,
                         horizontalArrangement = Arrangement.Start) {
                         Text(text = "Lot No : " , fontSize = 13.sp , fontWeight = FontWeight.Medium)
-                        Text(text = if(orderDaybook.voucher.type == "RECEIPT") incomingSum.value.toString() else outgoingSum.value.toString() , fontSize = 13.sp , fontWeight = FontWeight.Medium)
+                        Text(text = if(orderDaybook.voucher.type == "RECEIPT")  totalIncomingBags(orderDaybook).toString() else totalOutgoingBags(orderDaybook).toString(), fontSize = 13.sp , fontWeight = FontWeight.Medium)
 
                     }
                 }
@@ -272,6 +281,12 @@ fun StockTableRow(
                         //.border(0.5.dp, Color.Black)
                 )
             }
+            Text(text = "Total" ,fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(4.dp))
         }
         Row(modifier = Modifier.fillMaxWidth()) {
             values.forEach { value ->
@@ -287,6 +302,12 @@ fun StockTableRow(
                        // .border(0.5.dp, Color.Black)
                 )
             }
+            
+            Text(text = totalIncomingBags(orderDaybook).toString() ,fontSize = 11.sp,
+                color = Color.Black,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(4.dp))
         }
     }
 
@@ -359,3 +380,21 @@ fun DetailRow(label: String, value: String) {
 //    CardComponentDaybook()
 //}
 //155
+
+fun totalIncomingBags(orderDaybook: OrderDaybook):Int{
+    var totalBagsIn = 0;
+        orderDaybook.orderDetails[0].bagSizes.forEach {
+            totalBagsIn += it.quantity?.currentQuantity!!
+        }
+
+    return totalBagsIn
+}
+
+fun totalOutgoingBags(orderDaybook: OrderDaybook):Int{
+    var totalBagsOut = 0;
+    orderDaybook.orderDetails[0].bagSizes.forEach {
+        totalBagsOut += it.quantityRemoved!!
+    }
+
+    return totalBagsOut
+}

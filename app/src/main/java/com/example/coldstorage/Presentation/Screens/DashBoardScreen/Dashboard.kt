@@ -198,6 +198,7 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
                     if(data!= null){
                     LazyColumn(){
                         if (data != null) {
+                            Log.d("xvxvxv" , data.data.toString())
                             items(data.data){
                                 CardComponentDaybook(it)
 

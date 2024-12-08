@@ -37,7 +37,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,18 +82,36 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                     val farmerInfoAtui = (farmerData as FarmerApiState.success)?.farmerInfo
                     Column(modifier = Modifier.padding(12.dp)) {
                         if (farmerInfoAtui != null) {
-                            Text(text = "Account no :  ${farmerInfoAtui.farmerId}")
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = "Account no :  " , modifier = Modifier.weight(1f))
+                                Text(text = "${farmerInfoAtui.farmerId}" , modifier = Modifier.weight(.7f), fontWeight = FontWeight.Bold , textAlign = TextAlign.Start )
+                            }
                         }
                         if (farmerInfoAtui != null) {
-                            Text(text = "Name : ${farmerInfoAtui.name}")
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                Text(text = "Name : " , modifier = Modifier.weight(1f))
+                                Text(text = "${farmerInfoAtui.name}" ,  fontWeight = FontWeight.Bold , modifier = Modifier.weight(.7f), textAlign = TextAlign.Start)
+                            }
                         }
                         //Text(text = "S/O :")
                         if (farmerInfoAtui != null) {
-                            Text(text = "Address : ${farmerInfoAtui.address}")
-                        }
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = "Address : " , modifier = Modifier.weight(1f))
+                                Text(text = "${farmerInfoAtui.address}" ,  fontWeight = FontWeight.Bold ,  modifier = Modifier.weight(.7f),textAlign = TextAlign.Start)
+                            }                        }
                         if (farmerInfoAtui != null) {
-                            Text(text = "Contact : ${farmerInfoAtui.mobileNumber}")
-                        }
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = "Contact : " , modifier = Modifier.weight(1f))
+                                Text(text = "${farmerInfoAtui.mobileNumber}" ,  fontWeight = FontWeight.Bold , modifier = Modifier.weight(.7f), textAlign = TextAlign.Start)
+                            }                        }
 
 
 

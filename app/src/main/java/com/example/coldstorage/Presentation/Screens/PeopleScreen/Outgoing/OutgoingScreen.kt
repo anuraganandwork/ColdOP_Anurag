@@ -25,6 +25,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,15 +49,41 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
     var query by remember {
         mutableStateOf("")
     }
+    LaunchedEffect(Unit ){
+        Log.d("fromDayBook" ,fromDaybook.toString())
+
+    }
     val isNameSelected = remember { mutableStateOf(false) }
+     if(fromDaybook){
+    LaunchedEffect(query){
+        if(fromDaybook){
+            viewmodel.getAllVarieties(viewmodel.farmerAcc.value)
+        }else{
+            viewmodel.getAllVarieties(accNum)}
+    }
+} else{
+    LaunchedEffect(Unit){
+        if(fromDaybook){
+            viewmodel.getAllVarieties(viewmodel.farmerAcc.value)
+        }else{
+            Log.d("qwertyuiop" ,accNum)
+            viewmodel.getAllVarieties(accNum)}
+    }
+}
 
 
+    val searchResults = viewmodel.searchResults.collectAsState()
+
+    val allVarieties = viewmodel.allVarieties.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Outgoing Stock") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { navController.popBackStack()
+//                    viewmodel.searchResults.collectAsState() = emptyList()
+                        viewmodel.resetSearchResult()
+                    }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
@@ -101,7 +128,7 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
 
             LazyColumn(){
                 if (!isNameSelected.value) {
-                    items(viewmodel.searchResults) { result ->
+                    items(searchResults.value) { result ->
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -124,19 +151,19 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
 
             DropdownMenu_(
                 label = "Which variety would you like to take?",
-                options = listOf("Pukhraj"),
+                options = if(allVarieties.value.status!="") allVarieties.value.varieties else listOf("Please select farmer"),
                 selectedOption = selectedVariety,
                 onOptionSelected = { selectedVariety = it }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            DropdownMenu_(
-                label = "Which bag size would you like to take?",
-                options = listOf("All"),
-                selectedOption = selectedBagSize,
-                onOptionSelected = { selectedBagSize = it }
-            )
+//            DropdownMenu_(
+//                label = "Which bag size would you like to take?",
+//                options = listOf("All"),
+//                selectedOption = selectedBagSize,
+//                onOptionSelected = { selectedBagSize = it }
+//            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -147,7 +174,7 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                StockTable(fromDaybook, accNum, viewmodel, navController)
+                StockTable(selectedVariety ,fromDaybook, accNum, viewmodel, navController)
             }
 
 
@@ -185,7 +212,8 @@ fun DropdownMenu_(
                 DropdownMenuItem(onClick = {
                     onOptionSelected(option)
                     expanded = false
-                }    , text = {Text(option)}
+                }    , text = {Text(option , textAlign = TextAlign.Center) } ,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -193,7 +221,7 @@ fun DropdownMenu_(
 }
 
 @Composable
-fun StockTable(fromDaybook: Boolean,accNum: String,viewmodel: FunctionStoreOwner  , navController: NavController) {
+fun StockTable(selectedVariety:String ,fromDaybook: Boolean,accNum: String,viewmodel: FunctionStoreOwner  , navController: NavController) {
     val headers = listOf("V No.", "Variety", "Seed", "Goli", "Ration","Cut&Tok", "No.12", "Total")
     val selectedBlock =  remember { mutableStateOf(Color.White) }
    val selectedCells  = remember {
@@ -201,15 +229,42 @@ fun StockTable(fromDaybook: Boolean,accNum: String,viewmodel: FunctionStoreOwner
                > , Boolean>()
    }
     val transactionAllHistory = viewmodel.transactionHistory.collectAsState() // to learn
-  LaunchedEffect(Unit){
+    LaunchedEffect(Unit ){
+        Log.d("fromDayBook" ,fromDaybook.toString())
 
-      if(fromDaybook){
-          viewmodel.getAllRecipts(viewmodel.farmerAcc.value)
-      } else{
-          viewmodel.getAllRecipts(accNum)
+    }
+//    if(fromDaybook){
+//        LaunchedEffect(selectedVariety){
+//
+//            if(fromDaybook){
+//                viewmodel.getAllRecipts(viewmodel.farmerAcc.value)
+//            } else{
+//                viewmodel.getAllRecipts(accNum)
+//
+//            }
+//        }
+//
+//    } else{
+//        LaunchedEffect(Unit){
+//
+//            if(fromDaybook){
+//                viewmodel.getAllRecipts(viewmodel.farmerAcc.value)
+//            } else{
+//                viewmodel.getAllRecipts(accNum)
+//
+//            }
+//        }
+//
+//    }
+    LaunchedEffect(selectedVariety){
 
-      }
-  }
+        if(fromDaybook){
+            viewmodel.getAllRecipts(viewmodel.farmerAcc.value)
+        } else{
+            viewmodel.getAllRecipts(accNum)
+
+        }
+    }
 
     val selectedCellsList = remember { mutableStateListOf<SelectedCellData>() }
 
@@ -229,10 +284,10 @@ fun StockTable(fromDaybook: Boolean,accNum: String,viewmodel: FunctionStoreOwner
     }
     Log.d("OutgoingTable" , rows.toString())
 
-    fun saveInTheList(cellData : SelectedCellData){
-
-
-    }
+//    fun saveInTheList(cellData : SelectedCellData){
+//
+//
+//    }
 Column(modifier = Modifier
     .fillMaxHeight()
     ) {
@@ -240,7 +295,7 @@ Column(modifier = Modifier
 
     LazyColumn(modifier = Modifier
         .fillMaxWidth()
-        .height(300.dp)) {
+        ) {
         item {
             Row(Modifier.fillMaxWidth()) {
                 headers.forEach { header ->
@@ -257,11 +312,13 @@ Column(modifier = Modifier
                 }
             }
         }
-
+//val _row = rows.filter{ it.variety == selectedVariety}
+       // if(_row != null){
         items(rows.size) { rowIndex ->
-            val row = rows[rowIndex]
+            val row = rows.filter { it.variety == selectedVariety }.getOrNull(rowIndex)
+            //val row = _row[rowIndex]
             Log.d("Outgoingggrgrgrgrgrgrgr", row.toString())
-
+if(row!= null){
             Row(Modifier.fillMaxWidth()) {
                 Text(
                     text = row.voucherNumber.toString(), // First column - voucher number
@@ -575,9 +632,16 @@ Column(modifier = Modifier
                     }
                 )
 
+            }} else{
+                //Text(text = "Please select size!")
+                Log.d("NUllllll" , "No size selected")
             }
         }
-    }
+
+//        } else{
+//        }
+        }
+ if(!rows.filter { it.variety == selectedVariety }.isNullOrEmpty()){
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(vertical = 10.dp) , horizontalArrangement = Arrangement.End) {
@@ -595,17 +659,24 @@ Column(modifier = Modifier
                 //Log.d("SelectedCellListttt",selectedCellsList)
                 viewmodel.saveSelectedCellData(selectedCellsList)
 
-                if(fromDaybook){
+                if (fromDaybook) {
                     navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${viewmodel.farmerAcc.value}")
 
                 } else {
                     navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${accNum}")
-                }   }
+                }
+            }
 
             , shape = RoundedCornerShape(5.dp) , color =Color(0xFF23C45E) ){
             Text(text = "Proceed" ,modifier = Modifier
                 .padding(horizontal = 7.dp, vertical = 3.dp) )
         }
+    }} else{
+        Column(modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.Center) {
+           // Spacer(modifier = Modifier.padding(200.dp))
+            Text(text = "Please select a size!" , modifier = Modifier.fillMaxWidth() , textAlign = TextAlign.Center)
+        }
+
     }
 
 }
@@ -631,3 +702,4 @@ fun getSeparateKeys(selectedCells: MutableMap<Pair<Int, Int>, Boolean>): Pair<Li
 }
 
 
+//117
