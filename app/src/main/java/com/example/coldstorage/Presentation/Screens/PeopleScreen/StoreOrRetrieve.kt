@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -220,7 +222,7 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
     var expandedSortBy = remember { mutableStateOf(false) }
     var selectedSortBy = remember { mutableStateOf("Sort by Date") }
     val fromDaybookValue = false
-
+    val showEmptyBagAlert = remember{ mutableStateOf(false) }
 
     val stockSummary = viewmodel.stockSummary.collectAsState()
     val loadingStockSummary = viewmodel.loadingStockSummary.collectAsState()
@@ -242,7 +244,8 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                     painter = painterResource(id = R.drawable.backicon),
                     contentDescription = "Back Icon",
                     tint = Color.Black,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(30.dp).
+                    clickable { navController.popBackStack() }
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.more),
@@ -333,7 +336,9 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
             Surface(modifier = Modifier
                 .padding(vertical = 0.dp)
                 .background(Color.Green)
-                .clickable { showBottomSheet.value = true }) {
+                .clickable {
+                   // showBottomSheet.value = true
+                }) {
                 Text(
                     text = "View/Download Ledger Report",
                     modifier = Modifier
@@ -382,9 +387,12 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                         .padding()
                         .clickable {
                             // navController.navigate(AllScreens.OutgoingStockScreen.name+ "/${accNumber}")
-                            val fromDaybook = false
-                            navController.navigate(AllScreens.OutgoingStockScreen.name + "/$fromDaybook/$accountNumber")
-
+                           if(sum>0) {
+                               val fromDaybook = false
+                               navController.navigate(AllScreens.OutgoingStockScreen.name + "/$fromDaybook/$accountNumber")
+                           }else{
+                               showEmptyBagAlert.value = true
+                           }
 
                         }
                 ) {
@@ -401,7 +409,22 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                 }
 
             }
-
+            if(showEmptyBagAlert.value){
+                AlertDialog(
+                    onDismissRequest = { showEmptyBagAlert.value = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                           // viewModel.resetAddFarmerStatus()
+                           // navController.popBackStack()
+                            showEmptyBagAlert.value = false
+                        }) {
+                            Text("OK")
+                        }
+                    },
+                    title = { Text(text = "No bags!") },
+                    text = { Text(text = "No bags remaining") }
+                )
+            }
             //table starting here
             Spacer(modifier = Modifier.padding(15.dp))
 
