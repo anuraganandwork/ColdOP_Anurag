@@ -25,6 +25,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -56,6 +58,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.primeGreen
 import kotlinx.coroutines.launch
@@ -82,7 +85,8 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
-
+   val accountHolderName = remember {mutableStateOf("")}
+    val mobileNumber =remember {mutableStateOf("")}
 //    LaunchedEffect(key1 = keyboardHeight) {
 //        coroutineScope.launch {
 //            scrollState.scrollBy(keyboardHeight.toFloat())
@@ -117,7 +121,7 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Current Reciept Number :")
+                Text(text = "Current Receipt Number :")
                 if (currentReceiptNum != 0) {
                     Text(text = currentReceiptNum.toString(), color = Color.Blue)
                 } else {
@@ -158,6 +162,44 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
 
         // Search Results
         if (!isNameSelected.value) {
+            item{
+                Column {
+
+                    Text("New Farmer")
+                }
+            }
+            if(searchResults.value.size < 1) {
+               item{
+
+                   Column {
+
+
+                ColdOpTextField(value = accountHolderName.value, onValueChange = {
+                    accountHolderName.value = it
+                } , placeholder = "Enter name" )
+                       Spacer(modifier = Modifier.padding(10.dp))
+                   Row {
+
+
+                       ColdOpTextField(value = mobileNumber.value, onValueChange = {
+                           mobileNumber.value = it
+                       } , modifier = Modifier.weight(.75f), placeholder = "Enter mobile number")
+                       Button(onClick = { query = accountHolderName.value
+                                        isNameSelected.value = true }, enabled = accountHolderName.value.length > 0 && mobileNumber.value.length == 10
+
+                           , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContainerColor = Color.Gray , disabledContentColor = Color.White)) {
+                           Text(text = "Save")
+                       }
+
+                   }
+
+                   }
+            }
+
+
+
+
+            }
             items(searchResults.value) { result ->
                 Column(
                     modifier = Modifier
@@ -310,7 +352,7 @@ private fun QuantityInputField(
                     BorderStroke(1.dp, SolidColor(Color.Gray)),
                     shape = MaterialTheme.shapes.small
                 )
-                .padding(horizontal = 5.dp , vertical = 3.dp)
+                .padding(horizontal = 5.dp, vertical = 3.dp)
 
                 .width(134.dp)
                 .height(40.dp),

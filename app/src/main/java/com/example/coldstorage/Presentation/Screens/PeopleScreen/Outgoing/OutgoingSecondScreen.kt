@@ -585,7 +585,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
 
                         debounceJob?.cancel()
                         debounceJob = coroutineScope.launch {
-                            delay(700)
+                            delay(100)
                             if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! < pair.currentQuantity.toInt()) {
 
                                 val existingItem = outgoingResponseBody.find { it.orderId == pair.orderId }
@@ -629,7 +629,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
                                 Toast.makeText(context, "Please a enter a value less than ${pair.currentQuantity.toInt()+1}!", Toast.LENGTH_SHORT).show()
 
                             }
-                            keyboardController?.hide()
+                            //keyboardController?.hide()
 
                         }
                     },

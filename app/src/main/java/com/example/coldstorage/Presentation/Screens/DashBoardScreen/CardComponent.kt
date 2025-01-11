@@ -10,6 +10,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,6 +47,8 @@ import androidx.compose.ui.unit.sp
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.BagSizeDaybook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
 import com.example.coldstorage.R
+import com.example.coldstorage.ui.theme.primeGreen
+import com.example.coldstorage.ui.theme.primeRed
 
 
 @SuppressLint("SuspiciousIndentation")
@@ -74,7 +80,8 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
         elevation = CardDefaults.cardElevation(defaultElevation = 9.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
-        )
+        ) ,
+        border =if(orderDaybook.voucher.type == "RECEIPT") BorderStroke(.5.dp , primeGreen) else BorderStroke(.5.dp , primeRed)
 
 
     ){
@@ -152,8 +159,16 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
                         horizontalArrangement = Arrangement.Start) {
                         Text(text = "Lot No : " , fontSize = 13.sp , fontWeight = FontWeight.Medium)
                         Text(text = if(orderDaybook.voucher.type == "RECEIPT")  totalIncomingBags(orderDaybook).toString() else totalOutgoingBags(orderDaybook).toString(), fontSize = 13.sp , fontWeight = FontWeight.Medium)
-
+                        
                     }
+                    
+//                    PdfButton(
+//                        view = LocalView.current,
+//                        context = LocalContext.current,
+//                        contentWidth = 200.dp,
+//                        contentHeight = 200.dp,
+//                        density = LocalDensity.current
+//                    )
                 }
                 if(expanded){
                     //make this a lazyrow with bagsizes

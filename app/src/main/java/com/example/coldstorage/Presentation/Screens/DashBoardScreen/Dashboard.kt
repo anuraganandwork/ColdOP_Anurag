@@ -1,7 +1,9 @@
 package com.example.coldstorage.Presentation.Screens.DashBoardScreen
 
 import FirstBottomSheet
+import android.content.Context
 import android.util.Log
+import android.view.View
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,15 +50,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
 import com.example.coldstorage.Presentation.Screens.AllScreens
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpDropDown
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
 import com.example.coldstorage.R
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
@@ -85,9 +93,11 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
     val secondSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val thirdSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit ){
-        viewmodel.getOrdersDayBook("all" , "latest" , 1,50)
+    val context = LocalContext.current
+    val typeOfCard = remember { mutableStateOf("all") }
+    LaunchedEffect(typeOfCard.value ){
+        Log.d("asdfghjk",typeOfCard.value)
+        viewmodel.getOrdersDayBook(typeOfCard.value , "latest" , 1,50)
     }
     val state by viewmodel.dayBookOrdersData.collectAsState()
 
@@ -178,7 +188,12 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
         }
 
         Text(text = "Transactions", fontWeight = FontWeight.Bold , fontSize = 20.sp ,  modifier = Modifier.padding(horizontal = 15.dp , vertical = 10.dp))
+        Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween) {
+            
+            ColdOpDropDown(label = "Sort", options = listOf("Latest" , "Oldest"), onSelect = {} )
+            ColdOpDropDown(label = "Filter", options = listOf("incoming" , "outgoing" , "all"), onSelect = { selected -> typeOfCard.value = selected} )
 
+        }
             when (state) {
                 is FunctionStoreOwner.ApiStateDaybook.Loading -> {
                     // Show a loading indicator
@@ -206,7 +221,7 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
                         LazyColumn {
                             if (data!= null) {
                                 items(data.data) {
-                                    CardComponentDaybook(it)
+                                    cardWrapper(context , it)
                                 }
                             }
                         }
@@ -302,3 +317,49 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
 // work on the debouncing feature using jobs ,also  what is debouncing
 
 //1223- 123
+
+@Composable
+fun cardWrapper(context: Context,orderDaybook: OrderDaybook){
+//    val view = ComposeView(context).apply {
+//        setContent {         CardComponentDaybook(orderDaybook = orderDaybook)
+//        }
+//    }
+
+
+//    val (contentWidth, contentHeight) = calculateDimensions(context
+//    ) { CardComponentDaybook(orderDaybook = orderDaybook) }
+
+    Column {
+        CardComponentDaybook(orderDaybook = orderDaybook)
+//        PdfButton(
+//            content = { CardComponentDaybook(orderDaybook = orderDaybook) },
+//
+//            context = context,
+//            contentWidth = 200.dp,
+//            contentHeight = 200.dp,
+//            density = Density(context.resources.displayMetrics.density)
+//        )
+    }
+}
+
+
+fun calculateDimensions(context: Context, content: @Composable () -> Unit): Pair<Dp, Dp> {
+    val composeView = ComposeView(context).apply {
+        setContent { content() }
+    }
+
+    // Measure the view to determine its dimensions
+    composeView.measure(
+        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    )
+    val widthPx = composeView.measuredWidth
+    val heightPx = composeView.measuredHeight
+
+    // Convert to Dp
+    val density = context.resources.displayMetrics.density
+    val widthDp = Dp(widthPx / density)
+    val heightDp = Dp(heightPx / density)
+
+    return Pair(widthDp, heightDp)
+}
