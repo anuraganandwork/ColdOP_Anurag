@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,10 +26,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -46,9 +49,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -59,6 +64,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
+import com.example.coldstorage.R
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.primeGreen
 import kotlinx.coroutines.launch
@@ -97,7 +103,9 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
         viewmodel.getRecieptNumbers()
     }
     val searchResults = viewmodel.searchResults.collectAsState()
-
+    val openAddFarmerDailog = remember{
+        mutableStateOf(false)
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -133,73 +141,130 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
         // Account Name Section
         item {
             Text(text = "Enter Account Name (search and select)")
-            OutlinedTextField(
-                value = query,
-                onValueChange = {
-                    query = it
-                    viewmodel.onSearchQuery(query)
-                },
-                label = { Text("Search farmers") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.textFieldColors(
-                    focusedTextColor = Color.Black, // Text color inside the TextField
-                    disabledTextColor = Color.Gray,
-                    cursorColor = Color.Black, // Cursor color
-                    containerColor = Color.Transparent ,
-                    errorCursorColor = Color.Red, // Cursor color in error state
-                    focusedIndicatorColor = primeGreen, // Border color when focused
-                    unfocusedIndicatorColor = Color.Gray, // Border color when not focused
-                    errorIndicatorColor = Color.Red, // Border color in error state
-                    focusedLeadingIconColor = Color.Black,
-                    focusedTrailingIconColor = Color.Black,
-                    focusedLabelColor = primeGreen, // Label color when focused
-                    unfocusedLabelColor = Color.Gray, // Label color when not focused
-                    errorLabelColor = Color.Red // Label color in error state
+            Row(modifier = Modifier.fillMaxWidth() , verticalAlignment = Alignment.CenterVertically , horizontalArrangement = Arrangement.SpaceBetween) {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = {
+                        query = it
+                        viewmodel.onSearchQuery(query)
+                    },
+                    modifier = Modifier.weight(.9f),
+                    label = { Text("Search farmers") },
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedTextColor = Color.Black, // Text color inside the TextField
+                        disabledTextColor = Color.Gray,
+                        cursorColor = Color.Black, // Cursor color
+                        containerColor = Color.Transparent ,
+                        errorCursorColor = Color.Red, // Cursor color in error state
+                        focusedIndicatorColor = primeGreen, // Border color when focused
+                        unfocusedIndicatorColor = Color.Gray, // Border color when not focused
+                        errorIndicatorColor = Color.Red, // Border color in error state
+                        focusedLeadingIconColor = Color.Black,
+                        focusedTrailingIconColor = Color.Black,
+                        focusedLabelColor = primeGreen, // Label color when focused
+                        unfocusedLabelColor = Color.Gray, // Label color when not focused
+                        errorLabelColor = Color.Red // Label color in error state
+                    )
                 )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.width(5.dp))
+                Column(modifier = Modifier
+                    .weight(.2f)
+                    .fillMaxHeight()
+                    .clickable {
+                        openAddFarmerDailog.value = true
+                    }, verticalArrangement = Arrangement.Center , horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(painter = painterResource(id = R.drawable.plus) ,
+                        contentDescription = "New farmer add icon" , modifier = Modifier.size(32.dp),tint= primeGreen )
+                   Text(text = "New Farmer" , fontSize = 8.sp  , color = primeGreen , fontWeight = FontWeight.Medium)
+                }
+               // add dialog here
+           if(openAddFarmerDailog.value){
+               AlertDialog(onDismissRequest = { openAddFarmerDailog.value = false }, confirmButton = { /*TODO*/ } ,
+               title = { Text(text = "Create New Account")} , text = {
+                   Column {
+
+                       Row {
+                           Text(
+                               text = "Name:",
+                               modifier = Modifier
+                                   .weight(0.3f)
+                                   .padding(end = 8.dp),
+                           )
+
+                           // Input TextField
+                           ColdOpTextField(
+                               value = "",
+                               onValueChange = {},
+                               modifier = Modifier.weight(0.7f),
+                               placeholder = "Enter name"
+                           )
+                       }
+          Spacer(modifier = Modifier.padding(5.dp))
+                       Row {
+                           Text(text = "Contact : " ,
+                               modifier = Modifier
+                                   .weight(0.3f)
+                                   .padding(end = 8.dp),)
+                           ColdOpTextField(value = "", onValueChange ={},
+                               modifier = Modifier.weight(.7f),
+
+                               placeholder = "Enter mobile no.")
+                       }
+                       Spacer(modifier = Modifier.padding(10.dp))
+
+                       Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
+                           Button(onClick = { /*TODO*/ } , colors = ButtonColors(contentColor = Color.Black , containerColor = primeGreen , disabledContentColor = Color.White , disabledContainerColor = Color.Gray)) {
+                               Text(text = "Save")
+
+                           }
+                       }
+                   }
+                   })
+           }
+            }
+
         }
 
         // Search Results
         if (!isNameSelected.value) {
-            item{
-                Column {
-
-                    Text("New Farmer")
-                }
-            }
-            if(searchResults.value.size < 1) {
-               item{
-
-                   Column {
-
-
-                ColdOpTextField(value = accountHolderName.value, onValueChange = {
-                    accountHolderName.value = it
-                } , placeholder = "Enter name" )
-                       Spacer(modifier = Modifier.padding(10.dp))
-                   Row {
-
-
-                       ColdOpTextField(value = mobileNumber.value, onValueChange = {
-                           mobileNumber.value = it
-                       } , modifier = Modifier.weight(.75f), placeholder = "Enter mobile number")
-                       Button(onClick = { query = accountHolderName.value
-                                        isNameSelected.value = true }, enabled = accountHolderName.value.length > 0 && mobileNumber.value.length == 10
-
-                           , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContainerColor = Color.Gray , disabledContentColor = Color.White)) {
-                           Text(text = "Save")
-                       }
-
-                   }
-
-                   }
-            }
-
-
-
-
-            }
+//            item{
+//                Column {
+//
+//                    Text("New Farmer")
+//                }
+//            }
+//            if(searchResults.value.size < 1) {
+//               item{
+//
+//                   Column {
+//
+//
+//                ColdOpTextField(value = accountHolderName.value, onValueChange = {
+//                    accountHolderName.value = it
+//                } , placeholder = "Enter name" )
+//                       Spacer(modifier = Modifier.padding(10.dp))
+//                   Row {
+//
+//
+//                       ColdOpTextField(value = mobileNumber.value, onValueChange = {
+//                           mobileNumber.value = it
+//                       } , modifier = Modifier.weight(.75f), placeholder = "Enter mobile number")
+//                       Button(onClick = { query = accountHolderName.value
+//                                        isNameSelected.value = true }, enabled = accountHolderName.value.length > 0 && mobileNumber.value.length == 10
+//
+//                           , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContainerColor = Color.Gray , disabledContentColor = Color.White)) {
+//                           Text(text = "Save")
+//                       }
+//
+//                   }
+//
+//                   }
+//            }
+//
+//
+//
+//
+//            }
             items(searchResults.value) { result ->
                 Column(
                     modifier = Modifier
@@ -374,4 +439,4 @@ private fun QuantityInputField(
 //    return keyboardVisibilityState.keyboardHeight.toDp()
 //}
 
-//1214
+//9:23
