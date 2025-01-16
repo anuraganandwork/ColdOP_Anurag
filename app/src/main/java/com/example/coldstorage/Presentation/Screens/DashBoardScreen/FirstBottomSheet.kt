@@ -1,3 +1,6 @@
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,6 +32,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
@@ -63,15 +68,18 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.coldstorage.DataLayer.Api.FarmerData
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.R
+import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.primeGreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
+fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner  , viewModel: AuthViewmodel = hiltViewModel()) {
     var query by remember {
         mutableStateOf("")
     }
@@ -93,6 +101,19 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
    val accountHolderName = remember {mutableStateOf("")}
     val mobileNumber =remember {mutableStateOf("")}
+
+    //states for quickest add farmer route
+    var address by remember { mutableStateOf("") }
+    var imageUrl by remember { mutableStateOf("") }
+    var mobileNumberr by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var mobileNumberError by remember { mutableStateOf("") }
+    val loading = viewModel.loadingAddFarmer.collectAsState()
+    val statusAdding = viewModel.farmerAddStatus.collectAsState()
+    var showMobileError by remember { mutableStateOf(false) }
+
+
 //    LaunchedEffect(key1 = keyboardHeight) {
 //        coroutineScope.launch {
 //            scrollState.scrollBy(keyboardHeight.toFloat())
@@ -102,6 +123,16 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
     LaunchedEffect(Unit) {
         viewmodel.getRecieptNumbers()
     }
+
+    LaunchedEffect(statusAdding.value ){
+        if(statusAdding.value){
+            address = ""
+            name = ""
+            mobileNumberr = ""
+            imageUrl = ""
+            password = ""
+
+        }    }
     val searchResults = viewmodel.searchResults.collectAsState()
     val openAddFarmerDailog = remember{
         mutableStateOf(false)
@@ -179,7 +210,10 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
                 }
                // add dialog here
            if(openAddFarmerDailog.value){
-               AlertDialog(onDismissRequest = { openAddFarmerDailog.value = false }, confirmButton = { /*TODO*/ } ,
+               AlertDialog(onDismissRequest = {
+                   openAddFarmerDailog.value = false
+                   viewModel.resetAddFarmerStatus()
+                                              }, confirmButton = { /*TODO*/ } ,
                title = { Text(text = "Create New Account")} , text = {
                    Column {
 
@@ -193,30 +227,99 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner) {
 
                            // Input TextField
                            ColdOpTextField(
-                               value = "",
-                               onValueChange = {},
+                               value = name,
+                               onValueChange = { text ->
+                                   name = text
+                               },
                                modifier = Modifier.weight(0.7f),
                                placeholder = "Enter name"
                            )
                        }
           Spacer(modifier = Modifier.padding(5.dp))
-                       Row {
-                           Text(text = "Contact : " ,
-                               modifier = Modifier
-                                   .weight(0.3f)
-                                   .padding(end = 8.dp),)
-                           ColdOpTextField(value = "", onValueChange ={},
-                               modifier = Modifier.weight(.7f),
-
-                               placeholder = "Enter mobile no.")
+                       Column {
+                           Row(
+                               modifier = Modifier.fillMaxWidth(),
+                               verticalAlignment = Alignment.CenterVertically,
+                               horizontalArrangement = Arrangement.Start
+                           ) {
+                               Text(
+                                   text = "Contact: ",
+                                   modifier = Modifier
+                                       .weight(0.3f)
+                                       .padding(end = 8.dp),
+                               )
+                               Column(modifier = Modifier.weight(0.7f)) {
+                                   ColdOpTextField(
+                                       value = mobileNumberr,
+                                       onValueChange = { text ->
+                                           mobileNumberr = text
+                                           showMobileError = text.length != 10 && text.isNotEmpty() // Show error if not 10 digits
+                                       },
+                                       placeholder = "Enter mobile no.",
+                                       keyboardOptions = KeyboardOptions.Default.copy(
+                                           keyboardType = KeyboardType.Number
+                                       )
+                                   )
+                                   if (showMobileError) {
+                                       Text(
+                                           text = "Mobile no. should be of 10 digits",
+                                           color = Color.Red,
+                                           fontSize = 10.sp,
+                                           modifier = Modifier.padding(top = 2.dp)
+                                       )
+                                   }
+                               }
+                           }
                        }
+
                        Spacer(modifier = Modifier.padding(10.dp))
 
                        Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
-                           Button(onClick = { /*TODO*/ } , colors = ButtonColors(contentColor = Color.Black , containerColor = primeGreen , disabledContentColor = Color.White , disabledContainerColor = Color.Gray)) {
-                               Text(text = "Save")
-
+                           Button(
+                               onClick = {
+                                   val farmerData = FarmerData(
+                                       name = name,
+                                       mobileNumber = mobileNumberr,
+                                       address = "Added from quickest route",
+                                       password = "Added from quickest route",
+                                       imageUrl = "Added from quickest route"
+                                   )
+                                   try {
+                                       viewModel.quickRegister(farmerData)
+                                       Log.d("SuccessfullLOG", "farmer added quickly")
+                                   } catch (e: Exception) {
+                                       Log.d("ErrorLog", e.message.toString())
+                                   }
+                               },
+                               enabled = (mobileNumberr.length == 10 && name.isNotBlank()) || statusAdding.value,
+                               colors = ButtonDefaults.buttonColors(
+                                   contentColor = Color.Black,
+                                   containerColor = primeGreen,
+                                   disabledContentColor = Color.White,
+                                   disabledContainerColor = Color.Gray
+                               )
+                           ) {
+                               AnimatedContent(targetState = Pair(loading.value, statusAdding.value),
+                                   label = ""
+                               ) { (isLoading, isAdded, ) ->
+                                   when {
+                                       isLoading -> {
+                                           CircularProgressIndicator(
+                                               modifier = Modifier.size(20.dp),
+                                               color = Color.Black
+                                           )
+                                       }
+                                       isAdded -> {
+                                           Text(text = "Saved!", color = Color.Black)
+                                       }
+                                       else -> {
+                                           Text(text = "Save", color = Color.Black)
+                                       }
+                                   }
+                               }
                            }
+
+
                        }
                    }
                    })
