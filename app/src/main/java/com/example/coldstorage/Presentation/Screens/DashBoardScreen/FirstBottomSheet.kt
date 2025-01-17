@@ -72,6 +72,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.coldstorage.DataLayer.Api.FarmerData
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.R
+import com.example.coldstorage.R.*
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.primeGreen
@@ -208,6 +209,7 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner  , vi
                         contentDescription = "New farmer add icon" , modifier = Modifier.size(32.dp),tint= primeGreen )
                    Text(text = "New Farmer" , fontSize = 8.sp  , color = primeGreen , fontWeight = FontWeight.Medium)
                 }
+                //10:06
                // add dialog here
            if(openAddFarmerDailog.value){
                AlertDialog(onDismissRequest = {

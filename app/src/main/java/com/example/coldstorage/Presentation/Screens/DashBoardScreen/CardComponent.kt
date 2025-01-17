@@ -1,6 +1,8 @@
 package com.example.coldstorage.Presentation.Screens.DashBoardScreen
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -41,7 +43,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.BagSizeDaybook
@@ -94,6 +99,7 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
         val expandedString = "It consists of a reactive programming model with conciseness and ease of Kotlin programming language. It is fully declarative so that you can describe your UI by calling some series of functions that will transform your data into a UI hierarchy. When the data changes or is updated then the framework automatically recalls these functions and updates the view for you.\n" +
                 "\n" +
                 "Composable Function is represented in code by using @Composable annotation to the function name. This function will let you define your app’s UI programmatically by describing its shape and data dependencies rather than focusing on the UI construction process. "
+        val context = LocalContext.current
 
         Column(
             modifier = Modifier
@@ -108,12 +114,49 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
                   Row(modifier = Modifier.weight(1f)) {
                       Text(text = orderDaybook.voucher.type+" : " , fontSize = 13.sp , fontWeight = FontWeight.Bold)
                       Text(text = orderDaybook.voucher.voucherNumber.toString() , fontSize = 13.sp , fontWeight = FontWeight.Bold)
+                      Text(
+                          text = "Sh",
+                          modifier = Modifier.clickable {
+                              shareCardInfoMessage(
+                                  context,
+                                  "Type: ${orderDaybook.voucher.type} \n" +
+                                          "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
+                                          "Variety: ${orderDaybook.orderDetails[0].variety} \n" +
+                                          "\n"+
+                                          if (orderDaybook.voucher.type == "RECEIPT") {
+                                              "*Added Bags details:*\n" +
+                                                      orderDaybook.orderDetails[0].bagSizes.joinToString("\n") {
+                                                          "${it.size}: ${it.quantity?.currentQuantity ?: "N/A"}"
+                                                      }
+                                          } else {
+                                              "*Removed Bags details:*\n" +
+                                                      orderDaybook.orderDetails[0].bagSizes.joinToString("\n") {
+                                                          "${it.size}: ${it.quantityRemoved.toString() ?: "N/A"}"
+                                                      }
+                                          } + "\n"+
+                                          "\n"+
+                                          "*Total bags* : ${totalIncomingBags(orderDaybook).toString()} \n"+"\n"+
+                                  "Farmer Details :\n"+
+                                  "Name : ${orderDaybook.farmerId.name} \n"+
+                                  "Acc no. : ${orderDaybook.farmerId._id.take(5)} \n" +
+                                          "\n"+
+                                          "${buildAnnotatedString { 
+                                              append("Powered By :")
+                                              withStyle(style = SpanStyle(color = Color.Red, fontWeight = FontWeight.Bold)){
+                                                  append("*Cold-Op*")
+                                              }
+                                          }}"
+                              )
+                          }
+                      )
+
                   }
                     
-                   Row(modifier = Modifier.weight(.5f),verticalAlignment = Alignment.CenterVertically,
+                    Row(modifier = Modifier.weight(.5f),verticalAlignment = Alignment.CenterVertically,
                        horizontalArrangement = Arrangement.SpaceBetween) {
                        Text(text = orderDaybook.orderDetails[0].variety , fontSize = 13.sp , fontWeight = FontWeight.Bold)
                        //Icon(imageVector = Icon)
+
                        Spacer(modifier = Modifier.padding( start = 8.dp))
 //                     if(expanded){
 //                       Icon(painter = painterResource(id = R.drawable.upload), contentDescription = "Drop down icon" ,
@@ -413,4 +456,16 @@ fun totalOutgoingBags(orderDaybook: OrderDaybook):Int{
     }
 
     return totalBagsOut
+}
+
+
+fun shareCardInfoMessage(context: Context , message :String){
+ val shareIntent = Intent().apply{
+     action = Intent.ACTION_SEND
+     putExtra(Intent.EXTRA_TEXT , message)
+     type = "text/plain"
+
+}
+
+    context.startActivity(Intent.createChooser(shareIntent,"Share via"))
 }
