@@ -217,7 +217,7 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner  , vi
                    viewModel.resetAddFarmerStatus()
                                               }, confirmButton = { /*TODO*/ } ,
                title = { Text(text = "Create New Account")} , text = {
-                   Column {
+                   Column(modifier = Modifier.padding(top = 20.dp)) {
 
                        Row {
                            Text(
@@ -324,7 +324,7 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner  , vi
 
                        }
                    }
-                   })
+                   } , shape = RoundedCornerShape(10.dp),containerColor = Color.White)
            }
             }
 

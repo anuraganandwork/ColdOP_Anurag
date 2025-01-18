@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -95,9 +96,21 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val typeOfCard = remember { mutableStateOf("all") }
-    LaunchedEffect(typeOfCard.value ){
+    val sortingOrder = remember { mutableStateOf("latest") }
+    LaunchedEffect(typeOfCard.value , sortingOrder.value ){
         Log.d("asdfghjk",typeOfCard.value)
-        viewmodel.getOrdersDayBook(typeOfCard.value , "latest" , 1,50)
+        Log.d("qwertyu" , sortingOrder.value)
+       if(typeOfCard.value === "Outgoing"){
+           viewmodel.getOrdersDayBook("outgoing" , sortingOrder.value , 1,50)
+
+       }
+       else if(typeOfCard.value === "Incoming"){
+           viewmodel.getOrdersDayBook("incoming" , sortingOrder.value , 1,50)
+       }
+        else{
+           viewmodel.getOrdersDayBook("all" , sortingOrder.value , 1,50)
+
+       }
     }
     val state by viewmodel.dayBookOrdersData.collectAsState()
 
@@ -188,10 +201,11 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
         }
 
         Text(text = "Transactions", fontWeight = FontWeight.Bold , fontSize = 20.sp ,  modifier = Modifier.padding(horizontal = 15.dp , vertical = 10.dp))
-        Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(modifier = Modifier.padding(horizontal = 10.dp) , horizontalArrangement = Arrangement.SpaceAround) {
             
-            ColdOpDropDown(label = "Sort", options = listOf("Latest" , "Oldest"), onSelect = {} )
-            ColdOpDropDown(label = "Filter", options = listOf("incoming" , "outgoing" , "all"), onSelect = { selected -> typeOfCard.value = selected} )
+            ColdOpDropDown(label = "Sort", options = listOf("Latest" , "Oldest"), onSelect = { selected -> sortingOrder.value = selected.toLowerCase()} )
+            Spacer(modifier = Modifier.padding(8.dp))
+            ColdOpDropDown(label = "Filter", options = listOf("Incoming" , "Outgoing" , "Show All"), onSelect = { selected -> typeOfCard.value = selected} )
 
         }
             when (state) {
