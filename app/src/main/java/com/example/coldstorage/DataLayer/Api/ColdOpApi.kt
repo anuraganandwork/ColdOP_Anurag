@@ -8,6 +8,7 @@ import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderRespon
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.IncomingOrderResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.OutgoingApiCallResponse.OutgoingOrderApiResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.ResponseVariety.ResponseVariety
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.ResponseDetailedStockSummary
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.ResponseStockSummary
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import retrofit2.Response
@@ -87,6 +88,9 @@ interface ColdOpApi {
 
   @GET("api/store-admin/farmers/{id}/outgoing/varities")
   suspend fun getVarietyList(@Path("id") farmerId: String) : Response<ResponseVariety>
+
+  @GET("api/store-admin/farmers/{id}/stock-summary")
+  suspend fun getDetailedStockSummary(@Path("id") farmerId: String):Response<ResponseDetailedStockSummary>
 
 }
 

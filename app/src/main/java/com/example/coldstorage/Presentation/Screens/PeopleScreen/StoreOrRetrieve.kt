@@ -53,10 +53,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.coldstorage.DataLayer.Api.ColdStorageInfo
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.DashBoardScreen.CardComponentDaybook
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.AssignLocation
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpDropDown
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ConfirmationPageForOrder
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.EmailFilterDropdowns
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.LotDetailsDialogWrapper
@@ -143,6 +145,8 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
     LaunchedEffect( accountNumber){
         Log.d("current farmer" , "Account number is"+accountNumber)
     }
+
+
     Log.d("TransactionhistoryUI", transactionHistory.value.toString())
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -226,8 +230,14 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
 
     val stockSummary = viewmodel.stockSummary.collectAsState()
     val loadingStockSummary = viewmodel.loadingStockSummary.collectAsState()
+
+    val typeOfCard = remember { mutableStateOf("all") }
+    val sortingOrder = remember { mutableStateOf("latest") }
     LaunchedEffect(Unit ){
         viewmodel.getStockSummary(accountNumber)
+    }
+    LaunchedEffect(typeOfCard.value , sortingOrder.value ){
+        viewmodel.getSingleFarmerTransaction(accountNumber)
     }
    val sum =  stockSummary.value.totalInitialQuantity-stockSummary.value.totalQuantityRemoved
     Column(modifier = Modifier.verticalScroll(enabled = true, state = rememberScrollState(),)) {
@@ -244,8 +254,9 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                     painter = painterResource(id = R.drawable.backicon),
                     contentDescription = "Back Icon",
                     tint = Color.Black,
-                    modifier = Modifier.size(30.dp).
-                    clickable { navController.popBackStack() }
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clickable { navController.popBackStack() }
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.more),
@@ -337,7 +348,7 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                 .padding(vertical = 0.dp)
                 .background(Color.Green)
                 .clickable {
-                   // showBottomSheet.value = true
+                    // showBottomSheet.value = true
                 }) {
                 Text(
                     text = "View/Download Ledger Report",
@@ -387,12 +398,12 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                         .padding()
                         .clickable {
                             // navController.navigate(AllScreens.OutgoingStockScreen.name+ "/${accNumber}")
-                           if(sum>0) {
-                               val fromDaybook = false
-                               navController.navigate(AllScreens.OutgoingStockScreen.name + "/$fromDaybook/$accountNumber")
-                           }else{
-                               showEmptyBagAlert.value = true
-                           }
+                            if (sum > 0) {
+                                val fromDaybook = false
+                                navController.navigate(AllScreens.OutgoingStockScreen.name + "/$fromDaybook/$accountNumber")
+                            } else {
+                                showEmptyBagAlert.value = true
+                            }
 
                         }
                 ) {
@@ -431,12 +442,19 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
             Text(text = "Transaction", fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.padding(8.dp))
 
-            EmailFilterDropdowns(
-                expandedGroupBy = expandedGroupBy,
-                selectedGroupBy = selectedGroupBy,
-                expandedSortBy = expandedSortBy,
-                selectedSortBy = selectedSortBy
-            )
+//            EmailFilterDropdowns(
+//                expandedGroupBy = expandedGroupBy,
+//                selectedGroupBy = selectedGroupBy,
+//                expandedSortBy = expandedSortBy,
+//                selectedSortBy = selectedSortBy
+//            )
+            Row(modifier = Modifier.padding(horizontal = 10.dp) , horizontalArrangement = Arrangement.SpaceAround) {
+
+                ColdOpDropDown(label = "Sort", options = listOf("Latest" , "Oldest"), onSelect = { selected -> sortingOrder.value = selected.toLowerCase()} )
+                Spacer(modifier = Modifier.padding(8.dp))
+                ColdOpDropDown(label = "Filter", options = listOf("Incoming" , "Outgoing" , "Show All"), onSelect = { selected -> typeOfCard.value = selected} )
+
+            }
 
 
 //            LazyColumn {

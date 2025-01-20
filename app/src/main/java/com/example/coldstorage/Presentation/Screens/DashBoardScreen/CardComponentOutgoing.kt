@@ -34,7 +34,7 @@ data class RationRate(
 
 data class OutgoingCardRowData(
     val Bagtype : String,
-    val Address : LocationIncomingDaybook ,
+    val Address : String ,
     val voucherNum : Int ,
     val QtyIssued:Int,
     val availableQty : Int
@@ -180,7 +180,7 @@ Log.d("OutgoingCardDar=",listOfBags.toString())
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = item.Address.chamber+"-"+item.Address.floor+"-"+item.Address.row,
+                    text = item.Address,
                     modifier = Modifier.weight(1f),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,

@@ -3,6 +3,8 @@ package com.example.coldstorage.Presentation.Screens.DashBoardScreen
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -49,16 +51,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.BagSizeDaybook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.stringToImage
 import com.example.coldstorage.R
 import com.example.coldstorage.ui.theme.primeGreen
 import com.example.coldstorage.ui.theme.primeRed
+import java.io.File
+import java.io.FileOutputStream
 
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun CardComponentDaybook(orderDaybook: OrderDaybook){
+    Log.d("ordrererer" , orderDaybook.toString())
     var incomingSum = mutableStateOf(0)
     var outgoingSum = mutableStateOf(0)
 //    val totalGoli = totalBags(orderDaybook, "Goli")
@@ -114,46 +121,16 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
                   Row(modifier = Modifier.weight(1f)) {
                       Text(text = orderDaybook.voucher.type+" : " , fontSize = 13.sp , fontWeight = FontWeight.Bold)
                       Text(text = orderDaybook.voucher.voucherNumber.toString() , fontSize = 13.sp , fontWeight = FontWeight.Bold)
-                      Text(
-                          text = "Sh",
-                          modifier = Modifier.clickable {
-                              shareCardInfoMessage(
-                                  context,
-                                  "Type: ${orderDaybook.voucher.type} \n" +
-                                          "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
-                                          "Variety: ${orderDaybook.orderDetails[0].variety} \n" +
-                                          "\n"+
-                                          if (orderDaybook.voucher.type == "RECEIPT") {
-                                              "*Added Bags details:*\n" +
-                                                      orderDaybook.orderDetails[0].bagSizes.joinToString("\n") {
-                                                          "${it.size}: ${it.quantity?.currentQuantity ?: "N/A"}"
-                                                      }
-                                          } else {
-                                              "*Removed Bags details:*\n" +
-                                                      orderDaybook.orderDetails[0].bagSizes.joinToString("\n") {
-                                                          "${it.size}: ${it.quantityRemoved.toString() ?: "N/A"}"
-                                                      }
-                                          } + "\n"+
-                                          "\n"+
-                                          "*Total bags* : ${totalIncomingBags(orderDaybook).toString()} \n"+"\n"+
-                                  "Farmer Details :\n"+
-                                  "Name : ${orderDaybook.farmerId.name} \n"+
-                                  "Acc no. : ${orderDaybook.farmerId._id.take(5)} \n" +
-                                          "\n"+
-                                          "${buildAnnotatedString { 
-                                              append("Powered By :")
-                                              withStyle(style = SpanStyle(color = Color.Red, fontWeight = FontWeight.Bold)){
-                                                  append("*Cold-Op*")
-                                              }
-                                          }}"
-                              )
-                          }
-                      )
+//                      Text(
+//                          text = "Sh",
+//                          modifier = Modifier
+//                      )
 
                   }
                     
                     Row(modifier = Modifier.weight(.5f),verticalAlignment = Alignment.CenterVertically,
                        horizontalArrangement = Arrangement.SpaceBetween) {
+
                        Text(text = orderDaybook.orderDetails[0].variety , fontSize = 13.sp , fontWeight = FontWeight.Bold)
                        //Icon(imageVector = Icon)
 
@@ -199,10 +176,117 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
                         Text(text = if(orderDaybook.voucher.type == "RECEIPT") orderDaybook.dateOfSubmission.toString() else orderDaybook.dateOfExtraction.toString() , fontSize = 13.sp , fontWeight = FontWeight.Medium)
                     }
                     Row(modifier = Modifier.weight(.5f) ,
-                        horizontalArrangement = Arrangement.Start) {
-                        Text(text = "Lot No : " , fontSize = 13.sp , fontWeight = FontWeight.Medium)
-                        Text(text = if(orderDaybook.voucher.type == "RECEIPT")  totalIncomingBags(orderDaybook).toString() else totalOutgoingBags(orderDaybook).toString(), fontSize = 13.sp , fontWeight = FontWeight.Medium)
-                        
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        Row {
+                            Text(text = "Lot No : " , fontSize = 13.sp , fontWeight = FontWeight.Medium)
+                            Text(text = if(orderDaybook.voucher.type == "RECEIPT")  totalIncomingBags(orderDaybook).toString() else totalOutgoingBags(orderDaybook).toString(), fontSize = 13.sp , fontWeight = FontWeight.Medium)
+
+                        }
+                          Icon(painter = painterResource(id = R.drawable.sharingg), contentDescription = "share card",
+                            modifier = Modifier
+                                .padding(end = 3.dp)
+                                .size(17.dp)
+                                .clickable {
+                                    Log.d("outgoingcard crash" ,"Type: ${orderDaybook.voucher.type} \n" +
+                                            "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
+                                            "Variety: ${orderDaybook.orderDetails[0].variety} \n"
+                                    )
+                                    val formattedString = """
+Type: ${orderDaybook.voucher.type} | 
+Voucher No.: ${orderDaybook.voucher.voucherNumber} | 
+Variety: ${orderDaybook.orderDetails[0].variety} 
+
+${if (orderDaybook.voucher.type == "RECEIPT") {
+                                        "Added Bags: ${orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
+                                            "${it.size}: ${it.quantity?.currentQuantity ?: "N/A"}"
+                                        }}"
+                                    } else {
+                                        "Removed Bags: ${orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
+                                            "${it.size}: ${it.quantityRemoved ?: "N/A"}"
+                                        }}"
+                                    }}
+
+Total Bags: ${if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(orderDaybook) else totalOutgoingBags(orderDaybook)}
+
+Farmer: ${orderDaybook.farmerId.name } , Acc: ${orderDaybook.farmerId._id.take(5)}
+
+Powered By: ColdOp
+""".trimIndent()
+                                    Log.d("outgoingcard crash" ,formattedString
+                                    )
+                                    val bitmap = stringToImage(context = context,  // `this` is the activity context
+                                        text = formattedString,
+                                        backgroundResId = R.drawable.cardbg,
+                                        width = 400,
+                                        height = 400)
+                                    val file = File(context.cacheDir, "shared_card.png")
+                                    FileOutputStream(file).use { outputStream ->
+                                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                                    }
+
+                                    // Get a URI for the file using FileProvider
+                                    val uri: Uri = FileProvider.getUriForFile(
+                                        context,
+                                        "${context.packageName}.fileprovider",
+                                        file
+                                    )
+                                    val intent = Intent(Intent.ACTION_SEND).apply {
+                                        type = "image/png"
+                                        putExtra(Intent.EXTRA_STREAM, uri)
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    }
+
+                                    // Start the share intent
+                                    context.startActivity(Intent.createChooser(intent, "Share Receipt"))
+//                                    shareCardInfoMessage(
+//                                        context,
+//                                        "Type: ${orderDaybook.voucher.type} \n" +
+//                                                "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
+//                                                "Variety: ${orderDaybook.orderDetails[0].variety} \n" +
+//                                                "\n" +
+//                                                if (orderDaybook.voucher.type == "RECEIPT") {
+//                                                    "*Added Bags details:*\n" +
+//                                                            orderDaybook.orderDetails[0].bagSizes.joinToString(
+//                                                                "\n"
+//                                                            ) {
+//                                                                "${it.size}: ${it.quantity?.currentQuantity ?: "N/A"}"
+//                                                            }
+//                                                } else {
+//                                                    orderDaybook.orderDetails[0]?.bagSizes?.joinToString(
+//                                                        "\n"
+//                                                    ) {
+//                                                        "${it?.size}: ${it?.quantityRemoved}"
+//                                                    }?.let { Log.d("outgoing card crass", it) }
+//                                                    "*Removed Bags details:*\n" +
+//                                                            orderDaybook.orderDetails[0].bagSizes.joinToString(
+//                                                                "\n"
+//                                                            ) {
+//                                                                "${it}: Aa"
+//                                                            }
+//                                                } + "\n" +
+//                                                "\n" +
+//                                                "*Total bags* : ${if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(orderDaybook) else totalOutgoingBags(orderDaybook)}  \n" + "\n" +
+//                                                "Farmer Details :\n" +
+//                                                "Name : ${orderDaybook.farmerId.name} \n" +
+//                                                "Acc no. : ${orderDaybook.farmerId._id.take(5)} \n" +
+//                                                "\n" +
+//                                                "${
+//                                                    buildAnnotatedString {
+//                                                        append("Powered By :")
+//                                                        withStyle(
+//                                                            style = SpanStyle(
+//                                                                color = Color.Red,
+//                                                                fontWeight = FontWeight.Bold
+//                                                            )
+//                                                        ) {
+//                                                            append("*ColdOp*")
+//                                                        }
+//                                                    }
+//                                                }"
+//                                    )
+                                }
+                        )
                     }
                     
 //                    PdfButton(
@@ -289,10 +373,11 @@ fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook
             ) {
                 // Location Details
                 Column {
-                    Text(text = "Location" , fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    orderDaybook.orderDetails[0].location?.let { DetailRow("Chamber", it.chamber) }
-                    orderDaybook.orderDetails[0].location?.let { DetailRow("Floor", it.floor) }
-                    orderDaybook.orderDetails[0].location?.let { DetailRow("Row", it.row) }
+                    Text(text = "Location : ${orderDaybook.orderDetails[0].location}" , fontSize = 13.sp, fontWeight = FontWeight.Bold)
+//                    orderDaybook.orderDetails[0].location?.let { DetailRow("Chamber", it.chamber) }
+//                    orderDaybook.orderDetails[0].location?.let { DetailRow("Floor", it.floor) }
+//                    orderDaybook.orderDetails[0].location?.let { DetailRow("Row", it.row) }
+//
                 }
 
                 // Farmer Data

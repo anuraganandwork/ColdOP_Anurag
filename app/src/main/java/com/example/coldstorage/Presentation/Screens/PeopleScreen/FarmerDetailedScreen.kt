@@ -1,6 +1,7 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +51,7 @@ import androidx.navigation.NavController
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.AssignLocation
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ManageStocks
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.stringToImage
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FarmerApiState
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.primeGreen
@@ -176,9 +179,64 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
             }
 
 
+// add summary here
 
+            Text("Stock Summary")
+            Row {
+              
+                Column {
+                    Text(text = "Varities")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
 
+                }
+                Column {
+                    Text(text = "Varities")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
 
+                }
+                Column {
+                    Text(text = "Varities")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
+
+                }
+                Column {
+                    Text(text = "Varities")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
+
+                }
+                Column {
+                    Text(text = "Varities")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
+
+                }
+                Column {
+                    Text(text = "Varities")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
+                    Text(text = "Pukh")
+
+                }
+                
+            }
+
+//            val bitmap = stringToImage(inputText)
+//
+//            // Display the image
+//            Image(
+//                bitmap = bitmap.asImageBitmap(),
+//                contentDescription = "Generated Image",
+//                modifier = Modifier.fillMaxWidth()
+//            )
 
 
 

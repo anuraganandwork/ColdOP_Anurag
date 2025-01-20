@@ -6,3 +6,5 @@ data class ResponseStockSummary(
     val totalQuantityRemoved: Int,
     val message :String? = null
 )
+
+
