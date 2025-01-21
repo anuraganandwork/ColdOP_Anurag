@@ -1,6 +1,6 @@
 package com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary
 
-data class ResponseDetailedStockSummary(
+data class StockSummaryDetailedResponse(
     val status: String,
-    val stockSummary: StockSummary
+    val stockSummary: List<StockSummary>
 )

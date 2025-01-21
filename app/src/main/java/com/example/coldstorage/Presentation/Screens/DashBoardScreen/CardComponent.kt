@@ -193,9 +193,11 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
                                             "Variety: ${orderDaybook.orderDetails[0].variety} \n"
                                     )
                                     val formattedString = """
-Type: ${orderDaybook.voucher.type} | 
-Voucher No.: ${orderDaybook.voucher.voucherNumber} | 
+Date: ${if(orderDaybook.voucher.type == "RECEIPT") orderDaybook.dateOfSubmission else orderDaybook.dateOfExtraction}                                        
+Type: ${orderDaybook.voucher.type} 
+Voucher No.: ${orderDaybook.voucher.voucherNumber} 
 Variety: ${orderDaybook.orderDetails[0].variety} 
+
 
 ${if (orderDaybook.voucher.type == "RECEIPT") {
                                         "Added Bags: ${orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
@@ -211,7 +213,6 @@ Total Bags: ${if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(orde
 
 Farmer: ${orderDaybook.farmerId.name } , Acc: ${orderDaybook.farmerId._id.take(5)}
 
-Powered By: ColdOp
 """.trimIndent()
                                     Log.d("outgoingcard crash" ,formattedString
                                     )

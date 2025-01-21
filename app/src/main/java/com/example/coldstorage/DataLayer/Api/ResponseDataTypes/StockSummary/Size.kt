@@ -1,7 +1,8 @@
 package com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary
 
-data class Number12Summary(
+data class Size(
     val currentQuantity: Int,
     val initialQuantity: Int,
-    val quantityRemoved: Int
+    val quantityRemoved: Int,
+    val size: String
 )

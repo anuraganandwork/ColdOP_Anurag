@@ -1,7 +1,9 @@
 package com.example.coldstorage.ViewModel.StoreOwnerViewmodel
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +26,7 @@ import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.Order
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Order
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.ResponseVariety.ResponseVariety
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.ResponseStockSummary
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.StockSummary
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import com.example.coldstorage.DataLayer.Di.AuthInterceptor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -182,6 +185,7 @@ class FunctionStoreOwner @Inject constructor(
             _orderResult.value = result
         }
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun createIncomingOrder(): Result<Unit> {
         return withContext(Dispatchers.IO) {  // Use withContext for suspend function
             try {
@@ -641,6 +645,34 @@ class FunctionStoreOwner @Inject constructor(
         }
     }
 
+
+    private val _detailedSummary = MutableStateFlow<List<StockSummary>>(emptyList())
+    val detailedSummary:StateFlow<List<StockSummary>>  = _detailedSummary.asStateFlow()
+    private val _loadingDetailedSummary = MutableStateFlow<Boolean>(false)
+    val loadingDetailedSummary = _loadingDetailedSummary.asStateFlow()
+
+    fun getDetailedStockSummary(farmerId: String){
+        viewModelScope.launch {
+        _loadingDetailedSummary.value = true
+        try {
+            val response = api.getDetailedStockSummary(farmerId)
+            if(response.isSuccessful){
+                if(response.body()?.stockSummary?.size!! >0){
+                    _detailedSummary.value = response.body()?.stockSummary!!
+
+                }
+
+            }        }catch (e:Exception){
+
+        }
+            finally {
+                _loadingDetailedSummary.value = false
+
+            }
+        }
+    }
+
+
 }
 
 //learnt new thing
@@ -674,6 +706,7 @@ sealed class singleFarmerTransactionApiState{
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun getCurrentDate(): String {
     val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
     return LocalDate.now().format(formatter)

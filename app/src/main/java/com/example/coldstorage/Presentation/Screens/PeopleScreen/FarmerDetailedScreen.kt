@@ -64,7 +64,12 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
     LaunchedEffect(Unit ){
         viewModel.fetchSinglFarmerClick(accNumber)
     }
-
+    LaunchedEffect(Unit ){
+        viewModel.getDetailedStockSummary(accNumber)
+    }
+     val detailedSummary = viewModel.detailedSummary.collectAsState()
+    val loadingSummary= viewModel.loadingDetailedSummary.collectAsState()
+   Log.d("fghj",detailedSummary.value.toString())
     val farmerData by viewModel.farmerData.collectAsState();
     //val farmerInfoAtui = (farmerData as FarmerApiState.success)?.farmerInfo
 
@@ -183,7 +188,9 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
 
             Text("Stock Summary")
             Row {
-              
+              if(detailedSummary.value.isNullOrEmpty()){
+                  //add here
+              }
                 Column {
                     Text(text = "Varities")
                     Text(text = "Pukh")

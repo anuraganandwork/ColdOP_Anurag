@@ -66,6 +66,8 @@ fun stringToImage(
         textSize = 18f // Adjust text size
         isAntiAlias = true
         textAlign = Paint.Align.LEFT
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD) // Set bold font weight
+
     }
 
     // Create a blank bitmap with the given width and height
