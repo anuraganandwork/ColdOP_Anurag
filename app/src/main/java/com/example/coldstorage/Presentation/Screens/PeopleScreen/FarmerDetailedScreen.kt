@@ -48,12 +48,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.StockSummary
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.AssignLocation
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ManageStocks
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.stringToImage
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FarmerApiState
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
+import com.example.coldstorage.ui.theme.lightGrayBorder
 import com.example.coldstorage.ui.theme.primeGreen
 import kotlinx.coroutines.launch
 
@@ -88,7 +90,7 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
             when(farmerData){
                 is FarmerApiState.success -> {
                     val farmerInfoAtui = (farmerData as FarmerApiState.success)?.farmerInfo
-                    Column(modifier = Modifier.padding(12.dp)) {
+                    Column(modifier = Modifier.padding(10.dp)) {
                         if (farmerInfoAtui != null) {
                             Row(modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
@@ -133,10 +135,10 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
             }
 
             
-            Text(text = "Choose Action" , fontSize = 24.sp , fontWeight = FontWeight.Bold, modifier = Modifier.padding(12.dp))
+            Text(text = "Choose Action" , fontSize = 24.sp , fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
             Row(modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween){
+                .padding(10.dp), horizontalArrangement = Arrangement.SpaceBetween){
                 Button(onClick =  {
                     when(farmerData){
                         is FarmerApiState.success ->{
@@ -166,10 +168,10 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                         Text(
                             text = "Manage stocks",
                             color = Color.Black, // Text color
-                            maxLines = 2, // Ensure text can wrap to two lines
+                            maxLines = 1, // Ensure text can wrap to two lines
                             overflow = TextOverflow.Ellipsis, // Handle overflow
                             modifier = Modifier
-                                .padding(horizontal = 15.dp, vertical = 15.dp) // Padding around the text
+                                .padding(horizontal = 15.dp, vertical = 10.dp) // Padding around the text
                         )
                                    }
 //                Surface(modifier = Modifier
@@ -186,53 +188,142 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
 
 // add summary here
 
-            Text("Stock Summary")
-            Row {
-              if(detailedSummary.value.isNullOrEmpty()){
+            Text("Stock Summary" , fontSize = 24.sp , fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp) )
+            Column(modifier = Modifier.padding( start = 10.dp, top = 0.dp , end = 10.dp )) {
+              if(detailedSummary.value.isNotEmpty()){
                   //add here
+                 Row(){
+                     Text(text = "Varieties",fontSize = 13.sp , fontWeight = FontWeight.Bold , modifier = Modifier
+                         .padding(end = 5.dp)
+                         .weight(.35f))
+//                     detailedSummary.value.forEach {
+//
+//                         Row {
+//                             //it?.variety?.let { it1 -> Text(text = it1) }
+////                          Text(text = it?.sizes?.get(0)?.currentQuantity.toString())
+////                          Text(text = it?.sizes?.get(1)?.currentQuantity.toString())
+////                          Text(text = it.sizes?.get(2)?.currentQuantity.toString())
+////                          Text(text = it?.sizes?.get(3)?.currentQuantity.toString())
+////                          Text(text = it?.sizes?.get(4)?.currentQuantity.toString())
+//
+//                             it.sizes?.get(0)?.let{ bags->
+//                                 if(bags.size == "Number-12"){
+//                                     Text(text = "No.12" , fontSize = 13.sp , modifier = Modifier.padding(end = 5.dp))
+//
+//                                 } else {
+//                                 Text(text = bags.size.toString() , fontSize = 13.sp , modifier = Modifier.padding(end = 5.dp))
+//
+//
+//                                 }
+//                             }
+//
+//                         }
+//                     }
+                      Text(text = "Goli"  , fontSize = 13.sp , fontWeight = FontWeight.Bold, modifier = Modifier
+                          .padding(end = 5.dp)
+                          .weight(.2f))
+                      Text(text= "No12" , fontSize = 13.sp , fontWeight = FontWeight.Bold, modifier = Modifier
+                          .padding(end = 5.dp)
+                          .weight(.2f))
+                      Text(text = "Seed" , fontSize = 13.sp ,fontWeight = FontWeight.Bold, modifier = Modifier
+                          .padding(end = 5.dp)
+                          .weight(.2f))
+                      Text(text="Cut" , fontSize = 13.sp ,fontWeight = FontWeight.Bold, modifier = Modifier
+                          .padding(end = 5.dp)
+                          .weight(.19f))
+                      Text(text = "Ration" , fontSize = 13.sp ,fontWeight = FontWeight.Bold, modifier = Modifier
+                          .padding(end = 5.dp)
+                          .weight(.25f))
+                     Text(text = "Total" , fontSize = 13.sp ,fontWeight = FontWeight.Bold, modifier = Modifier
+                         .padding(end = 5.dp)
+                         .weight(.2f))
+
+                 }
+                  detailedSummary.value.forEach {
+
+                      Row {
+                          it?.variety?.let { it1 -> Text(text = it1 , fontSize = 13.sp , modifier = Modifier
+                              .padding(end = 5.dp)
+                              .weight(.35f)) }
+//                          Text(text = it?.sizes?.get(0)?.currentQuantity.toString())
+//                          Text(text = it?.sizes?.get(1)?.currentQuantity.toString())
+//                          Text(text = it.sizes?.get(2)?.currentQuantity.toString())
+//                          Text(text = it?.sizes?.get(3)?.currentQuantity.toString())
+//                          Text(text = it?.sizes?.get(4)?.currentQuantity.toString())
+                          Text(text = it.sizes.find { bag -> bag.size == "Goli" }?.let { bag-> bag.currentQuantity.toString() }?:"0" ,fontSize = 13.sp , modifier = Modifier
+                              .padding(end = 5.dp)
+                              .weight(.2f))
+                          Text(text = it.sizes.find { bag -> bag.size == "Number-12" }?.let { bag-> bag.currentQuantity.toString() }?:"0" ,fontSize = 13.sp , modifier = Modifier
+                              .padding(end = 5.dp)
+                              .weight(.2f))
+                          Text(text = it.sizes.find { bag -> bag.size == "Seed" }?.let { bag-> bag.currentQuantity.toString() }?:"0",fontSize = 13.sp , modifier = Modifier
+                              .padding(end = 5.dp)
+                              .weight(.2f))
+                          Text(text = it.sizes.find { bag -> bag.size == "Cut-tok" }?.let { bag-> bag.currentQuantity.toString() }?:"0" , fontSize = 13.sp , modifier = Modifier
+                              .padding(end = 5.dp)
+                              .weight(.19f))
+                          Text(text = it.sizes.find { bag -> bag.size == "Ration" }?.let { bag-> bag.currentQuantity.toString() }?:"0" , fontSize = 13.sp , modifier = Modifier
+                              .padding(end = 5.dp)
+                              .weight(.25f))
+                          Text(
+                              text = findSumOfSizesUnderSameVariety(
+                                  detailedSummary.value,
+                                  it.variety
+                              ).toString(), fontSize = 13.sp, modifier = Modifier
+                                  .padding(end = 5.dp)
+                                  .weight(.2f)
+                          )
+
+//                          it.sizes?.forEach { bags->
+//                              if(bags !== null){
+//                                  Text(text = bags.currentQuantity.toString() , fontSize = 13.sp , modifier = Modifier.padding(end = 5.dp) )
+//
+//                              } else {
+//                                  Text(text = "0" , fontSize = 13.sp , modifier = Modifier.padding(end = 5.dp) )
+//
+//                              }
+//
+//                          }
+
+                      }
+
+
+                      //
+                  }
+
+                 Row(modifier = Modifier.background(lightGrayBorder , RoundedCornerShape(2.dp))) {
+                     Text(text = "BagTotal", fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
+                         .padding(end = 5.dp)
+                         .weight(.35f))
+                     Text(text = findSumOfEachBagsize( detailedSummary.value, "Goli").toString()  ,  fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
+                         .padding(end = 5.dp)
+                         .weight(.2f))
+                     Text(text = findSumOfEachBagsize( detailedSummary.value, "Number-12").toString() , fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
+                         .padding(end = 5.dp)
+                         .weight(.2f))
+                     Text(text = findSumOfEachBagsize( detailedSummary.value, "Seed").toString() , fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
+                         .padding(end = 5.dp)
+                         .weight(.2f))
+                     Text(text = findSumOfEachBagsize( detailedSummary.value, "Cut-tok").toString() , fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
+                         .padding(end = 5.dp)
+                         .weight(.19f))
+                     Text(text = findSumOfEachBagsize( detailedSummary.value, "Ration").toString() , fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
+                         .padding(end = 5.dp)
+                         .weight(.25f))
+                     var grandtotal = 0;
+                     Text(text = grandTotal(detailedSummary.value).toString() ,fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
+                         .padding(end = 5.dp)
+                         .weight(.2f))
+
+                 }
+
+              } else {
+                  Text(text = "No bags stored!")
               }
-                Column {
-                    Text(text = "Varities")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
 
-                }
-                Column {
-                    Text(text = "Varities")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
 
-                }
-                Column {
-                    Text(text = "Varities")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
 
-                }
-                Column {
-                    Text(text = "Varities")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
 
-                }
-                Column {
-                    Text(text = "Varities")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
-
-                }
-                Column {
-                    Text(text = "Varities")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
-                    Text(text = "Pukh")
-
-                }
                 
             }
 
@@ -249,3 +340,41 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
 
         }
 }}
+
+fun findSumOfSizesUnderSameVariety(stockSummary : List<StockSummary> , variety: String) : Int{
+
+
+  val foundstock=   stockSummary.find { varietyIn-> varietyIn.variety == variety }
+    var totalSum = 0;
+    foundstock?.sizes?.forEach {
+        totalSum += it.currentQuantity
+    }
+
+    return totalSum;
+
+}
+
+
+fun findSumOfEachBagsize(stockSummary: List<StockSummary> , size:String) : Int{
+    var totalBags = 0;
+//   var sizess=  stockSummary.sizes.find { bag -> bag.size  == size}
+//    if (sizess != null) {
+//        totalBags = totalBags + sizess.currentQuantity
+//    }
+
+    stockSummary.forEach {
+       val bag =  it.sizes.find { bagsize -> bagsize.size == size  }
+        totalBags += bag?.currentQuantity ?:  0
+    }
+
+    return totalBags
+
+}
+
+fun grandTotal(stockSummary: List<StockSummary>):Int{
+    var grand = 0;
+    stockSummary.forEach {
+        grand +=   findSumOfSizesUnderSameVariety(stockSummary , it.variety)
+    }
+    return grand
+}

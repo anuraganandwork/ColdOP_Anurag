@@ -657,8 +657,10 @@ class FunctionStoreOwner @Inject constructor(
         try {
             val response = api.getDetailedStockSummary(farmerId)
             if(response.isSuccessful){
-                if(response.body()?.stockSummary?.size!! >0){
+                Log.d("dgdgdggdggd" ,response.body()?.stockSummary.toString() )
+                if(!response.body()?.stockSummary?.isEmpty()!!){
                     _detailedSummary.value = response.body()?.stockSummary!!
+                    Log.d("dgdgeereerer" ,detailedSummary.value.toString() )
 
                 }
 
