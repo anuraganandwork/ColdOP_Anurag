@@ -54,7 +54,7 @@ fun OrderCard(order: Order) {
             LazyColumn {
                 items(order.orderDetails) { detail ->
                     Text(text = "Variety "+detail.variety)
-                    Text(text = "Location"+ detail.location.floor + " "+detail.location.row + " "+ detail.location.chamber)
+                    Text(text = "Location"+ detail.location)
                     Text(text = "Bags "+detail.bagSizes.toString())
                     Spacer(modifier = Modifier.padding(15.dp))
                 }
@@ -78,7 +78,7 @@ fun OrderDetailItem(detail: com.example.coldstorage.DataLayer.Api.ResponseDataTy
             modifier = Modifier
                 .padding(8.dp)
         ) {
-            Text("Location: Floor ${detail.location.floor}, Row ${detail.location.row}, Chamber ${detail.location.chamber}")
+            Text("Location: ${detail.location}")
             Text("Variety: ${detail.variety}")
             detail.bagSizes.forEach { bagSize ->
                 Text("Size: ${bagSize.size}")

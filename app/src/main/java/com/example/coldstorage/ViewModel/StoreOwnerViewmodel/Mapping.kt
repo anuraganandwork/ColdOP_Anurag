@@ -11,7 +11,7 @@ data class  SelectedCellData(
     val voucherNumber: Int,
     val variety: String,
     val size: String?,
-    val address: Location,
+    val address: String,
     val dateOfSubmission: String,
     val currentQuantity: String)
 
@@ -20,7 +20,7 @@ data class ReceiptRow(
     val voucherNumber: Int,
     val variety: String,
     val size:  List<BagSize>,
-    val address: Location,
+    val address: String,
     val dateOfSubmission: String
 //    val currentQuantity: Int ,
 //    val initialQuantity: Int

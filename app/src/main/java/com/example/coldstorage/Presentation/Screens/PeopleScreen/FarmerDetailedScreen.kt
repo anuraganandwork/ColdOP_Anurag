@@ -195,7 +195,7 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                  Row(){
                      Text(text = "Varieties",fontSize = 13.sp , fontWeight = FontWeight.Bold , modifier = Modifier
                          .padding(end = 5.dp)
-                         .weight(.35f))
+                         .weight(.35f) , textAlign = TextAlign.Center)
 //                     detailedSummary.value.forEach {
 //
 //                         Row {
@@ -221,22 +221,22 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
 //                     }
                       Text(text = "Goli"  , fontSize = 13.sp , fontWeight = FontWeight.Bold, modifier = Modifier
                           .padding(end = 5.dp)
-                          .weight(.2f))
+                          .weight(.2f) , textAlign = TextAlign.Center)
                       Text(text= "No12" , fontSize = 13.sp , fontWeight = FontWeight.Bold, modifier = Modifier
                           .padding(end = 5.dp)
-                          .weight(.2f))
+                          .weight(.2f) , textAlign = TextAlign.Center)
                       Text(text = "Seed" , fontSize = 13.sp ,fontWeight = FontWeight.Bold, modifier = Modifier
                           .padding(end = 5.dp)
-                          .weight(.2f))
+                          .weight(.2f) , textAlign = TextAlign.Center)
                       Text(text="Cut" , fontSize = 13.sp ,fontWeight = FontWeight.Bold, modifier = Modifier
                           .padding(end = 5.dp)
-                          .weight(.19f))
+                          .weight(.19f) , textAlign = TextAlign.Center)
                       Text(text = "Ration" , fontSize = 13.sp ,fontWeight = FontWeight.Bold, modifier = Modifier
                           .padding(end = 5.dp)
-                          .weight(.25f))
+                          .weight(.25f) , textAlign = TextAlign.Center)
                      Text(text = "Total" , fontSize = 13.sp ,fontWeight = FontWeight.Bold, modifier = Modifier
                          .padding(end = 5.dp)
-                         .weight(.2f))
+                         .weight(.2f) , textAlign = TextAlign.Center)
 
                  }
                   detailedSummary.value.forEach {
@@ -244,7 +244,7 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                       Row {
                           it?.variety?.let { it1 -> Text(text = it1 , fontSize = 13.sp , modifier = Modifier
                               .padding(end = 5.dp)
-                              .weight(.35f)) }
+                              .weight(.35f) , textAlign = TextAlign.Center) }
 //                          Text(text = it?.sizes?.get(0)?.currentQuantity.toString())
 //                          Text(text = it?.sizes?.get(1)?.currentQuantity.toString())
 //                          Text(text = it.sizes?.get(2)?.currentQuantity.toString())
@@ -252,26 +252,26 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
 //                          Text(text = it?.sizes?.get(4)?.currentQuantity.toString())
                           Text(text = it.sizes.find { bag -> bag.size == "Goli" }?.let { bag-> bag.currentQuantity.toString() }?:"0" ,fontSize = 13.sp , modifier = Modifier
                               .padding(end = 5.dp)
-                              .weight(.2f))
+                              .weight(.2f) , textAlign = TextAlign.Center)
                           Text(text = it.sizes.find { bag -> bag.size == "Number-12" }?.let { bag-> bag.currentQuantity.toString() }?:"0" ,fontSize = 13.sp , modifier = Modifier
                               .padding(end = 5.dp)
-                              .weight(.2f))
+                              .weight(.2f) , textAlign = TextAlign.Center)
                           Text(text = it.sizes.find { bag -> bag.size == "Seed" }?.let { bag-> bag.currentQuantity.toString() }?:"0",fontSize = 13.sp , modifier = Modifier
                               .padding(end = 5.dp)
-                              .weight(.2f))
+                              .weight(.2f) , textAlign = TextAlign.Center)
                           Text(text = it.sizes.find { bag -> bag.size == "Cut-tok" }?.let { bag-> bag.currentQuantity.toString() }?:"0" , fontSize = 13.sp , modifier = Modifier
                               .padding(end = 5.dp)
-                              .weight(.19f))
+                              .weight(.19f) , textAlign = TextAlign.Center)
                           Text(text = it.sizes.find { bag -> bag.size == "Ration" }?.let { bag-> bag.currentQuantity.toString() }?:"0" , fontSize = 13.sp , modifier = Modifier
                               .padding(end = 5.dp)
-                              .weight(.25f))
+                              .weight(.25f) , textAlign = TextAlign.Center)
                           Text(
                               text = findSumOfSizesUnderSameVariety(
                                   detailedSummary.value,
                                   it.variety
                               ).toString(), fontSize = 13.sp, modifier = Modifier
                                   .padding(end = 5.dp)
-                                  .weight(.2f)
+                                  .weight(.2f) , textAlign = TextAlign.Center
                           )
 
 //                          it.sizes?.forEach { bags->
@@ -294,26 +294,26 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                  Row(modifier = Modifier.background(lightGrayBorder , RoundedCornerShape(2.dp))) {
                      Text(text = "BagTotal", fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
                          .padding(end = 5.dp)
-                         .weight(.35f))
+                         .weight(.35f) , textAlign = TextAlign.Center)
                      Text(text = findSumOfEachBagsize( detailedSummary.value, "Goli").toString()  ,  fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
                          .padding(end = 5.dp)
-                         .weight(.2f))
+                         .weight(.2f) , textAlign = TextAlign.Center)
                      Text(text = findSumOfEachBagsize( detailedSummary.value, "Number-12").toString() , fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
                          .padding(end = 5.dp)
-                         .weight(.2f))
+                         .weight(.2f) , textAlign = TextAlign.Center)
                      Text(text = findSumOfEachBagsize( detailedSummary.value, "Seed").toString() , fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
                          .padding(end = 5.dp)
-                         .weight(.2f))
+                         .weight(.2f) , textAlign = TextAlign.Center)
                      Text(text = findSumOfEachBagsize( detailedSummary.value, "Cut-tok").toString() , fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
                          .padding(end = 5.dp)
-                         .weight(.19f))
+                         .weight(.19f) , textAlign = TextAlign.Center)
                      Text(text = findSumOfEachBagsize( detailedSummary.value, "Ration").toString() , fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
                          .padding(end = 5.dp)
-                         .weight(.25f))
+                         .weight(.25f) , textAlign = TextAlign.Center)
                      var grandtotal = 0;
                      Text(text = grandTotal(detailedSummary.value).toString() ,fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
                          .padding(end = 5.dp)
-                         .weight(.2f))
+                         .weight(.2f) , textAlign = TextAlign.Center)
 
                  }
 

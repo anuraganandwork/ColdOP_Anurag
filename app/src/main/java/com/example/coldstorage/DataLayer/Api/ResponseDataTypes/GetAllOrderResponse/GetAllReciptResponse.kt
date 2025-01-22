@@ -27,7 +27,7 @@ data class Voucher(
 )
 
 data class OrderDetail(
-    val location: Location,
+    val location: String,
     val variety: String,
     val bagSizes: List<BagSize>
 )

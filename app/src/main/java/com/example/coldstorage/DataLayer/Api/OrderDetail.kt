@@ -2,6 +2,6 @@ package com.example.coldstorage.DataLayer.Api
 
 data class OrderDetail(
     val bagSizes: List<BagSize>,
-    val location: Location,
+    val location: String,
     val variety: String
 )

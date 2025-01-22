@@ -18,6 +18,7 @@ import com.example.coldstorage.DataLayer.Api.IncomingOrderData
 import com.example.coldstorage.DataLayer.Api.Location
 import com.example.coldstorage.DataLayer.Api.OrderDetail
 import com.example.coldstorage.DataLayer.Api.OutgoingData.BagUpdate
+import com.example.coldstorage.DataLayer.Api.OutgoingData.MainOutgoingOrderClass
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.PopulatedFarmer
 import com.example.coldstorage.DataLayer.Api.Quantity
@@ -72,6 +73,9 @@ class FunctionStoreOwner @Inject constructor(
     private val _seedBags = MutableStateFlow<String>("0")
     val seedBags :StateFlow<String> = _seedBags.asStateFlow()
 
+    private val _remarks = MutableStateFlow<String>("")
+    val remarks :StateFlow<String> =  _remarks.asStateFlow()
+
     private val _goli  = MutableStateFlow<String>("0")
     val goli :StateFlow<String> = _goli.asStateFlow()
 
@@ -112,6 +116,10 @@ class FunctionStoreOwner @Inject constructor(
     fun updateRow(value: String){_row.value = value}
 
     fun updateFarmerAcc(value: String){ _farmerAcc.value = value}
+
+    fun updateRemarks(value: String){
+        _remarks.value = value
+    }
 
     fun fetchFarmersList(){
         viewModelScope.launch {
@@ -179,6 +187,7 @@ class FunctionStoreOwner @Inject constructor(
   private val _orderResult = MutableStateFlow<Result<Unit>?>(null)
     val orderResult = _orderResult.asStateFlow()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun createIncomingOrderForUi(){
         viewModelScope.launch {
            val result = createIncomingOrder()
@@ -195,6 +204,7 @@ class FunctionStoreOwner @Inject constructor(
                     coldStorageId = authIntercepter.getStore_id("store")!!,
                     dateOfSubmission = getCurrentDate(),
                     farmerId = farmerAcc.value,
+                    remarks = remarks.value,
                     orderDetails = listOf(
                         OrderDetail(
                             bagSizes = listOf(
@@ -234,11 +244,7 @@ class FunctionStoreOwner @Inject constructor(
                                     size = "Number-12"
                                 )
                             ),
-                            location = Location(
-                                chamber = chamber.value,
-                                floor = floor.value,
-                                row = row.value
-                            ),
+                            location = chamber.value,
                             variety = variety.value
                         )
                     ),
@@ -281,7 +287,7 @@ class FunctionStoreOwner @Inject constructor(
     fun getAllRecipts(farmerId: String){
         viewModelScope.launch {
        _transactionHistory.value = getAllReciptsResponse.loading
-
+        Log.d("Farmer If logged" ,farmerId )
              try {
                  val response = api.getOldReciepts(farmerId)
                  if(response.isSuccessful){
@@ -407,13 +413,13 @@ class FunctionStoreOwner @Inject constructor(
     private val _orderOutgoingResult = MutableStateFlow<Result<Unit>?>(null)
     val orderOutgoingResult: StateFlow<Result<Unit>?> = _orderOutgoingResult.asStateFlow()
 
-    fun confirmOutgoingOrderForUi(farmerId: String ,outgoingRequestBody: List<OutgoingDataClassItem>){
+    fun confirmOutgoingOrderForUi(farmerId: String ,outgoingRequestBody: MainOutgoingOrderClass){
         viewModelScope.launch {
             val result = confirmOutgoingOrder(farmerId,outgoingRequestBody)
             _orderOutgoingResult.value = result
         }
     }
-     suspend fun confirmOutgoingOrder(farmerId: String ,outgoingRequestBody: List<OutgoingDataClassItem>  ) :Result<Unit>{
+     suspend fun confirmOutgoingOrder(farmerId: String ,outgoingRequestBody: MainOutgoingOrderClass  ) :Result<Unit>{
         //val outgoingOrderData =
         return withContext(Dispatchers.IO) {
             try {

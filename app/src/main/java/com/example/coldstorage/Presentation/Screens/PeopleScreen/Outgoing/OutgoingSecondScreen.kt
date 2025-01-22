@@ -51,9 +51,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.OutgoingData.BagUpdate
+import com.example.coldstorage.DataLayer.Api.OutgoingData.MainOutgoingOrderClass
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Location
 import com.example.coldstorage.Presentation.Screens.AllScreens
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.forSecondOutgoingPage
@@ -373,7 +375,9 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
         mutableStateOf("")
     }
     val context = LocalContext.current
-
+    val remarks = remember {mutableStateOf("")}
+     val mainOutgoingBody: MutableState<MainOutgoingOrderClass>  = remember {
+                       mutableStateOf(MainOutgoingOrderClass(remarks = "" , orders = emptyList() ))    }
     Column() {
         Row(modifier = Modifier.fillMaxWidth()) {
             headers.forEach { header ->
@@ -516,7 +520,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
 
                     )
                     Text(
-                        text = "${pair.address.chamber}-${pair.address.floor}-${pair.address.row}",
+                        text = "${pair.address}",
                         //text = pair.address,
                         modifier = Modifier.width(60.dp)
                         //.background(primeGreen)
@@ -614,14 +618,17 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
                                 } else {
                                     // Add a new order with the bag size
                                     outgoingResponseBody.add(
+
                                         OutgoingDataClassItem(
-                                            orderId = pair.orderId,
-                                            variety = pair.variety,
-                                            bagUpdates = listOf(
-                                                pair.size?.let { BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt()) }
+                                                orderId = pair.orderId,
+                                                variety = pair.variety,
+                                                bagUpdates = listOf(
+                                                    pair.size?.let { BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt()) }
+                                                )
                                             )
-                                        )
                                     )
+
+
                                 }
 
 
@@ -724,12 +731,31 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
     }}
             
             Spacer(modifier = Modifier.padding(27.dp))
+
+            // add remarks here
+            Text(text = "Remarks",  fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.padding(6.dp))
+
+            ColdOpTextField(value = remarks.value, onValueChange = {
+                                                                   remarks.value = it
+            } ,  placeholder = "Describe any sort of exception to be handelled in\n" +
+                    "the order , could be multiple address allocation." ,
+                modifier = Modifier
+                    .width(370.dp)
+                    .height(125.dp))
+
+
+
             Button(
                 onClick = {
                     Log.d("OutgoingSuccess" , "Pressed button")
                     Log.d("Outtttt" , outgoingResponseBody.toString())
                     // showBottomSheet.value = true
-                    try{viewmodel.confirmOutgoingOrderForUi(accNum ,outgoingResponseBody)
+                    mainOutgoingBody.value = MainOutgoingOrderClass(
+                        remarks = remarks.value,
+                        orders = outgoingResponseBody
+                    )
+                    try{viewmodel.confirmOutgoingOrderForUi(accNum ,mainOutgoingBody.value)
 
                        viewmodel.clearSelectedCellData()
                         //viewmodel.clearSelectedCells()
@@ -777,6 +803,6 @@ data class VoucherBagSizePair(
     val voucherNum: Int,
     val bagSize: String,
     val date: String,
-    val address: Location,
+    val address: String,
     val currentQuantity: Int
 )

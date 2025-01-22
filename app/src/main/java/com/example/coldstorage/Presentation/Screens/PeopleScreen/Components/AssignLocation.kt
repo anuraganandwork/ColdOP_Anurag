@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
+import com.example.coldstorage.ui.theme.lightGrayBorder
 import com.example.coldstorage.ui.theme.primeGreen
 import com.example.coldstorage.ui.theme.primeRed
 
@@ -57,6 +58,7 @@ fun AssignLocation(onContinue:()->Unit, viewmodel:FunctionStoreOwner= hiltViewMo
     val chamber = viewmodel.chamber.collectAsState()
     val floor = viewmodel.floor.collectAsState()
     val row = viewmodel.row.collectAsState()
+    val remarks = viewmodel.remarks.collectAsState()
     val loading = viewmodel.loading.collectAsState()
 //    val rack = remember{
 //        mutableStateOf("")
@@ -99,10 +101,12 @@ fun AssignLocation(onContinue:()->Unit, viewmodel:FunctionStoreOwner= hiltViewMo
             Spacer(modifier = Modifier.padding(10.dp))
             
             Text(text = "Enter Location Details", fontSize = 18.sp, fontWeight = FontWeight.Medium)
-            Text(text = "Set the respective location in your cold")
+            Text(text = "Set the respective location in your cold" , color = lightGrayBorder , fontSize = 15.sp)
+            Spacer(modifier = Modifier.padding(10.dp))
+
             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Chamber", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text(text = "Location", fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 BasicTextField(
                     value = chamber.value,
                     onValueChange = { text -> viewmodel.updateChamber(text) },
@@ -133,75 +137,75 @@ fun AssignLocation(onContinue:()->Unit, viewmodel:FunctionStoreOwner= hiltViewMo
                     }
                 )
             }
-            Spacer(modifier = Modifier.padding(10.dp))
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Floor", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                BasicTextField(
-                    value = floor.value,
-                    onValueChange = { text -> viewmodel.updateFloor(text) },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Text
-                    ),
-                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                    modifier = Modifier
-                        .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
-                        .border(
-                            BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .padding(horizontal = 5.dp, vertical = 1.dp)
-                        .width(134.dp)
-                        .height(40.dp),
-                    singleLine = true,
-                    maxLines = 1,
-                    textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center // Center-align the inner content
-                        ) {
-                            innerTextField()
-                        }
-                    }
-                )
-            }
-            Spacer(modifier = Modifier.padding(10.dp))
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Row", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                BasicTextField(
-                    value = row.value,
-                    onValueChange = { text -> viewmodel.updateRow(text)  },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Text
-                    ),
-                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                    modifier = Modifier
-                        .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
-                        .border(
-                            BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .padding(horizontal = 5.dp, vertical = 1.dp)
-                        .width(134.dp)
-                        .height(40.dp),
-                    singleLine = true,
-                    maxLines = 1,
-                    textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center // Center-align the inner content
-                        ) {
-                            innerTextField()
-                        }
-                    }
-                )
-            }
-            Spacer(modifier = Modifier.padding(10.dp))
+            Spacer(modifier = Modifier.padding(8.dp))
+//            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Text(text = "Floor", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+//                BasicTextField(
+//                    value = floor.value,
+//                    onValueChange = { text -> viewmodel.updateFloor(text) },
+//                    keyboardOptions = KeyboardOptions(
+//                        imeAction = ImeAction.Done,
+//                        keyboardType = KeyboardType.Text
+//                    ),
+//                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+//                    modifier = Modifier
+//                        .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
+//                        .border(
+//                            BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
+//                            shape = MaterialTheme.shapes.small
+//                        )
+//                        .padding(horizontal = 5.dp, vertical = 1.dp)
+//                        .width(134.dp)
+//                        .height(40.dp),
+//                    singleLine = true,
+//                    maxLines = 1,
+//                    textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center),
+//                    decorationBox = { innerTextField ->
+//                        Box(
+//                            modifier = Modifier.fillMaxSize(),
+//                            contentAlignment = Alignment.Center // Center-align the inner content
+//                        ) {
+//                            innerTextField()
+//                        }
+//                    }
+//                )
+//            }
+//            Spacer(modifier = Modifier.padding(10.dp))
+//            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Text(text = "Row", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+//                BasicTextField(
+//                    value = row.value,
+//                    onValueChange = { text -> viewmodel.updateRow(text)  },
+//                    keyboardOptions = KeyboardOptions(
+//                        imeAction = ImeAction.Done,
+//                        keyboardType = KeyboardType.Text
+//                    ),
+//                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+//                    modifier = Modifier
+//                        .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
+//                        .border(
+//                            BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
+//                            shape = MaterialTheme.shapes.small
+//                        )
+//                        .padding(horizontal = 5.dp, vertical = 1.dp)
+//                        .width(134.dp)
+//                        .height(40.dp),
+//                    singleLine = true,
+//                    maxLines = 1,
+//                    textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center),
+//                    decorationBox = { innerTextField ->
+//                        Box(
+//                            modifier = Modifier.fillMaxSize(),
+//                            contentAlignment = Alignment.Center // Center-align the inner content
+//                        ) {
+//                            innerTextField()
+//                        }
+//                    }
+//                )
+//            }
+          //  Spacer(modifier = Modifier.padding(10.dp))
 
 //            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
 //            ) {
@@ -228,6 +232,17 @@ fun AssignLocation(onContinue:()->Unit, viewmodel:FunctionStoreOwner= hiltViewMo
 //                    textStyle = TextStyle(fontSize = 24.sp)
 //                )
 //            }
+            Text(text = "Remarks",  fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.padding(6.dp))
+
+            ColdOpTextField(value = remarks.value, onValueChange = {
+                viewmodel.updateRemarks(it)
+            } ,  placeholder = "Describe any sort of exception to be handelled in\n" +
+                    "the order , could be multiple address allocation." ,
+                modifier = Modifier
+                    .width(370.dp)
+                    .height(125.dp))
+
             Spacer(modifier = Modifier.padding(10.dp))
             Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
                 Button(onClick= {

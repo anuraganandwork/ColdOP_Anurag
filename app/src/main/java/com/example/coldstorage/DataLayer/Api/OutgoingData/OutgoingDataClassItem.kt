@@ -6,3 +6,9 @@ data class OutgoingDataClassItem(
     val bagUpdates: List<BagUpdate?>,
 
     )
+
+
+data class MainOutgoingOrderClass(
+    val remarks :String ,
+    val  orders: List<OutgoingDataClassItem>
+)

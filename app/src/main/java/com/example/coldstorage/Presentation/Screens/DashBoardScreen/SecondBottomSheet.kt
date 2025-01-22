@@ -46,7 +46,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
+import com.example.coldstorage.ui.theme.lightGrayBorder
 import com.example.coldstorage.ui.theme.primeGreen
 import com.example.coldstorage.ui.theme.primeRed
 
@@ -65,6 +67,7 @@ fun  SecondBottomSheet(onContinue : ()-> Unit , onSuccess : () -> Unit , viewmod
     var showAlert by remember{
         mutableStateOf(false)
     }
+    val remarks = viewmodel.remarks.collectAsState()
 
     var errorMessage by remember {
         mutableStateOf("")
@@ -131,8 +134,8 @@ fun  SecondBottomSheet(onContinue : ()-> Unit , onSuccess : () -> Unit , viewmod
 
         item{
             Text(text = "Enter Address Details")
-            Text(text = "Set the respective location in your cold. ")
-
+            Text(text = "Set the respective location in your cold. ", color = lightGrayBorder , fontSize = 15.sp)
+            Spacer(modifier = Modifier.padding(10.dp))
             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Chamber", fontSize = 14.sp, fontWeight = FontWeight.Medium)
@@ -150,7 +153,7 @@ fun  SecondBottomSheet(onContinue : ()-> Unit , onSuccess : () -> Unit , viewmod
                             BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
                             shape = MaterialTheme.shapes.small
                         )
-                        .padding(horizontal = 5.dp , vertical = 3.dp)
+                        .padding(horizontal = 5.dp, vertical = 3.dp)
                         .width(134.dp)
                         .height(40.dp),
                     singleLine = true,
@@ -159,61 +162,77 @@ fun  SecondBottomSheet(onContinue : ()-> Unit , onSuccess : () -> Unit , viewmod
                 )
             }
 
-            Spacer(modifier = Modifier.padding(10.dp))
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Floor", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                BasicTextField(
-                    value = floor.value,
-                    onValueChange = { text -> viewmodel.updateFloor(text) },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Text
-                    ),
-                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                    modifier = Modifier
-                        .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
-                        .border(
-                            BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .padding(horizontal = 5.dp , vertical = 3.dp)
-                        .width(134.dp)
-                        .height(40.dp),
-                    singleLine = true,
-                    maxLines = 1,
-                    textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center)
-                )
-            }
-            Spacer(modifier = Modifier.padding(10.dp))
+            Spacer(modifier = Modifier.padding(8.dp))
+//            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Text(text = "Floor", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+//                BasicTextField(
+//                    value = floor.value,
+//                    onValueChange = { text -> viewmodel.updateFloor(text) },
+//                    keyboardOptions = KeyboardOptions(
+//                        imeAction = ImeAction.Done,
+//                        keyboardType = KeyboardType.Text
+//                    ),
+//                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+//                    modifier = Modifier
+//                        .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
+//                        .border(
+//                            BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
+//                            shape = MaterialTheme.shapes.small
+//                        )
+//                        .padding(horizontal = 5.dp , vertical = 3.dp)
+//                        .width(134.dp)
+//                        .height(40.dp),
+//                    singleLine = true,
+//                    maxLines = 1,
+//                    textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center)
+//                )
+//            }
+//            Spacer(modifier = Modifier.padding(10.dp))
 
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Row", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                BasicTextField(
-                    value = row.value,
-                    onValueChange = { text -> viewmodel.updateRow(text)  },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Text
-                    ),
-                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                    modifier = Modifier
-                        .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
-                        .border(
-                            BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .padding(horizontal = 5.dp , vertical = 3.dp)
-                        .width(134.dp)
-                        .height(40.dp),
-                    singleLine = true,
-                    maxLines = 1,
-                    textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center)
-                )
-            }
+//            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Text(text = "Row", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+//                BasicTextField(
+//                    value = row.value,
+//                    onValueChange = { text -> viewmodel.updateRow(text)  },
+//                    keyboardOptions = KeyboardOptions(
+//                        imeAction = ImeAction.Done,
+//                        keyboardType = KeyboardType.Text
+//                    ),
+//                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+//                    modifier = Modifier
+//                        .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
+//                        .border(
+//                            BorderStroke(1.dp, SolidColor(Color.Gray)), // Default border color
+//                            shape = MaterialTheme.shapes.small
+//                        )
+//                        .padding(horizontal = 5.dp , vertical = 3.dp)
+//                        .width(134.dp)
+//                        .height(40.dp),
+//                    singleLine = true,
+//                    maxLines = 1,
+//                    textStyle = TextStyle(fontSize = 18.sp , textAlign = TextAlign.Center)
+//                )
+//            }
+//
+//            Spacer(modifier = Modifier.padding(10.dp))
 
-            Spacer(modifier = Modifier.padding(10.dp))
+
+            Text(text = "Remarks",  fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.padding(6.dp))
+
+            ColdOpTextField(value = remarks.value, onValueChange = {
+                viewmodel.updateRemarks(it)
+            } ,  placeholder = "Describe any sort of exception to be handelled in\n" +
+                    "the order , could be multiple address allocation." ,
+                modifier = Modifier
+                    .width(370.dp)
+                    .height(125.dp))
+
+
+            Spacer(modifier = Modifier.padding(9.dp))
+
             Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
                 Surface(modifier = Modifier
                     .background(primeRed, RoundedCornerShape(10.dp))

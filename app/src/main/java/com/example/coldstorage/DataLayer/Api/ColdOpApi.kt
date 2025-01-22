@@ -1,6 +1,7 @@
 package com.example.coldstorage.DataLayer.Api
 
 import com.example.coldstorage.DataLayer.Api.GetRecieptNumberdata.RecieptNumData
+import com.example.coldstorage.DataLayer.Api.OutgoingData.MainOutgoingOrderClass
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseDayBook
@@ -61,7 +62,7 @@ interface ColdOpApi {
 
 
  @POST("api/store-admin/farmers/{id}/outgoing") //create new outgoing order
- suspend fun confirmOutgoingOrder(@Path("id") farmerId: String ,  @Body requestBody :  List<OutgoingDataClassItem>) : Response<OutgoingOrderApiResponse>
+ suspend fun confirmOutgoingOrder(@Path("id") farmerId: String ,  @Body requestBody :  MainOutgoingOrderClass) : Response<OutgoingOrderApiResponse>
 
 
   @GET("api/store-admin/66e1f22d782bbd67d3446805/farmers/search")

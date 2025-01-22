@@ -11,7 +11,7 @@ data class  forSecondOutgoingPage(
 
     val dateOfSubmission : String,
     val voucherNum : Int ,
-    val address : Location ,
+    val address : String ,
     val bagsizeData : List<BagSize>
 )
 fun mapDataForSecondOutgoingPage(recipts: List<Order>) : MutableList<forSecondOutgoingPage> {
