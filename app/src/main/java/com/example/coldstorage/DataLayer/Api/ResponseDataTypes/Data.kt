@@ -8,6 +8,7 @@ data class Data(
     val dateOfSubmission: String,
     val farmerId: String,
     val fulfilled: Boolean,
+    val remarks:String,
     val orderDetails: List<OrderDetail>,
     val updatedAt: String,
     val voucher: Voucher

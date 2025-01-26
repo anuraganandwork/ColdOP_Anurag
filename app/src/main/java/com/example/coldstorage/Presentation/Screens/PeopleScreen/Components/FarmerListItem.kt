@@ -64,20 +64,21 @@ fun farmerCard(farmerName:String,fatherName:String , accNum: String,  navControl
 
        ) {
            Row(verticalAlignment = Alignment.CenterVertically) {
-               AsyncImage(
-                   model = "https://images.indianexpress.com/2020/05/virat-kohli-1.jpg?w=414",
-                   contentDescription = null,
-
-                   modifier = Modifier
-                       .width(65.dp)
-                       .height(65.dp)
-                       .clip(CircleShape)
-                       .background(Color.Green)// Ensure the shape is clipped to a circle
-                   //  .border(border = BorderStroke(1.dp, Color.Transparent), shape = RoundedCornerShape(100.dp) )
-
-                   ,
-                   contentScale = ContentScale.Crop
-               )
+//               AsyncImage(
+//                   model = "https://images.indianexpress.com/2020/05/virat-kohli-1.jpg?w=414",
+//                   contentDescription = null,
+//
+//                   modifier = Modifier
+//                       .width(65.dp)
+//                       .height(65.dp)
+//                       .clip(CircleShape)
+//                       // Ensure the shape is clipped to a circle
+//                   //  .border(border = BorderStroke(1.dp, Color.Transparent), shape = RoundedCornerShape(100.dp) )
+//
+//                   ,
+//                   contentScale = ContentScale.Crop
+//               )
+               LetterAvatar(farmerName)
                Spacer(modifier = Modifier.padding(horizontal = 10.dp))
                Column(verticalArrangement = Arrangement.Center) {
                    Text(text = farmerName)

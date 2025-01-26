@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.logInData
 import com.example.coldstorage.Presentation.Navigation.Sections
 import com.example.coldstorage.Presentation.Screens.AllScreens
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 import com.example.coldstorage.ui.theme.primeGreen
 
@@ -84,22 +85,35 @@ fun CustomLoginPage(navController: NavController, viewModel: AuthViewmodel = hil
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            CustomTextField(
-                value = mobileNumber,
-                onValueChange = { mobileNumber = it },
-                placeholder = "Mobile Number",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+//            CustomTextField(
+//                value = mobileNumber,
+//                onValueChange = { mobileNumber = it },
+//                placeholder = "Mobile Number",
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+//            )
+            ColdOpTextField(value = mobileNumber, onValueChange = {mobileNumber = it},
+                placeholder = "Mobile Number",                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            CustomTextField(
-                value = password,
-                onValueChange = { password = it },
+            ColdOpTextField(value = password, onValueChange = { password = it },
                 placeholder = "Password",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-            )
+
+
+                )
+
+
+
+//            CustomTextField(
+//                value = password,
+//                onValueChange = { password = it },
+//                placeholder = "Password",
+//                visualTransformation = PasswordVisualTransformation(),
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+//            )
 
             Spacer(modifier = Modifier.height(32.dp))
 

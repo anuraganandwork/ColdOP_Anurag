@@ -4,5 +4,5 @@ data class IncomingOrderResponse(
     val `data`: Data,
     val message: String,
     val status: String,
-    val errorMessage :String
+    val errorMessage :String?
 )

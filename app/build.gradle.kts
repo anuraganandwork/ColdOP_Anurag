@@ -26,6 +26,14 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("/Users/anuraganand/Downloads/ColdStorageApp-master/app/release/keystore.jks")
+            storePassword = "123456"
+            keyAlias = "key0"
+            keyPassword = "123456"
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false

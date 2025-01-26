@@ -54,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -198,6 +199,12 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner  , vi
                         errorLabelColor = Color.Red // Label color in error state
                     )
                 )
+//                ColdOpTextField(value = query, onValueChange ={
+//                    query = it
+//                    viewmodel.onSearchQuery(query)
+//                }    ,                modifier = Modifier.weight(.9f),
+//                    placeholder = "Search farmers"
+//                )
                 Spacer(modifier = Modifier.width(5.dp))
                 Column(modifier = Modifier
                     .weight(.2f)
@@ -207,7 +214,7 @@ fun FirstBottomSheet(onContinue: () -> Unit, viewmodel: FunctionStoreOwner  , vi
                     }, verticalArrangement = Arrangement.Center , horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(painter = painterResource(id = R.drawable.plus) ,
                         contentDescription = "New farmer add icon" , modifier = Modifier.size(32.dp),tint= primeGreen )
-                   Text(text = "New Farmer" , fontSize = 8.sp  , color = primeGreen , fontWeight = FontWeight.Medium)
+//                   Text(text = "New Farmer" , fontSize = 8.sp  , color = primeGreen , fontWeight = FontWeight.Medium , modifier = Modifier.background(Color.Yellow).padding(0.dp))
                 }
                 //10:06
                // add dialog here

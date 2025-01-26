@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.FarmerData
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ImageUploadComponent
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.primeGreen
@@ -162,6 +163,9 @@ fun FarmerQuickAddInputForm(navController: NavController, viewModel: AuthViewmod
                         focusedIndicatorColor = Color.Gray
                     )
                 )
+//                ImageUploadComponent{image->
+//                    imageUrl = image
+//                }
             }
 
             item { Spacer(modifier = Modifier.height(16.dp)) }

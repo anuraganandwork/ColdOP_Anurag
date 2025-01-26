@@ -132,23 +132,52 @@ fun bottomNav(navControllerMain: NavController){
                     initialOffsetX = { fullWidth -> -fullWidth },
                     animationSpec = tween(durationMillis = 500)
                 ) },
-                popExitTransition = { slideOutHorizontally { fullWidth -> fullWidth } }){
+                popExitTransition = { slideOutHorizontally { fullWidth -> fullWidth } }
+
+
+            ){
                 FarmerQuickAddInputForm(navHostController)
             }
 
-            composable(route= AllScreens.StoreOrRetrieve.name+"/{accountNumber}" ,
+            composable(route= AllScreens.StoreOrRetrieve.name+"/{accountNumber}/{totalIncoming}/{totalOutgoing}" ,
                 arguments = listOf(navArgument("accountNumber"){
                     type = NavType.StringType
-                })
+                } ,
+                    navArgument("totalIncoming"){
+                        type = NavType.StringType
+                        nullable= true
+
+                    } ,
+                    navArgument("totalOutgoing"){
+                        type = NavType.StringType
+                        nullable = true
+
+                    }
+                    )
+
             ){
                 val accNum = it.arguments!!.getString("accountNumber")
+                val totalIncoming = it.arguments?.getString("totalIncoming")
+                val totalOutgoing = it.arguments?.getString("totalOutgoing")
 
-                storeOrRetrieve(accNum!! , navHostController)
+                storeOrRetrieve(accNum!! , totalIncoming ,totalOutgoing, navHostController)
             }
 
             composable(
                 route = AllScreens.OutgoingStockScreen.name + "/{fromDaybook}/{accountNumber}",
-                arguments = listOf(
+
+                enterTransition = { slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth },
+                    animationSpec = tween(durationMillis = 500) // Adjust duration to make it slower
+                ) },
+                exitTransition = { slideOutHorizontally { fullWidth -> -fullWidth } },
+                popEnterTransition = { slideInHorizontally(
+                    initialOffsetX = { fullWidth -> -fullWidth },
+                    animationSpec = tween(durationMillis = 500)
+                ) },
+                popExitTransition = { slideOutHorizontally { fullWidth -> fullWidth } }
+
+               , arguments = listOf(
                     navArgument("fromDaybook") {
                         type = NavType.BoolType
                        },

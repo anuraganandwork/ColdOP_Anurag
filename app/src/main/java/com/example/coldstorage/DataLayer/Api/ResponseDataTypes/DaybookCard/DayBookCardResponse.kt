@@ -13,6 +13,7 @@ data class OrderDaybook(
     val farmerId: FarmerInfo,
     val dateOfSubmission: String? = null,
     val dateOfExtraction: String? = null,
+    val remarks:String? = null,
     val orderDetails: List<OrderDetailDaybook>
 )
 

@@ -12,6 +12,7 @@ data class OutgoingOrderApi(
     val voucher: VoucherOutgoingOrderApi,
     val dateOfExtraction: String,
     val orderDetails: List<OrderDetailOutgoingOrderApi>,
+    val remarks :String,
     val _id: String,
     val createdAt: String,
     val updatedAt: String,
@@ -31,7 +32,7 @@ data class OrderDetailOutgoingOrderApi(
 
 data class IncomingOrderOutgoingOrderApi(
     val _id: String,
-    val location: LocationOutgoingOrderApi,
+    val location: String,
     val voucher: VoucherOutgoingOrderApi,
     val incomingBagSizes: List<IncomingBagSizeOutgoingOrderApi>
 )

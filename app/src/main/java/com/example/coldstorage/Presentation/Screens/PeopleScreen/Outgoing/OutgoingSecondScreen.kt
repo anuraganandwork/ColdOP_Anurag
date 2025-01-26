@@ -363,9 +363,15 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
 //        editableValues.clear()
 //        editableValues.addAll(List(data.size) { "" })
 //    }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
 
     LaunchedEffect(OutgoingOrderStatus ){
         if(OutgoingOrderStatus){
+            Log.d("Hello outgiggigigig" , OutgoingOrderStatus.toString())
+            if (keyboardController != null) {
+                keyboardController.hide()
+            }
             navController.navigate(AllScreens.OutgoingScreenSuccess.name)
             viewmodel.resetOrderOtgoingResult()
         }
@@ -742,7 +748,9 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
                     "the order , could be multiple address allocation." ,
                 modifier = Modifier
                     .width(370.dp)
-                    .height(125.dp))
+                    .height(125.dp)
+                    .padding(bottom = 10.dp)
+            )
 
 
 

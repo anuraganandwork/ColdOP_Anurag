@@ -143,8 +143,13 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                     when(farmerData){
                         is FarmerApiState.success ->{
                             val farmerInfoAtui = (farmerData as FarmerApiState.success)?.farmerInfo
-
-                            navController.navigate(route = AllScreens.StoreOrRetrieve.name + "/${farmerInfoAtui?._id}")}
+                            val totalIncoming = detailedSummary.value?.let { getTotalIncomingCount(it).toString() } ?: "0"
+                            val totalOutgoing = detailedSummary.value?.let { getTotalOutgoingCount(it).toString() } ?: "0"
+                            Log.d("dfdfdfgggggg555" , totalIncoming+"/"+totalOutgoing +"/"+ farmerInfoAtui?._id)
+                            var r = AllScreens.StoreOrRetrieve.name + "/${farmerInfoAtui?._id}" +"/${totalIncoming}" + "/${totalOutgoing}"
+                            Log.d("343434fgfgf" , r)
+                           navController.navigate(route = AllScreens.StoreOrRetrieve.name + "/${farmerInfoAtui?._id}" +"/${totalIncoming}" + "/${totalOutgoing}")
+                            }
                         else ->{
                             Log.d("Errrr","erererere")
                         }
@@ -310,7 +315,6 @@ fun farmerDetailedScreen(accNumber: String, navController: NavController , viewM
                      Text(text = findSumOfEachBagsize( detailedSummary.value, "Ration").toString() , fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
                          .padding(end = 5.dp)
                          .weight(.25f) , textAlign = TextAlign.Center)
-                     var grandtotal = 0;
                      Text(text = grandTotal(detailedSummary.value).toString() ,fontSize = 13.sp,fontWeight = FontWeight.Bold, modifier = Modifier
                          .padding(end = 5.dp)
                          .weight(.2f) , textAlign = TextAlign.Center)
@@ -377,4 +381,36 @@ fun grandTotal(stockSummary: List<StockSummary>):Int{
         grand +=   findSumOfSizesUnderSameVariety(stockSummary , it.variety)
     }
     return grand
+}
+
+
+fun getTotalIncomingCount(detailedSummary:List<StockSummary>?):Int{
+    var total =0 ;
+    if (detailedSummary != null) {
+        detailedSummary.forEach {
+            it.sizes.forEach {
+                total += it.initialQuantity
+            }
+
+        }
+    }
+
+
+    return total;
+}
+
+
+fun getTotalOutgoingCount(detailedSummary:List<StockSummary>?):Int{
+    var total = 0;
+
+    if (detailedSummary != null) {
+        detailedSummary.forEach {
+            it.sizes.forEach {
+                total += it.quantityRemoved
+            }
+        }
+    }
+
+
+    return total
 }

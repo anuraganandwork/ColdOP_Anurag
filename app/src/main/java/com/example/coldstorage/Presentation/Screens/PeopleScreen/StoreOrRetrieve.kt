@@ -129,7 +129,7 @@ val dummyTransactions = listOf(
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun storeOrRetrieve(accountNumber: String, navController: NavHostController, viewmodel: FunctionStoreOwner = hiltViewModel()) {
+fun storeOrRetrieve(accountNumber: String,totalIncoming:String? , totalOutgoing:String? , navController: NavHostController, viewmodel: FunctionStoreOwner = hiltViewModel()) {
     //variables for bottom sheet
     val transactionHistory = viewmodel.singleFarmerCard.collectAsState() // to learn
 //755
@@ -147,7 +147,7 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
     }
 
 
-    Log.d("TransactionhistoryUI", transactionHistory.value.toString())
+    //Log.d("TransactionhistoryUI", transactionHistory.value.toString())
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     var showBottomSheet = remember {
@@ -233,13 +233,15 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
 
     val typeOfCard = remember { mutableStateOf("all") }
     val sortingOrder = remember { mutableStateOf("latest") }
-    LaunchedEffect(Unit ){
-        viewmodel.getStockSummary(accountNumber)
-    }
+//    LaunchedEffect(Unit ){
+//        viewmodel.getStockSummary(accountNumber)
+//    }
     LaunchedEffect(typeOfCard.value , sortingOrder.value ){
         viewmodel.getSingleFarmerTransaction(accountNumber)
     }
    val sum =  stockSummary.value.totalInitialQuantity-stockSummary.value.totalQuantityRemoved
+   var totalSum = (totalIncoming?.toInt() ?: 0) - (totalOutgoing?.toInt() ?: 0)
+//var totalSum  = 0
     Column(modifier = Modifier.verticalScroll(enabled = true, state = rememberScrollState(),)) {
         Column(
             modifier = Modifier
@@ -309,11 +311,21 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                 )
                 Row() {
                     Text(text = "Total bags incoming", modifier = Modifier.weight(2f))
-                    Text(text = stockSummary.value.totalInitialQuantity.toString(), modifier = Modifier.weight(1f))
+                    if (totalIncoming != null) {
+                        Text(text = totalIncoming, modifier = Modifier.weight(1f))
+                    } else{
+                        Text(text = "0", modifier = Modifier.weight(1f))
+
+                    }
                 }
                 Row() {
                     Text(text = "Total bags outgoing", modifier = Modifier.weight(2f))
-                    Text(text = stockSummary.value.totalQuantityRemoved.toString(), modifier = Modifier.weight(1f))
+                    if (totalOutgoing != null) {
+                        Text(text =totalOutgoing, modifier = Modifier.weight(1f))
+                    } else{
+                        Text(text = "0", modifier = Modifier.weight(1f))
+
+                    }
                 }
 
                 Box(
@@ -322,14 +334,13 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                         .height(1.dp)
                         .background(Color.Black)
                 )
-
                 Row() {
                     Text(
                         text = "Current holdings",
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(2f)
                     )
-                    Text(text = sum.toString(), fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    Text(text = totalSum.toString(), fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 }
 
                 Box(
@@ -398,7 +409,7 @@ fun storeOrRetrieve(accountNumber: String, navController: NavHostController, vie
                         .padding()
                         .clickable {
                             // navController.navigate(AllScreens.OutgoingStockScreen.name+ "/${accNumber}")
-                            if (sum > 0) {
+                            if (totalSum > 0) {
                                 val fromDaybook = false
                                 navController.navigate(AllScreens.OutgoingStockScreen.name + "/$fromDaybook/$accountNumber")
                             } else {
