@@ -96,7 +96,7 @@ fun bottomNav(navControllerMain: NavController){
             icon = R.drawable.coldopsettings,
             route = AllScreens.Setting.name,
             number = 3,
-            selectedIcon = R.drawable.filledcoldophome
+            selectedIcon = R.drawable.coldopsettings
 
         )
     )

@@ -595,7 +595,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
 
                         debounceJob?.cancel()
                         debounceJob = coroutineScope.launch {
-                            delay(100)
+                            delay(20)
                             if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! < pair.currentQuantity.toInt()) {
 
                                 val existingItem = outgoingResponseBody.find { it.orderId == pair.orderId }
