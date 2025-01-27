@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,7 +37,7 @@ fun ColdOpDropDown(label: String, options: List<String>, onSelect: (String) -> U
     Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
         Button(onClick = { expanded = !expanded } ,
             shape = RoundedCornerShape(10.dp) ,
-
+    modifier = Modifier.padding(vertical = 1.dp),
              colors= ButtonColors(
                 containerColor = dropdownGrey ,
                 contentColor = lightGrayBorder,

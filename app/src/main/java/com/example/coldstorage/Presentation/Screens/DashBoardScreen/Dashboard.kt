@@ -157,7 +157,8 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
                 .weight(1f)
                 .padding(horizontal = 10.dp)
                 .clickable {
-                    showBottomSheetOnDaybook.value = true
+                   // showBottomSheetOnDaybook.value = true
+                    navController.navigate(AllScreens.FirstBottomSheetIncoming.name)
                 }) {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -256,39 +257,36 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
             }
     } }
 
-    if(showBottomSheetOnDaybook.value) {
-        ModalBottomSheet(
-            onDismissRequest = { showBottomSheetOnDaybook.value = false },
-            sheetState = firstSheetState, modifier = Modifier.height(700.dp),
-            properties = ModalBottomSheetProperties(
-                securePolicy = SecureFlagPolicy.Inherit,
-                isFocusable = true,
-                shouldDismissOnBackPress = true
-            )){
-
-            FirstBottomSheet( hideFirstBottomSheet , viewmodel = viewmodel)
-            }
-
-
-
-    }
-         if (showSecondSheetOnDaybook.value){
-             ModalBottomSheet(
-                 onDismissRequest = { showSecondSheetOnDaybook.value = false },
-                 sheetState = secondSheetState, modifier = Modifier.height(700.dp),
-                 properties = ModalBottomSheetProperties(
-                     securePolicy = SecureFlagPolicy.Inherit,
-                     isFocusable = true,
-                     shouldDismissOnBackPress = true
-                 )){
-                 SecondBottomSheet(onContinue = {
-                     Log.d("Success", "Pressed")
-
-                      }, onSuccess = {hideSecondBottomSheet()}, viewmodel = viewmodel) {
-                     openFirstBottomSheet()
-                 }
-             }
-         }
+//    if(showBottomSheetOnDaybook.value) {
+//        ModalBottomSheet(
+//            onDismissRequest = { showBottomSheetOnDaybook.value = false },
+//            sheetState = firstSheetState, modifier = Modifier.height(700.dp),
+//            properties = ModalBottomSheetProperties(
+//                securePolicy = SecureFlagPolicy.Inherit,
+//                isFocusable = true,
+//                shouldDismissOnBackPress = true
+//            )){
+//
+//            FirstBottomSheet( hideFirstBottomSheet , viewmodel = viewmodel)
+//            }
+//    }
+//         if (showSecondSheetOnDaybook.value){
+//             ModalBottomSheet(
+//                 onDismissRequest = { showSecondSheetOnDaybook.value = false },
+//                 sheetState = secondSheetState, modifier = Modifier.height(700.dp),
+//                 properties = ModalBottomSheetProperties(
+//                     securePolicy = SecureFlagPolicy.Inherit,
+//                     isFocusable = true,
+//                     shouldDismissOnBackPress = true
+//                 )){
+//                 SecondBottomSheet(onContinue = {
+//                     Log.d("Success", "Pressed")
+//
+//                      }, onSuccess = {hideSecondBottomSheet()}, viewmodel = viewmodel) {
+//                     openFirstBottomSheet()
+//                 }
+//             }
+//         }
 
         if(showThirdSheetOnDayBook.value){
             ModalBottomSheet(

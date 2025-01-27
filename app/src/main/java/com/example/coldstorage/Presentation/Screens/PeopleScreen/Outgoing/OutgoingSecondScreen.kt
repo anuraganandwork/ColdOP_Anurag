@@ -639,7 +639,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
 
 
                             } else{
-                                Toast.makeText(context, "Please a enter a value less than ${pair.currentQuantity.toInt()+1}!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Please a enter a value less than ${pair.currentQuantity.toInt()}!", Toast.LENGTH_SHORT).show()
 
                             }
                             //keyboardController?.hide()

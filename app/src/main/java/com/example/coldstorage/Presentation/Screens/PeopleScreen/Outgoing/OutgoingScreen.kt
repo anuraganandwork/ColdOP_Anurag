@@ -1,6 +1,7 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,8 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontWeight
@@ -51,7 +54,9 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
     }
     LaunchedEffect(Unit ){
         Log.d("fromDayBook" ,fromDaybook.toString())
-
+        if(fromDaybook) {
+            viewmodel.resetSearchResult()
+        }
     }
     val isNameSelected = remember { mutableStateOf(false) }
      if(fromDaybook){
@@ -127,21 +132,114 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
 
 
             LazyColumn(){
-                if (!isNameSelected.value) {
-                    items(searchResults.value) { result ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    query = result.name
-                                    isNameSelected.value = true
-                                    viewmodel.updateFarmerAcc(result._id)
-                                }
-                                .padding(vertical = 8.dp)
+                if (!isNameSelected.value && query.length>2) {
+//            item{
+//                Column {
+//
+//                    Text("New Farmer")
+//                }
+//            }
+//            if(searchResults.value.size < 1) {
+//               item{
+//
+//                   Column {
+//
+//
+//                ColdOpTextField(value = accountHolderName.value, onValueChange = {
+//                    accountHolderName.value = it
+//                } , placeholder = "Enter name" )
+//                       Spacer(modifier = Modifier.padding(10.dp))
+//                   Row {
+//
+//
+//                       ColdOpTextField(value = mobileNumber.value, onValueChange = {
+//                           mobileNumber.value = it
+//                       } , modifier = Modifier.weight(.75f), placeholder = "Enter mobile number")
+//                       Button(onClick = { query = accountHolderName.value
+//                                        isNameSelected.value = true }, enabled = accountHolderName.value.length > 0 && mobileNumber.value.length == 10
+//
+//                           , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContainerColor = Color.Gray , disabledContentColor = Color.White)) {
+//                           Text(text = "Save")
+//                       }
+//
+//                   }
+//
+//                   }
+//            }
+//
+//
+//
+//
+//            }
+                    item{
+                        Surface(
+                            color= Color.White,
+                            tonalElevation = 10.dp,
+                            shadowElevation = 10.dp,
+                            border= BorderStroke(2.dp, primeGreen )
                         ) {
-                            Text(text = result.name)
-                            Text(text = result.mobileNumber)
+                            if(searchResults.value.isNotEmpty()){
+//                        LazyColumn{
+//                            items(searchResults.value) { result ->
+//                                Column(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .drawBehind {
+//                                            drawLine(
+//                                                color = Color.Gray,
+//                                                start = Offset(0f, size.height),
+//                                                end = Offset(size.width, size.height),
+//                                                strokeWidth = 1.dp.toPx()
+//                                            )
+//                                        }
+//                                        .clickable {
+//                                            query = result.name
+//                                            isNameSelected.value = true
+//                                            viewmodel.updateFarmerAcc(result._id)
+//                                        }
+//                                        .padding(vertical = 8.dp)
+//                                ) {
+//                                    Text(text = result.name)
+//                                    Text(text = result.mobileNumber)
+//                                }
+//                            }
+//
+//                        }
+                                Column(modifier = Modifier.padding(horizontal = 10.dp)) {
+                                    searchResults.value.forEach {result->
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .background(Color.White)
+
+                                                .drawBehind {
+                                                    drawLine(
+                                                        color = Color.Gray,
+                                                        start = Offset(0f, size.height),
+                                                        end = Offset(size.width, size.height),
+                                                        strokeWidth = 1.dp.toPx()
+                                                    )
+                                                }
+                                                .clickable {
+                                                    query = result.name
+                                                    isNameSelected.value = true
+                                                    viewmodel.updateFarmerAcc(result._id)
+                                                }
+                                                .padding(vertical = 8.dp)
+                                        ) {
+                                            Text(text = result.name)
+                                            Text(text = result.mobileNumber)
+                                        }
+                                    }
+
+                                }
+                            } else{
+                                Text(text = "No farmer found!")
+                                Log.d("ghghgfh" , "NO search results")
+                            }
+
                         }
+
                     }
                 }
 

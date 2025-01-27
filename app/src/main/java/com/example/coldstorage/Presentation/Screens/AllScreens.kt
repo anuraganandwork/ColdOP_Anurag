@@ -14,6 +14,8 @@ enum class AllScreens {
     SignUp,
     OutgoingStockScreen,
     OutgoingSecondScreen,
-    OutgoingScreenSuccess
+    OutgoingScreenSuccess,
+    FirstBottomSheetIncoming,
+    SecondBottomSheetIncoming
 
 }

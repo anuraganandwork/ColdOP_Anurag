@@ -9,6 +9,6 @@ data class OutgoingDataClassItem(
 
 
 data class MainOutgoingOrderClass(
-    val remarks :String ,
+    val remarks :String? = "No Remarks",
     val  orders: List<OutgoingDataClassItem>
 )

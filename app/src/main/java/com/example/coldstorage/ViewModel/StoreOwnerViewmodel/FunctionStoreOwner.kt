@@ -73,7 +73,7 @@ class FunctionStoreOwner @Inject constructor(
     private val _seedBags = MutableStateFlow<String>("0")
     val seedBags :StateFlow<String> = _seedBags.asStateFlow()
 
-    private val _remarks = MutableStateFlow<String>("")
+    private val _remarks = MutableStateFlow<String>(" ")
     val remarks :StateFlow<String> =  _remarks.asStateFlow()
 
     private val _goli  = MutableStateFlow<String>("0")

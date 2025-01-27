@@ -1,5 +1,7 @@
 package com.example.coldstorage.Presentation.Screens.DashBoardScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,14 +48,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.lightGrayBorder
 import com.example.coldstorage.ui.theme.primeGreen
 import com.example.coldstorage.ui.theme.primeRed
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun  SecondBottomSheet(onContinue : ()-> Unit , onSuccess : () -> Unit , viewmodel:FunctionStoreOwner , onPrevious : ()->Unit  ,){
+fun  SecondBottomSheet( navController: NavController, viewmodel:FunctionStoreOwner  ,){
 
     val currentReceiptNum by viewmodel.currentRecieptNum.collectAsState(0)
 
@@ -68,7 +73,7 @@ fun  SecondBottomSheet(onContinue : ()-> Unit , onSuccess : () -> Unit , viewmod
         mutableStateOf(false)
     }
     val remarks = viewmodel.remarks.collectAsState()
-
+    val incomingOrderStatus = viewmodel.incomingOrderStatus.collectAsState()
     var errorMessage by remember {
         mutableStateOf("")
     }
@@ -84,7 +89,8 @@ fun  SecondBottomSheet(onContinue : ()-> Unit , onSuccess : () -> Unit , viewmod
                 when{
                     result.isSuccess  ->{
 
-                     onSuccess()
+                     //onSuccess()
+                        navController.navigate(AllScreens.OutgoingScreenSuccess.name)
                         viewmodel.resetOrderResult() // Clear the result after handling
 
                     }
@@ -138,7 +144,7 @@ fun  SecondBottomSheet(onContinue : ()-> Unit , onSuccess : () -> Unit , viewmod
             Spacer(modifier = Modifier.padding(10.dp))
             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Chamber", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text(text = "Location", fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 BasicTextField(
                     value = chamber.value,
                     onValueChange = { text -> viewmodel.updateChamber(text) },
@@ -237,7 +243,10 @@ fun  SecondBottomSheet(onContinue : ()-> Unit , onSuccess : () -> Unit , viewmod
                 Surface(modifier = Modifier
                     .background(primeRed, RoundedCornerShape(10.dp))
                     .clickable {
-                        onPrevious()
+                        //onPrevious()
+                        navController.navigate(
+                            AllScreens.FirstBottomSheetIncoming.name
+                        )
                     } , color= primeRed , shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(text = "Previous" , modifier = Modifier
@@ -250,7 +259,7 @@ fun  SecondBottomSheet(onContinue : ()-> Unit , onSuccess : () -> Unit , viewmod
                         .background(primeGreen, RoundedCornerShape(10.dp))
                         .clickable {
                             viewmodel.createIncomingOrderForUi()
-                            onContinue()
+                            // onContinue()
                         },
                     color = primeGreen,
                     shape = RoundedCornerShape(10.dp)

@@ -1,13 +1,17 @@
 package com.example.coldstorage.Presentation.Navigation
 
+import FirstBottomSheet
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
@@ -15,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +28,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -34,6 +44,7 @@ import androidx.navigation.navArgument
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.Auth.FarmerQuickAddInputForm
 import com.example.coldstorage.Presentation.Screens.DashBoardScreen.Dashboard
+import com.example.coldstorage.Presentation.Screens.DashBoardScreen.SecondBottomSheet
 import com.example.coldstorage.Presentation.Screens.OfflineScreen.Offline
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing.OutgoingOrderSuccess
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing.OutgoingSecondScreen
@@ -42,8 +53,10 @@ import com.example.coldstorage.Presentation.Screens.PeopleScreen.People
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.farmerDetailedScreen
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.storeOrRetrieve
 import com.example.coldstorage.Presentation.Screens.SettingScreen.Setting
-import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
+import com.example.coldstorage.R
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
+import com.example.coldstorage.ui.theme.primeGreen
+import okhttp3.internal.wait
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,27 +68,36 @@ fun bottomNav(navControllerMain: NavController){
     val items = listOf(
         NavigationItem(
             label = "Home",
-            icon = Icons.Default.Home,
+            icon = R.drawable.coldophome
+            ,
             route = AllScreens.Dashboard.name,
-            number =  0
+            number =  0,
+            selectedIcon = R.drawable.filledcoldophome
         ),
         NavigationItem(
             label = "People",
-            icon = Icons.Default.Person,
+            icon = R.drawable.coldoppeople,
             route = AllScreens.People.name,
-            number = 1
+            number = 1,
+            selectedIcon = R.drawable.filledcoldoppeople
+
+
         ),
         NavigationItem(
             label = "Dashboard",
-            icon = Icons.Default.Warning,
+            icon = R.drawable.coldoppeichartt,
             route = AllScreens.Offline.name,
-            number = 2
+            number = 2,
+            selectedIcon = R.drawable.filledcoldoppiechart
+
         ),
         NavigationItem(
             label = "Setting",
-            icon = Icons.Default.Settings,
+            icon = R.drawable.coldopsettings,
             route = AllScreens.Setting.name,
-            number  = 3,
+            number = 3,
+            selectedIcon = R.drawable.filledcoldophome
+
         )
     )
     var selectedItem by remember { mutableStateOf(items[0]) }
@@ -85,14 +107,36 @@ fun bottomNav(navControllerMain: NavController){
     Scaffold(
       bottomBar = {
           if (currentRoute != AllScreens.StoreOrRetrieve.name){
-          NavigationBar {
+          NavigationBar(modifier = Modifier.drawBehind {
+              drawLine(
+                  color = Color.Black,
+                  start = Offset(0f, 0f),
+                  end = Offset(size.width, 0f),
+                  strokeWidth = 2.dp.toPx()
+              )
+          }, containerColor = Color.White , tonalElevation = 7.dp) {
           items.forEach { navigationItem ->
           NavigationBarItem(
                       selected = selectedItem == navigationItem, // Doubt
                       onClick = { navHostController.navigate(route = navigationItem.route)
                                 selectedItem = items[navigationItem.number]},
-                      icon ={ Icon(imageVector = navigationItem.icon, contentDescription = "")},
-                      label = {Text(text = navigationItem.label)})
+                      icon ={ Icon(painter = if(selectedItem == navigationItem) painterResource(id = navigationItem.selectedIcon ) else painterResource(id = navigationItem.icon), contentDescription = "" ,
+                          modifier = Modifier
+                              .background(
+                                  color = if (selectedItem == navigationItem) primeGreen else Color.Transparent,
+                                  shape = RoundedCornerShape(8.dp)
+                              )
+                              .padding(8.dp)
+                              .size(33.dp)
+                              ,
+                          tint = if (selectedItem == navigationItem) Color.White else Color.Unspecified
+                      )
+                            },
+              colors = NavigationBarItemDefaults.colors(
+                  selectedIconColor = Color.Unspecified,
+                  indicatorColor = Color.Transparent
+              ),
+              alwaysShowLabel = false)
 }
           } }
       }
@@ -215,6 +259,30 @@ fun bottomNav(navControllerMain: NavController){
                 OutgoingOrderSuccess(viewmodel = viewmodel , navHostController)
             }
 
+
+
+
+            composable(route = AllScreens.FirstBottomSheetIncoming.name ,
+                enterTransition = { slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth },
+                    animationSpec = tween(durationMillis = 500) // Adjust duration to make it slower
+                ) },
+                exitTransition = { slideOutHorizontally { fullWidth -> -fullWidth } },
+                popEnterTransition = { slideInHorizontally(
+                    initialOffsetX = { fullWidth -> -fullWidth },
+                    animationSpec = tween(durationMillis = 500)
+                ) },
+                popExitTransition = { slideOutHorizontally { fullWidth -> fullWidth } }){
+                FirstBottomSheet(navController = navHostController, viewmodel =viewmodel )
+            }
+
+            composable(route = AllScreens.SecondBottomSheetIncoming.name
+                ){
+                SecondBottomSheet(
+                   navController = navHostController,
+                    viewmodel = viewmodel
+                )
+            }
 
 
 
