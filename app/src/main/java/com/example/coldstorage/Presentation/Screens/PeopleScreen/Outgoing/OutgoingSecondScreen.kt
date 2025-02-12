@@ -208,7 +208,7 @@ fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
     
 }
 
-@SuppressLint("SuspiciousIndentation")
+@SuppressLint("SuspiciousIndentation", "LongLogTag")
 @Composable
 fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: NavController) {
     val transactionHistory = viewmodel.transactionHistory.collectAsState()
@@ -599,10 +599,9 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
                             if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! < pair.currentQuantity.toInt()) {
 
                                 val existingItem = outgoingResponseBody.find { it.orderId == pair.orderId }
-
                                 if (existingItem != null) {
                                     val existingBagSize = existingItem.bagUpdates.find { it?.size == pair.size }
-
+                                    Log.d("Outgoingsecscrn" ,existingBagSize.toString() )
                                     if (existingBagSize != null) {
                                         val updatedBagWithOldBag = existingBagSize.copy(quantityToRemove = textFieldValue.text.toInt())
                                         val updatedBagUpdates = existingItem.bagUpdates.toMutableList().apply {
@@ -612,6 +611,8 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
                                         val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
                                         val index = outgoingResponseBody.indexOf(existingItem)
                                         if (index != -1) outgoingResponseBody[index] = updatedElement
+                                        Log.d("OutgoingsecscrnResponseBody" ,outgoingResponseBody.toString() )
+
                                     } else {
                                         val updatedBagUpdates = existingItem.bagUpdates.toMutableList().apply {
                                             pair.size?.let { add(BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt())) }
@@ -632,10 +633,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
                                                     pair.size?.let { BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt()) }
                                                 )
                                             )
-                                    )
-
-
-                                }
+                                    ) }
 
 
                             } else{

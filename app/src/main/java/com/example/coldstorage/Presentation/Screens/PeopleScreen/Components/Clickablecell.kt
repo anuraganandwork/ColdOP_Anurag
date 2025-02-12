@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Surface
@@ -31,82 +34,106 @@ import androidx.compose.ui.unit.sp
 import com.example.coldstorage.ui.theme.primeRed
 
 @Composable
-fun ClickableBlock(cell: String , cellTwo:String ,  isSelected: Boolean,
-                   onToggle: (Boolean) -> Unit , saveSelected:()-> Unit) {
+fun ClickableBlock(
+    cell: String,
+    cellTwo: String,
+    qtyToRemove: String,
+    isSelected: Boolean,
+    onToggle: (Boolean) -> Unit,
+    saveSelected: () -> Unit
+) {
     // Individual state for each block's background color
     var selectedBlock = remember { mutableStateOf(Color.White) }
 
-    Surface(modifier = Modifier
-        .width(43.dp)
-        .height(43.dp)
-        .padding(start = 6.dp, top = 3.dp, end = 4.dp)
-
-        .clickable {
-
-            onToggle(!isSelected)
+    Surface(
+        modifier = Modifier
+            .width(43.dp)
+            .height(43.dp)
+            .padding(start = 6.dp, top = 3.dp, end = 4.dp)
+            .clickable {
+                onToggle(!isSelected)
                 saveSelected()
-
-//yhi pe dikkat hai
-
-        } ,
-        //color = primeRed
+            }
     ) {
-        Column(
-            modifier = Modifier
-                .width(43.dp)
-                .height(43.dp)
-                .background(
-
-                    color = if (isSelected) Color.Green else Color.White,
-                    shape = RoundedCornerShape(4.dp)
-                )
-                .border(
-                    width = 1.dp,
-                    color = if (cell.toInt() > 0) Color.Green else Color.Gray, // Provide a valid color
-                    shape = RoundedCornerShape(4.dp)
-                )
-
-
-        ) {
-            Box(
+        Column {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f), // Takes up half the available height
-                contentAlignment = Alignment.Center
+                    .width(43.dp)
+                    .height(43.dp)
+                    .background(
+                        color = if (isSelected) Color.Green else Color.White,
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = if (cell.toInt() > 0) Color.Green else Color.Gray,
+                        shape = RoundedCornerShape(4.dp)
+                    )
             ) {
-                Text(
-                    text = cell,
-                    fontSize = 9.sp,
-                    textAlign = TextAlign.Center,
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f), // Takes up half the available height
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = cell,
+                        fontSize = 9.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+
+                Divider(
+                    thickness = 1.dp,
+                    color = Color.Black,
+                    modifier = Modifier.padding(horizontal = 1.dp)
                 )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f), // Takes up the other half of the height
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = cellTwo,
+                        fontSize = 9.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
 
-            Divider(
-                thickness = 1.dp,
-                color = Color.Black,
-                modifier = Modifier.padding(horizontal = 1.dp)
-            )
-
+            // Position the qtyToRemove badge in the bottom right corner
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f), // Takes up the other half of the height
-                contentAlignment = Alignment.Center
+                    //.align(Alignment.BottomEnd)
+                    .offset(x = 12.dp, y = 12.dp) // Adjust position for the badge
             ) {
-                Text(
-                    text = cellTwo,
-                    fontSize = 9.sp,
-                    textAlign = TextAlign.Center,
-                )
+                Box(
+                    modifier = Modifier
+                        .size(20.dp) // Badge size
+                        .background(
+                            color = Color.Red,
+                            shape = CircleShape
+                        )
+                        .align(Alignment.Center)
+                ) {
+                    Text(
+                        text = qtyToRemove,
+                        fontSize = 10.sp,
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
-
         }
     }
 }
-@Preview
-@Composable
-fun pppppp(){
-    ClickableBlock(cell = "44", cellTwo = "34", isSelected = false , onToggle ={} ) {
 
-    }
-}
+//@Preview
+//@Composable
+//fun pppppp(){
+//    ClickableBlock(cell = "44", cellTwo = "34", isSelected = false , onToggle ={} ) {
+//
+//    }
+//}
