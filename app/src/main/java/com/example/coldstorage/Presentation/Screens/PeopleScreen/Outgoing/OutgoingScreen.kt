@@ -430,18 +430,75 @@ Column(modifier = Modifier
         ) {
         item {
             Row(Modifier.fillMaxWidth()) {
-                headers.forEach { header ->
-                    Log.d("OutgoingTable", rows.toString())
+//                headers.forEach { header ->
+//                    Log.d("OutgoingTable", rows.toString())
+//
+//                    Text(
+//                        text = header,
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 8.sp,
+//
+//                        modifier = Modifier.weight(1f),
+//                        textAlign = TextAlign.Center
+//                    )
+//                }
+                Text(
+                    text = headers[0],
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.sp,
 
-                    Text(
-                        text = header,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 8.sp,
+                    modifier = Modifier.weight(.6f),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = headers[1],
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.sp,
 
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Center
-                    )
-                }
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = headers[2],
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.sp,
+
+                    modifier = Modifier.weight(.8f),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = headers[3],
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.sp,
+
+                    modifier = Modifier.weight(.8f),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = headers[4],
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.sp,
+
+                    modifier = Modifier.weight(.8f),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = headers[5],
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.sp,
+
+                    modifier = Modifier.weight(.8f),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = headers[6],
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.sp,
+
+                    modifier = Modifier.weight(.8f),
+                    textAlign = TextAlign.Center
+                )
+
             }
         }
 //val _row = rows.filter{ it.variety == selectedVariety}
@@ -451,14 +508,15 @@ Column(modifier = Modifier
             //val row = _row[rowIndex]
             Log.d("Outgoingggrgrgrgrgrgrgr", row.toString())
 if(row!= null){
-            Row(Modifier.fillMaxWidth()) {
+            Row(Modifier.fillMaxWidth().padding(bottom = 15.dp)) {
                 Text(
                     text = row.voucherNumber.toString(), // First column - voucher number
                     modifier = Modifier
                         .padding(start = 3.dp)
-                        .width(15.dp)
-                       // .background(primeRed)
-                    ,                    fontSize = 11.sp
+                            .weight(.6f),
+
+                    // .background(primeRed)
+                                  fontSize = 11.sp
 
                 )
 
@@ -466,8 +524,8 @@ if(row!= null){
                     text = row.variety, // Second column - variety
                     modifier = Modifier
                         .padding(start = 3.dp)
-                        .width(50.dp)
-                        ,
+                        .weight(1f),
+
                     fontSize = 11.sp
                 )
 //                listOf(row.size, row.currentQuantity /* Add other fields if needed */).forEachIndexed { index, cell ->
@@ -488,19 +546,19 @@ if(row!= null){
                 val qtyToRemoveZero = remember{
                     mutableStateOf("0")
                 }
-                ClickableBlock(
-                    cell = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0",
-                    cellTwo = row.size.getOrNull(0)?.quantity?.initialQuantity?.toString() ?: "0",
-                    qtyToRemove = qtyToRemoveZero.value ,
+                Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
+                    ClickableBlock(
+                        cell = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0",
+                        cellTwo = row.size.getOrNull(0)?.quantity?.initialQuantity?.toString() ?: "0",
+                        qtyToRemove = qtyToRemoveZero.value,
+                        isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
+                        onToggle = { isSelected ->
+                           // selectedCells[Pair(rowIndex, 2)] = isSelected
+                            openDailogForQtyRemovedZero.value = true
+                        },
 
-                    isSelected = selectedCells[Pair(rowIndex, 2)]
-                        ?: false, // Use +2 to skip the first two columns
-                    onToggle = { isSelected ->
-                        selectedCells[Pair(rowIndex, 2)] = isSelected
-                        openDailogForQtyRemovedZero.value = true
-                    } ,saveSelected = {
-                       // if(selectedCells[Pair(rowIndex, 2)] == true){
-                            if(selectedCellsList.contains( SelectedCellData(
+                        saveSelected = {
+                            if(selectedCellsList.contains(SelectedCellData(
                                     orderId = row.orderId,
                                     voucherNumber = row.voucherNumber,
                                     variety = row.variety,
@@ -508,7 +566,6 @@ if(row!= null){
                                     address = row.address,
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                 ))){
                                 selectedCellsList.remove(SelectedCellData(
                                     orderId = row.orderId,
@@ -518,9 +575,8 @@ if(row!= null){
                                     address = row.address,
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                 ))
-                                } else{
+                            } else {
                                 selectedCellsList.add(
                                     SelectedCellData(
                                         orderId = row.orderId,
@@ -530,15 +586,30 @@ if(row!= null){
                                         address = row.address,
                                         dateOfSubmission = row.dateOfSubmission,
                                         currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                     )
                                 )
-                                }
+                            }
+                        }
+                    )
 
-                      //  }
-
+                    if(qtyToRemoveZero.value != "0" && qtyToRemoveZero.value.length>0) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
+                                .background(color = Color.Red, shape = CircleShape)
+                                .align(Alignment.BottomEnd),  // Changed to BottomEnd for bottom-right positioning
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = qtyToRemoveZero.value,
+                                fontSize = 10.sp,
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
-                )
+                }
                 if(openDailogForQtyRemovedZero.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedZero.value = false }, confirmButton = { /*TODO*/ } , text={
                          Column {
@@ -578,30 +649,30 @@ if(row!= null){
 
 
                 }
-                if(qtyToRemoveZero.value !== "0"){
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp) // Badge size
-                            .background(
-                                color = Color.Red,
-                                shape = CircleShape
-                            )
-                    ) {
-                        Text(
-                            text = qtyToRemoveZero.value,
-                            fontSize = 10.sp,
-                            color = Color.White,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                }
+//                if(qtyToRemoveZero.value !== "0"){
+//                    Box(
+//                        modifier = Modifier
+//                            .size(20.dp) // Badge size
+//                            .background(
+//                                color = Color.Red,
+//                                shape = CircleShape
+//                            )
+//                    ) {
+//                        Text(
+//                            text = qtyToRemoveZero.value,
+//                            fontSize = 10.sp,
+//                            color = Color.White,
+//                            modifier = Modifier.align(Alignment.Center)
+//                        )
+//                    }
+//                }
 
 
 
 
 
 
-
+// second cell
 
                 val openDailogForQtyRemovedOne = remember {
                     mutableStateOf(false)
@@ -609,21 +680,18 @@ if(row!= null){
                 val qtyToRemoveOne = remember{
                     mutableStateOf("0")
                 }
-                ClickableBlock(
-                    cell = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0",
-                    cellTwo = row.size.getOrNull(1)?.quantity?.initialQuantity?.toString() ?: "0",
-                    qtyToRemove = qtyToRemoveOne.value ,
-
-                    isSelected = selectedCells[Pair(rowIndex, 3)]
-                        ?: false, // Use +2 to skip the first two columns
-                    onToggle = { isSelected ->
-                        selectedCells[Pair(rowIndex, 3)] = isSelected
-                        openDailogForQtyRemovedOne.value = true
-
-                    },
-                    saveSelected =  {
-                      //  if(selectedCells[Pair(rowIndex, 3)] == true){
-                            if(selectedCellsList.contains( SelectedCellData(
+                Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
+                    ClickableBlock(
+                        cell = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0",
+                        cellTwo = row.size.getOrNull(1)?.quantity?.initialQuantity?.toString() ?: "0",
+                        qtyToRemove = qtyToRemoveOne.value,
+                        isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
+                        onToggle = { isSelected ->
+                            //selectedCells[Pair(rowIndex, 2)] = isSelected
+                            openDailogForQtyRemovedOne.value = true
+                        },
+                        saveSelected = {
+                            if(selectedCellsList.contains(SelectedCellData(
                                     orderId = row.orderId,
                                     voucherNumber = row.voucherNumber,
                                     variety = row.variety,
@@ -631,7 +699,6 @@ if(row!= null){
                                     address = row.address,
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                 ))){
                                 selectedCellsList.remove(SelectedCellData(
                                     orderId = row.orderId,
@@ -641,9 +708,8 @@ if(row!= null){
                                     address = row.address,
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                 ))
-                            } else{
+                            } else {
                                 selectedCellsList.add(
                                     SelectedCellData(
                                         orderId = row.orderId,
@@ -653,15 +719,30 @@ if(row!= null){
                                         address = row.address,
                                         dateOfSubmission = row.dateOfSubmission,
                                         currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                     )
                                 )
                             }
+                        }
+                    )
 
-                       // }
-
+                    if(qtyToRemoveOne.value != "0" && qtyToRemoveOne.value.length>0) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
+                                .background(color = Color.Red, shape = CircleShape)
+                                .align(Alignment.BottomEnd),  // Position at top-right corner
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = qtyToRemoveOne.value,
+                                fontSize = 10.sp,
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
-                )
+                }
                 if(openDailogForQtyRemovedOne.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedOne.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
@@ -704,23 +785,23 @@ if(row!= null){
 
 
                 }
-                if(qtyToRemoveOne.value !== "0"){
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp) // Badge size
-                            .background(
-                                color = Color.Red,
-                                shape = CircleShape
-                            )
-                    ) {
-                        Text(
-                            text = qtyToRemoveOne.value,
-                            fontSize = 10.sp,
-                            color = Color.White,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                }
+//                if(qtyToRemoveOne.value !== "0"){
+//                    Box(
+//                        modifier = Modifier
+//                            .size(20.dp) // Badge size
+//                            .background(
+//                                color = Color.Red,
+//                                shape = CircleShape
+//                            )
+//                    ) {
+//                        Text(
+//                            text = qtyToRemoveOne.value,
+//                            fontSize = 10.sp,
+//                            color = Color.White,
+//                            modifier = Modifier.align(Alignment.Center)
+//                        )
+//                    }
+//                }
 
 
                 val openDailogForQtyRemovedTwo = remember {
@@ -730,21 +811,18 @@ if(row!= null){
                     mutableStateOf("0")
                 }
 
-                ClickableBlock(
-                    cell = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0",
-                    cellTwo = row.size.getOrNull(2)?.quantity?.initialQuantity?.toString() ?: "0",
-                    qtyToRemove = qtyToRemoveTwo.value ,
-
-                    isSelected = selectedCells[Pair(rowIndex, 4)]
-                        ?: false, // Use +2 to skip the first two columns
-                    onToggle = { isSelected ->
-                        selectedCells[Pair(rowIndex, 4)] = isSelected
-                        openDailogForQtyRemovedTwo.value = true
-
-                    },
-                    saveSelected = {
-                       // if(selectedCells[Pair(rowIndex, 4)] == true){
-                            if(selectedCellsList.contains( SelectedCellData(
+                Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
+                    ClickableBlock(
+                        cell = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0",
+                        cellTwo = row.size.getOrNull(2)?.quantity?.initialQuantity?.toString() ?: "0",
+                        qtyToRemove = qtyToRemoveTwo.value,
+                        isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
+                        onToggle = { isSelected ->
+                          //  selectedCells[Pair(rowIndex, 2)] = isSelected
+                            openDailogForQtyRemovedTwo.value = true
+                        },
+                        saveSelected = {
+                            if(selectedCellsList.contains(SelectedCellData(
                                     orderId = row.orderId,
                                     voucherNumber = row.voucherNumber,
                                     variety = row.variety,
@@ -752,7 +830,6 @@ if(row!= null){
                                     address = row.address,
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                 ))){
                                 selectedCellsList.remove(SelectedCellData(
                                     orderId = row.orderId,
@@ -762,9 +839,8 @@ if(row!= null){
                                     address = row.address,
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                 ))
-                            } else{
+                            } else {
                                 selectedCellsList.add(
                                     SelectedCellData(
                                         orderId = row.orderId,
@@ -774,15 +850,30 @@ if(row!= null){
                                         address = row.address,
                                         dateOfSubmission = row.dateOfSubmission,
                                         currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                     )
                                 )
                             }
+                        }
+                    )
 
-                       // }
-
+                    if(qtyToRemoveTwo.value != "0"  && qtyToRemoveTwo.value.length>0) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
+                                .background(color = Color.Red, shape = CircleShape)
+                                .align(Alignment.BottomEnd),  // Position at top-right corner
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = qtyToRemoveTwo.value,
+                                fontSize = 10.sp,
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
-                )
+                }
                 if(openDailogForQtyRemovedTwo.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedTwo.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
@@ -822,23 +913,23 @@ if(row!= null){
 
 
                 }
-                if(qtyToRemoveTwo.value !== "0"){
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp) // Badge size
-                            .background(
-                                color = Color.Red,
-                                shape = CircleShape
-                            )
-                    ) {
-                        Text(
-                            text = qtyToRemoveTwo.value,
-                            fontSize = 10.sp,
-                            color = Color.White,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                }
+//                if(qtyToRemoveTwo.value !== "0"){
+//                    Box(
+//                        modifier = Modifier
+//                            .size(20.dp) // Badge size
+//                            .background(
+//                                color = Color.Red,
+//                                shape = CircleShape
+//                            )
+//                    ) {
+//                        Text(
+//                            text = qtyToRemoveTwo.value,
+//                            fontSize = 10.sp,
+//                            color = Color.White,
+//                            modifier = Modifier.align(Alignment.Center)
+//                        )
+//                    }
+//                }
 
 
                 val openDailogForQtyRemovedThree = remember {
@@ -848,21 +939,18 @@ if(row!= null){
                     mutableStateOf("0")
                 }
 
-                ClickableBlock(
-                    cell = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0",
-                    cellTwo = row.size.getOrNull(3)?.quantity?.initialQuantity?.toString() ?: "0",
-                    qtyToRemove = qtyToRemoveThree.value ,
-
-                    isSelected = selectedCells[Pair(rowIndex, 5)]
-                        ?: false, // Use +2 to skip the first two columns
-                    onToggle = { isSelected ->
-                        selectedCells[Pair(rowIndex, 5)] = isSelected
-                        openDailogForQtyRemovedThree.value = true
-
-                    },
-                    saveSelected = {
-                       // if(selectedCells[Pair(rowIndex, 5)] == true){
-                            if(selectedCellsList.contains( SelectedCellData(
+                Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
+                    ClickableBlock(
+                        cell = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0",
+                        cellTwo = row.size.getOrNull(3)?.quantity?.initialQuantity?.toString() ?: "0",
+                        qtyToRemove = qtyToRemoveThree.value,
+                        isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
+                        onToggle = { isSelected ->
+                           // selectedCells[Pair(rowIndex, 2)] = isSelected
+                            openDailogForQtyRemovedThree.value = true
+                        },
+                        saveSelected = {
+                            if(selectedCellsList.contains(SelectedCellData(
                                     orderId = row.orderId,
                                     voucherNumber = row.voucherNumber,
                                     variety = row.variety,
@@ -870,7 +958,6 @@ if(row!= null){
                                     address = row.address,
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                 ))){
                                 selectedCellsList.remove(SelectedCellData(
                                     orderId = row.orderId,
@@ -880,9 +967,8 @@ if(row!= null){
                                     address = row.address,
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                 ))
-                            } else{
+                            } else {
                                 selectedCellsList.add(
                                     SelectedCellData(
                                         orderId = row.orderId,
@@ -892,15 +978,30 @@ if(row!= null){
                                         address = row.address,
                                         dateOfSubmission = row.dateOfSubmission,
                                         currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                     )
                                 )
                             }
+                        }
+                    )
 
-                       // }
-
+                    if(qtyToRemoveThree.value != "0" && qtyToRemoveThree.value.length>0) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
+                                .background(color = Color.Red, shape = CircleShape)
+                                .align(Alignment.BottomEnd),  // Position at top-right corner
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = qtyToRemoveThree.value,
+                                fontSize = 10.sp,
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
-                )
+                }
                 //Spacer(modifier = Modifier.padding(start = 3.dp))
                 if(openDailogForQtyRemovedThree.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedThree.value = false }, confirmButton = { /*TODO*/ } , text={
@@ -942,23 +1043,23 @@ if(row!= null){
 
 
                 }
-                if(qtyToRemoveThree.value !== "0"){
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp) // Badge size
-                            .background(
-                                color = Color.Red,
-                                shape = CircleShape
-                            )
-                    ) {
-                        Text(
-                            text = qtyToRemoveThree.value,
-                            fontSize = 10.sp,
-                            color = Color.White,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                }
+//                if(qtyToRemoveThree.value !== "0"){
+//                    Box(
+//                        modifier = Modifier
+//                            .size(20.dp) // Badge size
+//                            .background(
+//                                color = Color.Red,
+//                                shape = CircleShape
+//                            )
+//                    ) {
+//                        Text(
+//                            text = qtyToRemoveThree.value,
+//                            fontSize = 10.sp,
+//                            color = Color.White,
+//                            modifier = Modifier.align(Alignment.Center)
+//                        )
+//                    }
+//                }
 
 
 
@@ -970,19 +1071,18 @@ if(row!= null){
                     mutableStateOf("0")
                 }
 
-                ClickableBlock(
-                    cell = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0",
-                    cellTwo = row.size.getOrNull(4)?.quantity?.initialQuantity?.toString() ?: "0",
-                    qtyToRemove = qtyToRemoveFour.value ,
-                    isSelected = selectedCells[Pair(rowIndex, 6)]
-                        ?: false, // Use +2 to skip the first two columns
-                    onToggle = { isSelected ->
-                        selectedCells[Pair(rowIndex, 6)] = isSelected
-                        openDailogForQtyRemovedFour.value = true
-
-                    },saveSelected =  {
-                       // if(selectedCells[Pair(rowIndex, 6)] == true){
-                            if(selectedCellsList.contains( SelectedCellData(
+                Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
+                    ClickableBlock(
+                        cell = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0",
+                        cellTwo = row.size.getOrNull(4)?.quantity?.initialQuantity?.toString() ?: "0",
+                        qtyToRemove = qtyToRemoveZero.value,
+                        isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
+                        onToggle = { isSelected ->
+                            //selectedCells[Pair(rowIndex, 2)] = isSelected
+                            openDailogForQtyRemovedFour.value = true
+                        },
+                        saveSelected = {
+                            if(selectedCellsList.contains(SelectedCellData(
                                     orderId = row.orderId,
                                     voucherNumber = row.voucherNumber,
                                     variety = row.variety,
@@ -990,7 +1090,6 @@ if(row!= null){
                                     address = row.address,
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                 ))){
                                 selectedCellsList.remove(SelectedCellData(
                                     orderId = row.orderId,
@@ -1000,9 +1099,8 @@ if(row!= null){
                                     address = row.address,
                                     dateOfSubmission = row.dateOfSubmission,
                                     currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                 ))
-                            } else{
+                            } else {
                                 selectedCellsList.add(
                                     SelectedCellData(
                                         orderId = row.orderId,
@@ -1012,15 +1110,30 @@ if(row!= null){
                                         address = row.address,
                                         dateOfSubmission = row.dateOfSubmission,
                                         currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
-
                                     )
                                 )
                             }
+                        }
+                    )
 
-                       // }
-
+                    if(qtyToRemoveFour.value != "0" && qtyToRemoveFour.value.length>0) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
+                                .background(color = Color.Red, shape = CircleShape)
+                                .align(Alignment.BottomEnd),  // Position at top-right corner
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = qtyToRemoveFour.value,
+                                fontSize = 10.sp,
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
-                )
+                }
                 if(openDailogForQtyRemovedFour.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedFour.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
@@ -1062,23 +1175,23 @@ if(row!= null){
 
 
                 }
-                if(qtyToRemoveFour.value !== "0"){
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp) // Badge size
-                            .background(
-                                color = Color.Red,
-                                shape = CircleShape
-                            )
-                    ) {
-                        Text(
-                            text = qtyToRemoveFour.value,
-                            fontSize = 10.sp,
-                            color = Color.White,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                }
+//                if(qtyToRemoveFour.value !== "0"){
+//                    Box(
+//                        modifier = Modifier
+//                            .size(20.dp) // Badge size
+//                            .background(
+//                                color = Color.Red,
+//                                shape = CircleShape
+//                            )
+//                    ) {
+//                        Text(
+//                            text = qtyToRemoveFour.value,
+//                            fontSize = 10.sp,
+//                            color = Color.White,
+//                            modifier = Modifier.align(Alignment.Center)
+//                        )
+//                    }
+//                }
 
 //                val totalQuantity = row.size
 //                    .take(5) // Take the first 5 elements or fewer if the list is smaller
