@@ -3,7 +3,6 @@ package com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 
@@ -19,7 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,14 +28,12 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -53,7 +49,6 @@ import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.OutgoingData.BagUpdate
 import com.example.coldstorage.DataLayer.Api.OutgoingData.MainOutgoingOrderClass
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
-import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Location
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.finalConfirmation
@@ -69,12 +64,14 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navController: NavController) {
+fun OutgoingSecondScreen(accNum: String, viewmodel: FunctionStoreOwner, navController: NavController) {
     var seedBags by remember { mutableStateOf("0") }
     var rationBags by remember { mutableStateOf("0") }
     var no12Bags by remember { mutableStateOf("0") }
     var cutTokBags by remember { mutableStateOf("0") }
-    var goliBags by remember { mutableStateOf("0") }
+    var remarks by remember { mutableStateOf("0") }
+    val mainOutgoingBody: MutableState<MainOutgoingOrderClass>  = remember {
+        mutableStateOf(MainOutgoingOrderClass(remarks = "/" , orders = emptyList() ))    }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val showBottomSheet = remember {
@@ -83,6 +80,9 @@ fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navCo
     val showAlertConfirmation = remember {
         mutableStateOf(false)
     }
+    val OutgoingOrderLoader by viewmodel.outgoingOrderLoader.collectAsState()
+    val OutgoingOrderStatus by viewmodel.outgoingOrderStatus.collectAsState()
+
     val onApiSuccess: () -> Unit = {
         Log.d("OnnApiSuccess" , showBottomSheet.value.toString())
         //showAlertConfirmation.value = true
@@ -94,9 +94,37 @@ fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navCo
 
 
     val totalSeedBags = mutableStateOf<String>("")
+    val retrievedData by viewmodel.retrievedSelectedData.collectAsState()
+    Log.d("SelectedCellData" , retrievedData.toString())
+    val keyboardController = LocalSoftwareKeyboardController.current
 
 
+    LaunchedEffect(Unit){
 
+        // viewmodel.getAllRecipts(accNum)
+        viewmodel.retrieveSelectedCellData()
+
+        Log.d("OutgoingSh" , viewmodel.getTheSelectedStock().toString())
+        Log.d("OutgoingSh" , viewmodel.getTheSelectedIndex().toString())
+//        selectedCellData?.let {
+//            // Use the retrieved data
+//            Log.d("SelectedDataaaaa", "Order ID: ${it.orderId}, Voucher Number: ${it.voucherNumber} , size: ${it.size}")
+//        } ?: run {
+//            Log.d("SelectedDataaaaa", "No selected data found.")
+//        }
+
+    }
+
+    LaunchedEffect(OutgoingOrderStatus ){
+        if(OutgoingOrderStatus){
+            Log.d("Hello outgiggigigig" , OutgoingOrderStatus.toString())
+            if (keyboardController != null) {
+                keyboardController.hide()
+            }
+            navController.navigate(AllScreens.OutgoingScreenSuccess.name)
+            viewmodel.resetOrderOtgoingResult()
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -126,14 +154,75 @@ fun OutgoingSecondScreen(accNum : String , viewmodel: FunctionStoreOwner , navCo
 //        InputField("Goli Bags", goliBags) { goliBags = it }
 
         Spacer(modifier = Modifier.height(16.dp))
+        if(retrievedData != null){
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1.25f) // This makes the table take the remaining space
-        ) {
-            StockTablee(accNum ,viewmodel , navController)
+            Spacer(modifier = Modifier.padding(27.dp))
+            Spacer(modifier = Modifier.padding(6.dp))
+            retrievedData!!.forEach {
+              it.bagUpdates.forEach {bags->
+                  Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween) {
+                      Text(text = bags.size)
+                      Text(text = bags.quantityToRemove.toString())
+                  }
+              }
+            }
+            Button(
+                onClick = {
+                    Log.d("OutgoingSuccess" , "Pressed button")
+                    // showBottomSheet.value = true
+                    if(retrievedData!= null){
+                    mainOutgoingBody.value = MainOutgoingOrderClass(
+                        remarks = remarks,
+                        orders = retrievedData!!
+                    )}
+                    try{
+                        viewmodel.confirmOutgoingOrderForUi(accNum ,mainOutgoingBody.value)
+
+                        viewmodel.clearSelectedCellData()
+                        //viewmodel.clearSelectedCells()
+                        Log.d("OutgoingInTry" , "Pressedsffd button")
+
+                    }catch (e:Exception){
+                        Log.d("innnnnn" , e.message.toString())
+                    }
+
+                    //   navController.navigate(AllScreens.OutgoingScreenSuccess.name)
+                    //  openConfirmSheet(true)
+                },
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .width(150.dp)
+                    .height(40.dp), colors = ButtonDefaults.buttonColors(containerColor = primeGreen , contentColor = Color.White)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center, // Centers the content within the Box
+                    modifier = Modifier.fillMaxSize(),
+                    // Ensures Box takes full size of Surface
+                ) {
+                    if (OutgoingOrderLoader) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp), // Small size for the indicator
+                            color = Color.Black
+                        )
+                    } else {
+                        Text(
+                            text = "Continue",
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 10.dp)
+                        )
+                    }
+                }
+            }
+        
         }
+       
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .weight(1.25f) // This makes the table take the remaining space
+//        ) {
+//            //StockTablee(accNum ,viewmodel , navController)
+//        }
         Spacer(modifier = Modifier.height(16.dp))
        if(showAlertConfirmation.value){
 //           AlertDialog(onDismissRequest = { /*TODO*/ }, confirmButton = { /*TODO*/ } ,
@@ -216,7 +305,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
 
     LaunchedEffect(Unit){
 
-        viewmodel.getAllRecipts(accNum)
+       // viewmodel.getAllRecipts(accNum)
         viewmodel.retrieveSelectedCellData()
 
         Log.d("OutgoingSh" , viewmodel.getTheSelectedStock().toString())
@@ -230,9 +319,8 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
 
     }
 
-    val OutgoingOrderLoader by viewmodel.outgoingOrderLoader.collectAsState()
-    val OutgoingOrderStatus by viewmodel.outgoingOrderStatus.collectAsState()
-    val orderOutgoingResult by viewmodel.orderOutgoingResult.collectAsState()
+
+     val orderOutgoingResult by viewmodel.orderOutgoingResult.collectAsState()
 
 //    LaunchedEffect(orderOutgoingResult) {
 //        //1230
@@ -366,16 +454,20 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
     val keyboardController = LocalSoftwareKeyboardController.current
 
 
-    LaunchedEffect(OutgoingOrderStatus ){
-        if(OutgoingOrderStatus){
-            Log.d("Hello outgiggigigig" , OutgoingOrderStatus.toString())
-            if (keyboardController != null) {
-                keyboardController.hide()
-            }
-            navController.navigate(AllScreens.OutgoingScreenSuccess.name)
-            viewmodel.resetOrderOtgoingResult()
-        }
-    }
+//    LaunchedEffect(OutgoingOrderStatus ){
+//        if(OutgoingOrderStatus){
+//            Log.d("Hello outgiggigigig" , OutgoingOrderStatus.toString())
+//            if (keyboardController != null) {
+//                keyboardController.hide()
+//            }
+//            navController.navigate(AllScreens.OutgoingScreenSuccess.name)
+//            viewmodel.resetOrderOtgoingResult()
+//        }
+//    }
+
+
+
+
 
     val field  = remember{
         mutableStateOf("")
@@ -503,241 +595,11 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
 //            }
 //        }
         if(retrievedData != null){
-        LazyColumn {
-            items(retrievedData!!) { pair ->
-                Log.d("Rowwww" ,voucherBagSizePairs.toString())
 
-                val keyboardController = LocalSoftwareKeyboardController.current
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = pair.voucherNumber.toString(),
-                        modifier = Modifier.width(35.dp)
-                        // .background(primeRed)
-                        ,
-                        fontSize = 11.sp,
-                        textAlign = TextAlign.Center
-
-                    )
-                    Text(
-                        text = "${pair.address}",
-                        //text = pair.address,
-                        modifier = Modifier.width(60.dp)
-                        //.background(primeGreen)
-                        ,
-                        fontSize = 11.sp,
-                        textAlign = TextAlign.Center
-
-                    )
-                    pair.size?.let {
-                        Text(
-                            text = it,
-                            modifier = Modifier.width(90.dp)
-                            //.background(primeRed)
-                            ,
-                            fontSize = 11.sp,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    Text(
-                        text = pair.currentQuantity.toString(),
-                        modifier = Modifier.width(50.dp)
-                        //  .background(primeGreen)
-                        ,
-                        fontSize = 11.sp,
-                        textAlign = TextAlign.Center
-
-                    )
-//                    BasicTextField(
-//                        value = quantityValues[pair to pair.bagSize] ?: "",
-//                        onValueChange = { newValue ->
-//                            quantityValues = quantityValues.toMutableMap().apply {
-//                                put(pair.voucherNum to pair.bagSize, newValue)
-//                            }
-//                        },
-//                        modifier = Modifier
-//                            .width(80.dp)
-//                            .height(40.dp)
-//                            .border(1.dp, Color.Gray, RoundedCornerShape(5.dp)),
-//                        textStyle = TextStyle(
-//                            textAlign = TextAlign.Center,
-//                            fontSize = 12.sp
-//                        ),
-//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                        maxLines = 1,
-//                        decorationBox = { innerTextField ->
-//                            Box(
-//                                contentAlignment = Alignment.Center,
-//                                modifier = Modifier.fillMaxSize()
-//                            ) {
-//                                innerTextField()
-//                            }
-//                        }
-//                    )
-                    val coroutineScope = rememberCoroutineScope()
-                    var debounceJob by remember { mutableStateOf<Job?>(null) }
-                    var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
-
-                    Column {
-                        if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! > pair.currentQuantity.toInt()) {
-                            Text(text = "*Error", color = primeRed, fontSize = 11.sp)
-                        }
-
-
-                    BasicTextField(value = textFieldValue, onValueChange = { newValue ->
-                        textFieldValue = newValue
-
-                        debounceJob?.cancel()
-                        debounceJob = coroutineScope.launch {
-                            delay(20)
-                            if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! < pair.currentQuantity.toInt()) {
-
-                                val existingItem = outgoingResponseBody.find { it.orderId == pair.orderId }
-                                if (existingItem != null) {
-                                    val existingBagSize = existingItem.bagUpdates.find { it?.size == pair.size }
-                                    Log.d("Outgoingsecscrn" ,existingBagSize.toString() )
-                                    if (existingBagSize != null) {
-                                        val updatedBagWithOldBag = existingBagSize.copy(quantityToRemove = textFieldValue.text.toInt())
-                                        val updatedBagUpdates = existingItem.bagUpdates.toMutableList().apply {
-                                            val indexOfBag = indexOf(existingBagSize)
-                                            if (indexOfBag != -1) this[indexOfBag] = updatedBagWithOldBag
-                                        }
-                                        val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
-                                        val index = outgoingResponseBody.indexOf(existingItem)
-                                        if (index != -1) outgoingResponseBody[index] = updatedElement
-                                        Log.d("OutgoingsecscrnResponseBody" ,outgoingResponseBody.toString() )
-
-                                    } else {
-                                        val updatedBagUpdates = existingItem.bagUpdates.toMutableList().apply {
-                                            pair.size?.let { add(BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt())) }
-                                        }
-
-                                        val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
-                                        val index = outgoingResponseBody.indexOf(existingItem)
-                                        if (index != -1) outgoingResponseBody[index] = updatedElement
-                                    }
-                                } else {
-                                    // Add a new order with the bag size
-                                    outgoingResponseBody.add(
-
-                                        OutgoingDataClassItem(
-                                                orderId = pair.orderId,
-                                                variety = pair.variety,
-                                                bagUpdates = listOf(
-                                                    pair.size?.let { BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt()) }
-                                                )
-                                            )
-                                    ) }
-
-
-                            } else{
-                                Toast.makeText(context, "Please a enter a value less than ${pair.currentQuantity.toInt()}!", Toast.LENGTH_SHORT).show()
-
-                            }
-                            //keyboardController?.hide()
-
-                        }
-                    },
-                        textStyle = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        ),
-                        // Set font size to 11.sp
-
-
-                        modifier = Modifier
-                            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
-                            .width(134.dp)
-                            .height(40.dp)
-                            .padding(vertical = 2.dp),
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                if (textFieldValue.text.toIntOrNull() != null && textFieldValue.text.toIntOrNull()!! < pair.currentQuantity.toInt()) {
-
-                                    keyboardController?.hide()
-                               val existingItem =      outgoingResponseBody.find {it.orderId == pair.orderId}
-
-                                if(existingItem!= null){
-                                val updatedBagUpdates =     existingItem.bagUpdates.toMutableList().apply {
-                                        this.add(pair.size?.let { BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt() ) })
-//                                    pair.size?.let {
-//                                        add(BagUpdate(size = it, quantityToRemove = textFieldValue.text.toInt()))
-//                                    }
-
-                                    }
-
-                                val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
-                                    val index = outgoingResponseBody.indexOf(existingItem)
-                                    outgoingResponseBody[index] = updatedElement
-                                }else{
-                                    outgoingResponseBody.add(
-                                        OutgoingDataClassItem(
-                                            orderId = pair.orderId,
-                                            variety = pair.variety,
-                                            bagUpdates = listOf(pair.size?.let {
-                                                BagUpdate(
-                                                    it,
-                                                    textFieldValue.text.toInt()
-                                                )
-                                            })
-                                        )
-                                    )
-                                }
-
-
-                                } else{
-                                    Toast.makeText(context, "Please a enter a value less than ${pair.currentQuantity.toInt()+1}!", Toast.LENGTH_SHORT).show()
-
-                                }
-                            }
-                        ), singleLine = true,
-                        decorationBox = { innerTextField ->
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                innerTextField()
-                            }
-                        })
-                }
-
-                    var lastChangeTime by remember { mutableStateOf(System.currentTimeMillis()) }
-                    val typingTimeout = 300L // Timeout in milliseconds
-//                    LaunchedEffect(textFieldValue ){
-//                        lastChangeTime = System.currentTimeMillis()
-//                    }
-//                    LaunchedEffect(lastChangeTime) {
-//                        delay(typingTimeout)
-//                        if (System.currentTimeMillis() >= lastChangeTime + typingTimeout) {
-//                            outgoingResponseBody.add(
-//                                OutgoingDataClassItem(
-//                                    orderId = pair.orderId,
-//                                    variety = pair.variety,
-//                                    bagUpdates = listOf(pair.size?.let { BagUpdate(it, textFieldValue.text.toInt()) })
-//                                )
-//                            )                        }
-//                    }
-
-
-                }
-
-    }}
-            
             Spacer(modifier = Modifier.padding(27.dp))
 
             // add remarks here
-            Text(text = "Remarks",  fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Text(text = retrievedData.toString(),  fontSize = 14.sp, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.padding(6.dp))
 
             ColdOpTextField(value = remarks.value, onValueChange = {
@@ -779,24 +641,24 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
                     .width(150.dp)
                     .height(40.dp), colors = ButtonDefaults.buttonColors(containerColor = primeGreen , contentColor = Color.White)
             ) {
-                Box(
-                    contentAlignment = Alignment.Center, // Centers the content within the Box
-                    modifier = Modifier.fillMaxSize(),
-                    // Ensures Box takes full size of Surface
-                ) {
-                    if (OutgoingOrderLoader) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp), // Small size for the indicator
-                            color = Color.Black
-                        )
-                    } else {
-                        Text(
-                            text = "Continue",
-                            color = Color.White,
-                            modifier = Modifier.padding(horizontal = 10.dp)
-                        )
-                   }
-                }
+//                Box(
+//                    contentAlignment = Alignment.Center, // Centers the content within the Box
+//                    modifier = Modifier.fillMaxSize(),
+//                    // Ensures Box takes full size of Surface
+//                ) {
+//                    if (OutgoingOrderLoader) {
+//                        CircularProgressIndicator(
+//                            modifier = Modifier.size(20.dp), // Small size for the indicator
+//                            color = Color.Black
+//                        )
+//                    } else {
+//                        Text(
+//                            text = "Continue",
+//                            color = Color.White,
+//                            modifier = Modifier.padding(horizontal = 10.dp)
+//                        )
+//                   }
+//                }
             }
 }
 

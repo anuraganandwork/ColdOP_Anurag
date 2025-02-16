@@ -10,7 +10,7 @@ data class  SelectedCellData(
     val orderId: String,
     val voucherNumber: Int,
     val variety: String,
-    val size: String?,
+    val size: String,
     val address: String,
     val dateOfSubmission: String,
     val currentQuantity: String)

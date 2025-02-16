@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -36,8 +37,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -384,7 +387,7 @@ fun StockTable(selectedVariety:String ,fromDaybook: Boolean,accNum: String,viewm
         mutableListOf<OutgoingDataClassItem>()
     }
     val mainOutgoingBody: MutableState<MainOutgoingOrderClass>  = remember {
-        mutableStateOf(MainOutgoingOrderClass(remarks = "" , orders = emptyList() ))    }
+        mutableStateOf(MainOutgoingOrderClass(remarks = "/" , orders = emptyList() ))    }
     val OutgoingOrderLoader by viewmodel.outgoingOrderLoader.collectAsState()
 
     val OutgoingOrderStatus by viewmodel.outgoingOrderStatus.collectAsState()
@@ -455,7 +458,7 @@ Column(modifier = Modifier
                     fontWeight = FontWeight.Bold,
                     fontSize = 8.sp,
 
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1.2f),
                     textAlign = TextAlign.Center
                 )
                 Text(
@@ -524,7 +527,7 @@ if(row!= null){
                     text = row.variety, // Second column - variety
                     modifier = Modifier
                         .padding(start = 3.dp)
-                        .weight(1f),
+                        .weight(1.2f),
 
                     fontSize = 11.sp
                 )
@@ -544,7 +547,7 @@ if(row!= null){
                     mutableStateOf(false)
                 }
                 val qtyToRemoveZero = remember{
-                    mutableStateOf("0")
+                    mutableStateOf("")
                 }
                 Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
                     ClickableBlock(
@@ -558,56 +561,34 @@ if(row!= null){
                         },
 
                         saveSelected = {
-                            if(selectedCellsList.contains(SelectedCellData(
-                                    orderId = row.orderId,
-                                    voucherNumber = row.voucherNumber,
-                                    variety = row.variety,
-                                    size = row.size.getOrNull(0)?.size?.toString(),
-                                    address = row.address,
-                                    dateOfSubmission = row.dateOfSubmission,
-                                    currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
-                                ))){
-                                selectedCellsList.remove(SelectedCellData(
-                                    orderId = row.orderId,
-                                    voucherNumber = row.voucherNumber,
-                                    variety = row.variety,
-                                    size = row.size.getOrNull(0)?.size?.toString(),
-                                    address = row.address,
-                                    dateOfSubmission = row.dateOfSubmission,
-                                    currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
-                                ))
-                            } else {
-                                selectedCellsList.add(
-                                    SelectedCellData(
-                                        orderId = row.orderId,
-                                        voucherNumber = row.voucherNumber,
-                                        variety = row.variety,
-                                        size = row.size.getOrNull(0)?.size?.toString(),
-                                        address = row.address,
-                                        dateOfSubmission = row.dateOfSubmission,
-                                        currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0"
-                                    )
-                                )
-                            }
+
                         }
                     )
 
                     if(qtyToRemoveZero.value != "0" && qtyToRemoveZero.value.length>0) {
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
-                                .background(color = Color.Red, shape = CircleShape)
-                                .align(Alignment.BottomEnd),  // Changed to BottomEnd for bottom-right positioning
-                            contentAlignment = Alignment.Center
-                        ) {
+//                        Surface(
+//                            modifier = Modifier
+//                                .size(18.dp)
+//                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
+//                                .align(Alignment.BottomEnd),
+//
+//                            color = Color.Red
+//                        ) {
                             Text(
                                 text = qtyToRemoveZero.value,
-                                fontSize = 10.sp,
+                                fontSize = 8.sp,
                                 color = Color.White,
-                                modifier = Modifier.align(Alignment.Center)
+                                modifier = Modifier.offset(x = (1).dp, y = 15.dp).align(Alignment.BottomEnd)
+                                    .padding(10.dp)
+                                .background(
+                                    color = Color.Red , shape = CircleShape
+                                )  // Changed y offset to positive to move it down
+                            ,
+                                maxLines = 1,
+                                textAlign = TextAlign.Center
+
                             )
-                        }
+                       // }
                     }
                 }
                 if(openDailogForQtyRemovedZero.value){
@@ -618,7 +599,7 @@ if(row!= null){
                              row.size.getOrNull(0)?.size?.let { Text(text = it) }
                              ColdOpTextField(value = qtyToRemoveZero.value , onValueChange = {
                                   qtyToRemoveZero.value = it
-                             })
+                             }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
                              Button(onClick = {
 //                                 outgoingResponseBody.add(
 //
@@ -633,7 +614,12 @@ if(row!= null){
 //                                 )
 //                             )
                                  CoroutineScope(Dispatchers.Main).launch{
-                                     outgoingEntry(qtyToRemoveZero ,row , outgoingResponseBody , 0 )
+                                     if(qtyToRemoveZero.value.length > 0){
+                                     outgoingEntry(qtyToRemoveZero ,row , outgoingResponseBody , 0 )}
+                                     else {
+                                         outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 0 )}
+
+
                                      delay(300)
                                      openDailogForQtyRemovedZero.value = false
                                  }
@@ -678,7 +664,7 @@ if(row!= null){
                     mutableStateOf(false)
                 }
                 val qtyToRemoveOne = remember{
-                    mutableStateOf("0")
+                    mutableStateOf("")
                 }
                 Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
                     ClickableBlock(
@@ -689,39 +675,8 @@ if(row!= null){
                         onToggle = { isSelected ->
                             //selectedCells[Pair(rowIndex, 2)] = isSelected
                             openDailogForQtyRemovedOne.value = true
-                        },
-                        saveSelected = {
-                            if(selectedCellsList.contains(SelectedCellData(
-                                    orderId = row.orderId,
-                                    voucherNumber = row.voucherNumber,
-                                    variety = row.variety,
-                                    size = row.size.getOrNull(1)?.size?.toString(),
-                                    address = row.address,
-                                    dateOfSubmission = row.dateOfSubmission,
-                                    currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
-                                ))){
-                                selectedCellsList.remove(SelectedCellData(
-                                    orderId = row.orderId,
-                                    voucherNumber = row.voucherNumber,
-                                    variety = row.variety,
-                                    size = row.size.getOrNull(1)?.size?.toString(),
-                                    address = row.address,
-                                    dateOfSubmission = row.dateOfSubmission,
-                                    currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
-                                ))
-                            } else {
-                                selectedCellsList.add(
-                                    SelectedCellData(
-                                        orderId = row.orderId,
-                                        voucherNumber = row.voucherNumber,
-                                        variety = row.variety,
-                                        size = row.size.getOrNull(1)?.size?.toString(),
-                                        address = row.address,
-                                        dateOfSubmission = row.dateOfSubmission,
-                                        currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0"
-                                    )
-                                )
-                            }
+                        }, saveSelected = {
+
                         }
                     )
 
@@ -751,7 +706,7 @@ if(row!= null){
                             row.size.getOrNull(1)?.size?.let { Text(text = it) }
                             ColdOpTextField(value = qtyToRemoveOne.value , onValueChange = {
                                 qtyToRemoveOne.value = it
-                            })
+                            } , placeholder = "Enter Quantity" ,  keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
                             Button(onClick = {
 //                                outgoingResponseBody.add(
 //
@@ -768,8 +723,12 @@ if(row!= null){
                                // outgoingEntry(qtyToRemoveOne ,row , outgoingResponseBody , 1 )
                                 CoroutineScope(Dispatchers.Main).launch{
 
+                                   if(qtyToRemoveOne.value.length > 0 ){
+                                    outgoingEntry(qtyToRemoveOne ,row , outgoingResponseBody , 1 )}
+                                    else {
+                                       outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 1 )}
 
-                                    outgoingEntry(qtyToRemoveOne ,row , outgoingResponseBody , 1 )
+
                                     delay(300)
                                     openDailogForQtyRemovedOne.value = false
                                 }
@@ -808,53 +767,55 @@ if(row!= null){
                     mutableStateOf(false)
                 }
                 val qtyToRemoveTwo = remember{
-                    mutableStateOf("0")
+                    mutableStateOf("")
                 }
 
                 Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
-                    ClickableBlock(
-                        cell = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0",
-                        cellTwo = row.size.getOrNull(2)?.quantity?.initialQuantity?.toString() ?: "0",
-                        qtyToRemove = qtyToRemoveTwo.value,
-                        isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
-                        onToggle = { isSelected ->
-                          //  selectedCells[Pair(rowIndex, 2)] = isSelected
-                            openDailogForQtyRemovedTwo.value = true
-                        },
-                        saveSelected = {
-                            if(selectedCellsList.contains(SelectedCellData(
-                                    orderId = row.orderId,
-                                    voucherNumber = row.voucherNumber,
-                                    variety = row.variety,
-                                    size = row.size.getOrNull(2)?.size?.toString(),
-                                    address = row.address,
-                                    dateOfSubmission = row.dateOfSubmission,
-                                    currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
-                                ))){
-                                selectedCellsList.remove(SelectedCellData(
-                                    orderId = row.orderId,
-                                    voucherNumber = row.voucherNumber,
-                                    variety = row.variety,
-                                    size = row.size.getOrNull(2)?.size?.toString(),
-                                    address = row.address,
-                                    dateOfSubmission = row.dateOfSubmission,
-                                    currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
-                                ))
-                            } else {
-                                selectedCellsList.add(
-                                    SelectedCellData(
-                                        orderId = row.orderId,
-                                        voucherNumber = row.voucherNumber,
-                                        variety = row.variety,
-                                        size = row.size.getOrNull(2)?.size?.toString(),
-                                        address = row.address,
-                                        dateOfSubmission = row.dateOfSubmission,
-                                        currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
-                                    )
-                                )
+                    if (row != null) {
+                        ClickableBlock(
+                            cell = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0",
+                            cellTwo = row.size.getOrNull(2)?.quantity?.initialQuantity?.toString() ?: "0",
+                            qtyToRemove = qtyToRemoveTwo.value,
+                            isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
+                            onToggle = { isSelected ->
+                                //  selectedCells[Pair(rowIndex, 2)] = isSelected
+                                openDailogForQtyRemovedTwo.value = true
+                            },
+                            saveSelected = {
+                //                            if(selectedCellsList.contains(SelectedCellData(
+                //                                    orderId = row.orderId,
+                //                                    voucherNumber = row.voucherNumber,
+                //                                    variety = row.variety,
+                //                                    size = row.size.getOrNull(2)?.size?.toString(),
+                //                                    address = row.address,
+                //                                    dateOfSubmission = row.dateOfSubmission,
+                //                                    currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
+                //                                ))){
+                //                                selectedCellsList.remove(SelectedCellData(
+                //                                    orderId = row.orderId,
+                //                                    voucherNumber = row.voucherNumber,
+                //                                    variety = row.variety,
+                //                                    size = row.size.getOrNull(2)?.size?.toString(),
+                //                                    address = row.address,
+                //                                    dateOfSubmission = row.dateOfSubmission,
+                //                                    currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
+                //                                ))
+                //                            } else {
+                //                                selectedCellsList.add(
+                //                                    SelectedCellData(
+                //                                        orderId = row.orderId,
+                //                                        voucherNumber = row.voucherNumber,
+                //                                        variety = row.variety,
+                //                                        size = row.size.getOrNull(2)?.size?.toString(),
+                //                                        address = row.address,
+                //                                        dateOfSubmission = row.dateOfSubmission,
+                //                                        currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
+                //                                    )
+                //                                )
+                //                            }
                             }
-                        }
-                    )
+                        )
+                    }
 
                     if(qtyToRemoveTwo.value != "0"  && qtyToRemoveTwo.value.length>0) {
                         Box(
@@ -882,7 +843,7 @@ if(row!= null){
                             row.size.getOrNull(2)?.size?.let { Text(text = it) }
                             ColdOpTextField(value = qtyToRemoveTwo.value , onValueChange = {
                                 qtyToRemoveTwo.value = it
-                            })
+                            } , placeholder = "Enter Quantity", keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
                             Button(onClick = {
 //                                outgoingResponseBody.add(
 //
@@ -898,7 +859,12 @@ if(row!= null){
 //                            )
                                 //outgoingEntry(qtyToRemoveTwo ,row , outgoingResponseBody , 2 )
                                 CoroutineScope(Dispatchers.Main).launch{
-                                    outgoingEntry(qtyToRemoveTwo ,row , outgoingResponseBody , 2 )
+                                    if(qtyToRemoveTwo.value.length > 0){
+                                    outgoingEntry(qtyToRemoveTwo ,row , outgoingResponseBody , 2 )}
+                                    else {
+                                        outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 2 )}
+
+
                                     delay(300)
                                     openDailogForQtyRemovedTwo.value = false
                                 }
@@ -936,13 +902,13 @@ if(row!= null){
                     mutableStateOf(false)
                 }
                 val qtyToRemoveThree = remember{
-                    mutableStateOf("0")
+                    mutableStateOf("")
                 }
 
                 Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
                     ClickableBlock(
-                        cell = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0",
-                        cellTwo = row.size.getOrNull(3)?.quantity?.initialQuantity?.toString() ?: "0",
+                        cell = row?.size?.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0",
+                        cellTwo = row?.size?.getOrNull(3)?.quantity?.initialQuantity?.toString() ?: "0",
                         qtyToRemove = qtyToRemoveThree.value,
                         isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
                         onToggle = { isSelected ->
@@ -950,37 +916,37 @@ if(row!= null){
                             openDailogForQtyRemovedThree.value = true
                         },
                         saveSelected = {
-                            if(selectedCellsList.contains(SelectedCellData(
-                                    orderId = row.orderId,
-                                    voucherNumber = row.voucherNumber,
-                                    variety = row.variety,
-                                    size = row.size.getOrNull(3)?.size?.toString(),
-                                    address = row.address,
-                                    dateOfSubmission = row.dateOfSubmission,
-                                    currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
-                                ))){
-                                selectedCellsList.remove(SelectedCellData(
-                                    orderId = row.orderId,
-                                    voucherNumber = row.voucherNumber,
-                                    variety = row.variety,
-                                    size = row.size.getOrNull(3)?.size?.toString(),
-                                    address = row.address,
-                                    dateOfSubmission = row.dateOfSubmission,
-                                    currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
-                                ))
-                            } else {
-                                selectedCellsList.add(
-                                    SelectedCellData(
-                                        orderId = row.orderId,
-                                        voucherNumber = row.voucherNumber,
-                                        variety = row.variety,
-                                        size = row.size.getOrNull(3)?.size?.toString(),
-                                        address = row.address,
-                                        dateOfSubmission = row.dateOfSubmission,
-                                        currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
-                                    )
-                                )
-                            }
+//                            if(selectedCellsList.contains(SelectedCellData(
+//                                    orderId = row.orderId,
+//                                    voucherNumber = row.voucherNumber,
+//                                    variety = row.variety,
+//                                    size = row.size.getOrNull(3)?.size?.toString(),
+//                                    address = row.address,
+//                                    dateOfSubmission = row.dateOfSubmission,
+//                                    currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
+//                                ))){
+//                                selectedCellsList.remove(SelectedCellData(
+//                                    orderId = row.orderId,
+//                                    voucherNumber = row.voucherNumber,
+//                                    variety = row.variety,
+//                                    size = row.size.getOrNull(3)?.size?.toString(),
+//                                    address = row.address,
+//                                    dateOfSubmission = row.dateOfSubmission,
+//                                    currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
+//                                ))
+//                            } else {
+//                                selectedCellsList.add(
+//                                    SelectedCellData(
+//                                        orderId = row.orderId,
+//                                        voucherNumber = row.voucherNumber,
+//                                        variety = row.variety,
+//                                        size = row.size.getOrNull(3)?.size?.toString(),
+//                                        address = row.address,
+//                                        dateOfSubmission = row.dateOfSubmission,
+//                                        currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
+//                                    )
+//                                )
+                           // }
                         }
                     )
 
@@ -1011,7 +977,7 @@ if(row!= null){
                             row.size.getOrNull(3)?.size?.let { Text(text = it) }
                             ColdOpTextField(value = qtyToRemoveThree.value , onValueChange = {
                                 qtyToRemoveThree.value = it
-                            })
+                            }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
                             Button(onClick = {
 
 //                                outgoingResponseBody.add(
@@ -1028,7 +994,12 @@ if(row!= null){
 //                            )
                                // outgoingEntry(qtyToRemoveThree ,row , outgoingResponseBody , 3 )
                                 CoroutineScope(Dispatchers.Main).launch{
-                                    outgoingEntry(qtyToRemoveThree ,row , outgoingResponseBody , 3 )
+                                    if(qtyToRemoveThree.value.length > 0){
+                                    outgoingEntry(qtyToRemoveThree ,row , outgoingResponseBody , 3 )}
+                                    else {
+                                        outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 3 )}
+
+
                                     delay(300)
                                     openDailogForQtyRemovedThree.value = false
                                 }
@@ -1067,8 +1038,8 @@ if(row!= null){
                 val openDailogForQtyRemovedFour = remember {
                     mutableStateOf(false)
                 }
-                val qtyToRemoveFour = remember{
-                    mutableStateOf("0")
+                val qtyToRemoveFour : MutableState<String> = remember{
+                    mutableStateOf("")
                 }
 
                 Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
@@ -1082,37 +1053,7 @@ if(row!= null){
                             openDailogForQtyRemovedFour.value = true
                         },
                         saveSelected = {
-                            if(selectedCellsList.contains(SelectedCellData(
-                                    orderId = row.orderId,
-                                    voucherNumber = row.voucherNumber,
-                                    variety = row.variety,
-                                    size = row.size.getOrNull(4)?.size?.toString(),
-                                    address = row.address,
-                                    dateOfSubmission = row.dateOfSubmission,
-                                    currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
-                                ))){
-                                selectedCellsList.remove(SelectedCellData(
-                                    orderId = row.orderId,
-                                    voucherNumber = row.voucherNumber,
-                                    variety = row.variety,
-                                    size = row.size.getOrNull(4)?.size?.toString(),
-                                    address = row.address,
-                                    dateOfSubmission = row.dateOfSubmission,
-                                    currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
-                                ))
-                            } else {
-                                selectedCellsList.add(
-                                    SelectedCellData(
-                                        orderId = row.orderId,
-                                        voucherNumber = row.voucherNumber,
-                                        variety = row.variety,
-                                        size = row.size.getOrNull(4)?.size?.toString(),
-                                        address = row.address,
-                                        dateOfSubmission = row.dateOfSubmission,
-                                        currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0"
-                                    )
-                                )
-                            }
+
                         }
                     )
 
@@ -1142,7 +1083,7 @@ if(row!= null){
                             row.size.getOrNull(4)?.size?.let { Text(text = it) }
                             ColdOpTextField(value = qtyToRemoveFour.value , onValueChange = {
                                 qtyToRemoveFour.value = it
-                            })
+                            }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
                             Button(onClick = {
 //                                outgoingResponseBody.add(
 //
@@ -1158,7 +1099,12 @@ if(row!= null){
 //                            )
                              // outgoingEntry(qtyToRemoveFour ,row , outgoingResponseBody , 4 )
                                 CoroutineScope(Dispatchers.Main).launch{
-                                    outgoingEntry(qtyToRemoveFour ,row , outgoingResponseBody , 4 )
+                                    if(qtyToRemoveFour.value.length>0){
+                                    outgoingEntry(qtyToRemoveFour ,row , outgoingResponseBody , 4 )}
+                                    else {
+                                        outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 4 )}
+
+
                                     delay(300)
                                     openDailogForQtyRemovedFour.value = false
                                 }
@@ -1252,22 +1198,28 @@ if(row!= null){
 //                viewmodel.proceedToNextOutgoing(finalVouchers, secondKeys)
 //                Log.d("Next", "finalvouchers " + finalVouchers + "second keys " + secondKeys)
 //                //Log.d("SelectedCellListttt",selectedCellsList)
-//                viewmodel.saveSelectedCellData(selectedCellsList)
+                     // viewmodel.saveSelectedCellData(selectedCellsList)
 //
-//                if (fromDaybook) {
-//                    navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${viewmodel.farmerAcc.value}")
-//
-//                } else {
-//                    navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${accNum}")
-//                }
+
 
                 mainOutgoingBody.value = MainOutgoingOrderClass(
                     remarks = "Added from new flow",
                     orders = outgoingResponseBody
                 )
-                try{viewmodel.confirmOutgoingOrderForUi(accNum ,mainOutgoingBody.value)
+                Log.d("OutgoingInTry" , "Pressedsffd button outsdie")
 
-                    viewmodel.clearSelectedCellData()
+                try{
+                    viewmodel.saveSelectedCellData(outgoingResponseBody)
+
+                    if (fromDaybook) {
+                        navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${viewmodel.farmerAcc.value}")
+
+                    } else {
+                        navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${accNum}")
+                    }
+                   // viewmodel.confirmOutgoingOrderForUi(accNum ,mainOutgoingBody.value)
+
+                   // viewmodel.clearSelectedCellData()
                     //viewmodel.clearSelectedCells()
                     Log.d("OutgoingInTry" , "Pressedsffd button")
 

@@ -7,7 +7,7 @@ import com.example.coldstorage.DataLayer.Api.OutgoingData.BagUpdate
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.ReceiptRow
 
-fun outgoingEntry(inputState:MutableState<String> , reciptRow: ReceiptRow , outgoingResponseBody: MutableList<OutgoingDataClassItem> , index :Int){
+fun outgoingEntry(inputState:MutableState<String>  , reciptRow: ReceiptRow , outgoingResponseBody: MutableList<OutgoingDataClassItem> , index :Int){
 
 
     if (inputState.value.toIntOrNull() != null && inputState.value.toIntOrNull()!! < reciptRow.size.getOrNull(index)?.quantity?.currentQuantity?.toInt()!!) {
@@ -43,7 +43,7 @@ fun outgoingEntry(inputState:MutableState<String> , reciptRow: ReceiptRow , outg
                     orderId = reciptRow.orderId,
                     variety = reciptRow.variety,
                     bagUpdates = listOf(
-                        reciptRow.size.getOrNull(index)?.size?.let { BagUpdate(size = it, quantityToRemove = inputState.value.toInt()) }
+                         BagUpdate(size =  reciptRow.size.getOrNull(index)!!.size, quantityToRemove = inputState.value.toInt())
                     )
                 )
             ) }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import com.example.coldstorage.DataLayer.Api.ColdOpApi
+import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Auth.AuthManager
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.SelectedCellData
 import com.google.gson.Gson
@@ -151,7 +152,7 @@ companion object{
     public fun clearSelectedCell(){
         sharedPrefSelectedStock.edit().clear().apply()
     }
-    public fun saveSelectedCellData(selectedCellData: List<SelectedCellData>) {
+    public fun saveSelectedCellData(selectedCellData: List<OutgoingDataClassItem>) {
         val sharedPref = context.getSharedPreferences("SelectedCellData", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
         //
@@ -165,13 +166,13 @@ companion object{
         editor.apply()
     }
 
-    fun getSelectedCellData(): List<SelectedCellData> {
+    fun getSelectedCellData(): List<OutgoingDataClassItem> {
         val sharedPref = context.getSharedPreferences("SelectedCellData", Context.MODE_PRIVATE)
         val json = sharedPref.getString("selected_cell_data", null)
 
         if (json != null) {
             val gson = Gson()
-            val type = object : TypeToken<List<SelectedCellData>>() {}.type
+            val type = object : TypeToken<List<OutgoingDataClassItem>>() {}.type
             return gson.fromJson(json, type)
         }
 

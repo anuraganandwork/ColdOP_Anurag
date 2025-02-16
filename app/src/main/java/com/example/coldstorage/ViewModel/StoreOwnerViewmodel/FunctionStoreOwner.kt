@@ -311,7 +311,7 @@ class FunctionStoreOwner @Inject constructor(
         }
     }
     fun saveSelectedCellData(
-        selectedCellsList : List<SelectedCellData>
+        selectedCellsList : List<OutgoingDataClassItem>
     ) {
         // Create a SelectedCellData object with provided data
 //        val selectedCellData = SelectedCellData(
@@ -332,8 +332,8 @@ class FunctionStoreOwner @Inject constructor(
         // Save the data through AuthInterceptor
         authIntercepter.saveSelectedCellData(selectedCellsList)
     }
-     private val _retrievedSelectedData = MutableStateFlow<List<SelectedCellData>?>(emptyList())
-    val retrievedSelectedData: StateFlow<List<SelectedCellData>?> = _retrievedSelectedData.asStateFlow()
+     private val _retrievedSelectedData = MutableStateFlow<List<OutgoingDataClassItem>?>(emptyList())
+    val retrievedSelectedData: StateFlow<List<OutgoingDataClassItem>?> = _retrievedSelectedData.asStateFlow()
     fun retrieveSelectedCellData() {
         _retrievedSelectedData.value = authIntercepter.getSelectedCellData()
         Log.d("rerererr" , retrievedSelectedData.value.toString())

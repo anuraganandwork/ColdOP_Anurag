@@ -7,21 +7,15 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +50,6 @@ import com.example.coldstorage.Presentation.Screens.SettingScreen.Setting
 import com.example.coldstorage.R
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.primeGreen
-import okhttp3.internal.wait
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -235,12 +228,12 @@ fun bottomNav(navControllerMain: NavController){
             }
 
 
-            composable(route = AllScreens.OutgoingSecondScreen.name + "/{accountNumber}" ,
-                arguments = listOf(navArgument("accountNumber"){
+            composable(route = AllScreens.OutgoingSecondScreen.name + "/{outgoingRequestBody}" ,
+                arguments = listOf(navArgument("outgoingRequestBody"){
                     type = NavType.StringType
                 })
             ){
-                val accNum = it.arguments!!.getString("accountNumber")
+                val accNum = it.arguments!!.getString("outgoingRequestBody")
 
                 OutgoingSecondScreen(accNum!! , viewmodel, navHostController)
             }
