@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -338,7 +339,7 @@ fun DropdownMenu_(
 
 @Composable
 fun StockTable(selectedVariety:String ,fromDaybook: Boolean,accNum: String,viewmodel: FunctionStoreOwner  , navController: NavController) {
-    val headers = listOf("V No.", "Variety", "Seed", "Goli", "Ration","Cut&Tok", "No.12")
+    val headers = listOf("V No.", "Variety", "Goli", "No.12", "Seed","Ration", "Cut&Tok")
     val selectedBlock =  remember { mutableStateOf(Color.White) }
    val selectedCells  = remember {
        mutableStateMapOf<Pair<Int , Int
@@ -511,12 +512,15 @@ Column(modifier = Modifier
             //val row = _row[rowIndex]
             Log.d("Outgoingggrgrgrgrgrgrgr", row.toString())
 if(row!= null){
-            Row(Modifier.fillMaxWidth().padding(bottom = 15.dp)) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 15.dp)) {
                 Text(
                     text = row.voucherNumber.toString(), // First column - voucher number
                     modifier = Modifier
                         .padding(start = 3.dp)
-                            .weight(.6f),
+                        .weight(.6f),
 
                     // .background(primeRed)
                                   fontSize = 11.sp
@@ -549,7 +553,9 @@ if(row!= null){
                 val qtyToRemoveZero = remember{
                     mutableStateOf("")
                 }
-                Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
+                Box(modifier = Modifier
+                    .wrapContentSize()
+                    .weight(.8f)) {  // Wrap everything in a Box for overlay positioning
                     ClickableBlock(
                         cell = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0",
                         cellTwo = row.size.getOrNull(0)?.quantity?.initialQuantity?.toString() ?: "0",
@@ -578,11 +584,13 @@ if(row!= null){
                                 text = qtyToRemoveZero.value,
                                 fontSize = 8.sp,
                                 color = Color.White,
-                                modifier = Modifier.offset(x = (1).dp, y = 15.dp).align(Alignment.BottomEnd)
+                                modifier = Modifier
+                                    .offset(x = (1).dp, y = 15.dp)
+                                    .align(Alignment.BottomEnd)
                                     .padding(10.dp)
-                                .background(
-                                    color = Color.Red , shape = CircleShape
-                                )  // Changed y offset to positive to move it down
+                                    .background(
+                                        color = Color.Red, shape = CircleShape
+                                    )  // Changed y offset to positive to move it down
                             ,
                                 maxLines = 1,
                                 textAlign = TextAlign.Center
@@ -594,40 +602,36 @@ if(row!= null){
                 if(openDailogForQtyRemovedZero.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedZero.value = false }, confirmButton = { /*TODO*/ } , text={
                          Column {
-                             Text(text = "Order id")
-                             Text(text = row.orderId)
-                             row.size.getOrNull(0)?.size?.let { Text(text = it) }
+                             Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
+                             Text(text = "Current Availble Quantity : ")
+                                 Text(text = (row.size.getOrNull(0)?.quantity?.currentQuantity.toString()), color = primeGreen)
+                             }
+                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
+                                 Text(text = "Enter Qty : ")
                              ColdOpTextField(value = qtyToRemoveZero.value , onValueChange = {
                                   qtyToRemoveZero.value = it
-                             }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
-                             Button(onClick = {
-//                                 outgoingResponseBody.add(
+                             }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
+                                 Button(onClick = {
 //
-//                                 OutgoingDataClassItem(
-//                                     orderId = row.orderId,
-//                                     variety = row.variety,
-//                                     bagUpdates = listOf(
-//                                        // row.size?.let { BagUpdate(size = it, quantityToRemove = qtyToRemoveZero.value.toInt()) }
-//                                         row.size.getOrNull(0)
-//                                             ?.let { BagUpdate(size = it.size , quantityToRemove =qtyToRemoveZero.value.toInt()  ) }
-//                                     )
-//                                 )
-//                             )
-                                 CoroutineScope(Dispatchers.Main).launch{
-                                     if(qtyToRemoveZero.value.length > 0){
-                                     outgoingEntry(qtyToRemoveZero ,row , outgoingResponseBody , 0 )}
-                                     else {
-                                         outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 0 )}
+                                     CoroutineScope(Dispatchers.Main).launch{
+                                         if(qtyToRemoveZero.value.length > 0){
+                                             outgoingEntry(qtyToRemoveZero ,row , outgoingResponseBody , 0 )}
+                                         else {
+                                             outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 0 )}
 
 
-                                     delay(300)
-                                     openDailogForQtyRemovedZero.value = false
+                                         delay(300)
+                                         openDailogForQtyRemovedZero.value = false
+                                     }
+
+
+                                 } , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContentColor = Color.White, disabledContainerColor = Color.Gray)) {
+                                     Text(text = "Save")
                                  }
-
-
-                             }) {
-                                 Text(text = "Save")
                              }
+
                          }
 
 
@@ -666,7 +670,9 @@ if(row!= null){
                 val qtyToRemoveOne = remember{
                     mutableStateOf("")
                 }
-                Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
+                Box(modifier = Modifier
+                    .wrapContentSize()
+                    .weight(.8f)) {  // Wrap everything in a Box for overlay positioning
                     ClickableBlock(
                         cell = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0",
                         cellTwo = row.size.getOrNull(1)?.quantity?.initialQuantity?.toString() ?: "0",
@@ -684,7 +690,10 @@ if(row!= null){
                         Box(
                             modifier = Modifier
                                 .size(20.dp)
-                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
+                                .offset(
+                                    x = (1).dp,
+                                    y = 15.dp
+                                )  // Changed y offset to positive to move it down
                                 .background(color = Color.Red, shape = CircleShape)
                                 .align(Alignment.BottomEnd),  // Position at top-right corner
                             contentAlignment = Alignment.Center
@@ -701,42 +710,36 @@ if(row!= null){
                 if(openDailogForQtyRemovedOne.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedOne.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
-                            Text(text = "Order id")
-                            Text(text = row.orderId)
-                            row.size.getOrNull(1)?.size?.let { Text(text = it) }
-                            ColdOpTextField(value = qtyToRemoveOne.value , onValueChange = {
-                                qtyToRemoveOne.value = it
-                            } , placeholder = "Enter Quantity" ,  keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
-                            Button(onClick = {
-//                                outgoingResponseBody.add(
-//
-//                                OutgoingDataClassItem(
-//                                    orderId = row.orderId,
-//                                    variety = row.variety,
-//                                    bagUpdates = listOf(
-//                                        // row.size?.let { BagUpdate(size = it, quantityToRemove = qtyToRemoveZero.value.toInt()) }
-//                                        row.size.getOrNull(1)
-//                                            ?.let { BagUpdate(size = it.size , quantityToRemove =qtyToRemoveZero.value.toInt()  ) }
-//                                    )
-//                                )
-//                            )
-                               // outgoingEntry(qtyToRemoveOne ,row , outgoingResponseBody , 1 )
-                                CoroutineScope(Dispatchers.Main).launch{
-
-                                   if(qtyToRemoveOne.value.length > 0 ){
-                                    outgoingEntry(qtyToRemoveOne ,row , outgoingResponseBody , 1 )}
-                                    else {
-                                       outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 1 )}
-
-
-                                    delay(300)
-                                    openDailogForQtyRemovedOne.value = false
-                                }
-
-
-                            }) {
-                                Text(text = "Save")
+                            Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
+                                Text(text = "Current Availble Quantity : ")
+                                Text(text = (row.size.getOrNull(1)?.quantity?.currentQuantity.toString()), color = primeGreen)
                             }
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
+                                Text(text = "Enter Qty : ")
+                                ColdOpTextField(value = qtyToRemoveOne.value , onValueChange = {
+                                    qtyToRemoveOne.value = it
+                                }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
+                                Button(onClick = {
+//
+                                    CoroutineScope(Dispatchers.Main).launch{
+                                        if(qtyToRemoveOne.value.length > 0){
+                                            outgoingEntry(qtyToRemoveOne ,row , outgoingResponseBody , 1 )}
+                                        else {
+                                            outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 1 )}
+
+
+                                        delay(300)
+                                        openDailogForQtyRemovedOne.value = false
+                                    }
+
+
+                                } , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContentColor = Color.White, disabledContainerColor = Color.Gray)) {
+                                    Text(text = "Save")
+                                }
+                            }
+
                         }
 
 
@@ -770,7 +773,9 @@ if(row!= null){
                     mutableStateOf("")
                 }
 
-                Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
+                Box(modifier = Modifier
+                    .wrapContentSize()
+                    .weight(.8f)) {  // Wrap everything in a Box for overlay positioning
                     if (row != null) {
                         ClickableBlock(
                             cell = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0",
@@ -821,7 +826,10 @@ if(row!= null){
                         Box(
                             modifier = Modifier
                                 .size(20.dp)
-                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
+                                .offset(
+                                    x = (1).dp,
+                                    y = 15.dp
+                                )  // Changed y offset to positive to move it down
                                 .background(color = Color.Red, shape = CircleShape)
                                 .align(Alignment.BottomEnd),  // Position at top-right corner
                             contentAlignment = Alignment.Center
@@ -838,40 +846,36 @@ if(row!= null){
                 if(openDailogForQtyRemovedTwo.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedTwo.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
-                            Text(text = "Order id")
-                            Text(text = row.orderId)
-                            row.size.getOrNull(2)?.size?.let { Text(text = it) }
-                            ColdOpTextField(value = qtyToRemoveTwo.value , onValueChange = {
-                                qtyToRemoveTwo.value = it
-                            } , placeholder = "Enter Quantity", keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
-                            Button(onClick = {
-//                                outgoingResponseBody.add(
-//
-//                                OutgoingDataClassItem(
-//                                    orderId = row.orderId,
-//                                    variety = row.variety,
-//                                    bagUpdates = listOf(
-//                                        // row.size?.let { BagUpdate(size = it, quantityToRemove = qtyToRemoveZero.value.toInt()) }
-//                                        row.size.getOrNull(2)
-//                                            ?.let { BagUpdate(size = it.size , quantityToRemove =qtyToRemoveTwo.value.toInt()  ) }
-//                                    )
-//                                )
-//                            )
-                                //outgoingEntry(qtyToRemoveTwo ,row , outgoingResponseBody , 2 )
-                                CoroutineScope(Dispatchers.Main).launch{
-                                    if(qtyToRemoveTwo.value.length > 0){
-                                    outgoingEntry(qtyToRemoveTwo ,row , outgoingResponseBody , 2 )}
-                                    else {
-                                        outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 2 )}
-
-
-                                    delay(300)
-                                    openDailogForQtyRemovedTwo.value = false
-                                }
-
-                            }) {
-                                Text(text = "Save")
+                            Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
+                                Text(text = "Current Availble Quantity : ")
+                                Text(text = (row.size.getOrNull(2)?.quantity?.currentQuantity.toString()), color = primeGreen)
                             }
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
+                                Text(text = "Enter Qty : ")
+                                ColdOpTextField(value = qtyToRemoveTwo.value , onValueChange = {
+                                    qtyToRemoveTwo.value = it
+                                }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
+                                Button(onClick = {
+//
+                                    CoroutineScope(Dispatchers.Main).launch{
+                                        if(qtyToRemoveTwo.value.length > 0){
+                                            outgoingEntry(qtyToRemoveTwo ,row , outgoingResponseBody , 2 )}
+                                        else {
+                                            outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 2 )}
+
+
+                                        delay(300)
+                                        openDailogForQtyRemovedTwo.value = false
+                                    }
+
+
+                                } , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContentColor = Color.White, disabledContainerColor = Color.Gray)) {
+                                    Text(text = "Save")
+                                }
+                            }
+
                         }
 
 
@@ -905,7 +909,9 @@ if(row!= null){
                     mutableStateOf("")
                 }
 
-                Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
+                Box(modifier = Modifier
+                    .wrapContentSize()
+                    .weight(.8f)) {  // Wrap everything in a Box for overlay positioning
                     ClickableBlock(
                         cell = row?.size?.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0",
                         cellTwo = row?.size?.getOrNull(3)?.quantity?.initialQuantity?.toString() ?: "0",
@@ -954,7 +960,10 @@ if(row!= null){
                         Box(
                             modifier = Modifier
                                 .size(20.dp)
-                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
+                                .offset(
+                                    x = (1).dp,
+                                    y = 15.dp
+                                )  // Changed y offset to positive to move it down
                                 .background(color = Color.Red, shape = CircleShape)
                                 .align(Alignment.BottomEnd),  // Position at top-right corner
                             contentAlignment = Alignment.Center
@@ -972,41 +981,36 @@ if(row!= null){
                 if(openDailogForQtyRemovedThree.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedThree.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
-                            Text(text = "Order id")
-                            Text(text = row.orderId)
-                            row.size.getOrNull(3)?.size?.let { Text(text = it) }
-                            ColdOpTextField(value = qtyToRemoveThree.value , onValueChange = {
-                                qtyToRemoveThree.value = it
-                            }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
-                            Button(onClick = {
-
-//                                outgoingResponseBody.add(
-//
-//                                OutgoingDataClassItem(
-//                                    orderId = row.orderId,
-//                                    variety = row.variety,
-//                                    bagUpdates = listOf(
-//                                        // row.size?.let { BagUpdate(size = it, quantityToRemove = qtyToRemoveZero.value.toInt()) }
-//                                        row.size.getOrNull(3)
-//                                            ?.let { BagUpdate(size = it.size , quantityToRemove =qtyToRemoveThree.value.toInt()  ) }
-//                                    )
-//                                )
-//                            )
-                               // outgoingEntry(qtyToRemoveThree ,row , outgoingResponseBody , 3 )
-                                CoroutineScope(Dispatchers.Main).launch{
-                                    if(qtyToRemoveThree.value.length > 0){
-                                    outgoingEntry(qtyToRemoveThree ,row , outgoingResponseBody , 3 )}
-                                    else {
-                                        outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 3 )}
-
-
-                                    delay(300)
-                                    openDailogForQtyRemovedThree.value = false
-                                }
-
-                            }) {
-                                Text(text = "Save")
+                            Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
+                                Text(text = "Current Availble Quantity : ")
+                                Text(text = (row.size.getOrNull(3)?.quantity?.currentQuantity.toString()), color = primeGreen)
                             }
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
+                                Text(text = "Enter Qty : ")
+                                ColdOpTextField(value = qtyToRemoveThree.value , onValueChange = {
+                                    qtyToRemoveThree.value = it
+                                }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
+                                Button(onClick = {
+//
+                                    CoroutineScope(Dispatchers.Main).launch{
+                                        if(qtyToRemoveThree.value.length > 0){
+                                            outgoingEntry(qtyToRemoveThree ,row , outgoingResponseBody , 3 )}
+                                        else {
+                                            outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 3 )}
+
+
+                                        delay(300)
+                                        openDailogForQtyRemovedThree.value = false
+                                    }
+
+
+                                } , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContentColor = Color.White, disabledContainerColor = Color.Gray)) {
+                                    Text(text = "Save")
+                                }
+                            }
+
                         }
 
 
@@ -1042,7 +1046,9 @@ if(row!= null){
                     mutableStateOf("")
                 }
 
-                Box(modifier = Modifier.wrapContentSize().weight(.8f)) {  // Wrap everything in a Box for overlay positioning
+                Box(modifier = Modifier
+                    .wrapContentSize()
+                    .weight(.8f)) {  // Wrap everything in a Box for overlay positioning
                     ClickableBlock(
                         cell = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0",
                         cellTwo = row.size.getOrNull(4)?.quantity?.initialQuantity?.toString() ?: "0",
@@ -1061,7 +1067,10 @@ if(row!= null){
                         Box(
                             modifier = Modifier
                                 .size(20.dp)
-                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
+                                .offset(
+                                    x = (1).dp,
+                                    y = 15.dp
+                                )  // Changed y offset to positive to move it down
                                 .background(color = Color.Red, shape = CircleShape)
                                 .align(Alignment.BottomEnd),  // Position at top-right corner
                             contentAlignment = Alignment.Center
@@ -1078,42 +1087,36 @@ if(row!= null){
                 if(openDailogForQtyRemovedFour.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedFour.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
-                            Text(text = "Order id")
-                            Text(text = row.orderId)
-                            row.size.getOrNull(4)?.size?.let { Text(text = it) }
-                            ColdOpTextField(value = qtyToRemoveFour.value , onValueChange = {
-                                qtyToRemoveFour.value = it
-                            }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
-                            Button(onClick = {
-//                                outgoingResponseBody.add(
-//
-//                                OutgoingDataClassItem(
-//                                    orderId = row.orderId,
-//                                    variety = row.variety,
-//                                    bagUpdates = listOf(
-//                                        // row.size?.let { BagUpdate(size = it, quantityToRemove = qtyToRemoveZero.value.toInt()) }
-//                                        row.size.getOrNull(4)
-//                                            ?.let { BagUpdate(size = it.size , quantityToRemove =qtyToRemoveFour.value.toInt()  ) }
-//                                    )
-//                                )
-//                            )
-                             // outgoingEntry(qtyToRemoveFour ,row , outgoingResponseBody , 4 )
-                                CoroutineScope(Dispatchers.Main).launch{
-                                    if(qtyToRemoveFour.value.length>0){
-                                    outgoingEntry(qtyToRemoveFour ,row , outgoingResponseBody , 4 )}
-                                    else {
-                                        outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 4 )}
-
-
-                                    delay(300)
-                                    openDailogForQtyRemovedFour.value = false
-                                }
-
-
-
-                            }) {
-                                Text(text = "Save")
+                            Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
+                                Text(text = "Current Availble Quantity : ")
+                                Text(text = (row.size.getOrNull(4)?.quantity?.currentQuantity.toString()), color = primeGreen)
                             }
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
+                                Text(text = "Enter Qty : ")
+                                ColdOpTextField(value = qtyToRemoveFour.value , onValueChange = {
+                                    qtyToRemoveFour.value = it
+                                }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
+                                Button(onClick = {
+//
+                                    CoroutineScope(Dispatchers.Main).launch{
+                                        if(qtyToRemoveFour.value.length > 0){
+                                            outgoingEntry(qtyToRemoveFour ,row , outgoingResponseBody , 4 )}
+                                        else {
+                                            outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 4 )}
+
+
+                                        delay(300)
+                                        openDailogForQtyRemovedFour.value = false
+                                    }
+
+
+                                } , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContentColor = Color.White, disabledContainerColor = Color.Gray)) {
+                                    Text(text = "Save")
+                                }
+                            }
+
                         }
 
 
@@ -1198,7 +1201,7 @@ if(row!= null){
 //                viewmodel.proceedToNextOutgoing(finalVouchers, secondKeys)
 //                Log.d("Next", "finalvouchers " + finalVouchers + "second keys " + secondKeys)
 //                //Log.d("SelectedCellListttt",selectedCellsList)
-                     // viewmodel.saveSelectedCellData(selectedCellsList)
+                // viewmodel.saveSelectedCellData(selectedCellsList)
 //
 
 
@@ -1206,9 +1209,9 @@ if(row!= null){
                     remarks = "Added from new flow",
                     orders = outgoingResponseBody
                 )
-                Log.d("OutgoingInTry" , "Pressedsffd button outsdie")
+                Log.d("OutgoingInTry", "Pressedsffd button outsdie")
 
-                try{
+                try {
                     viewmodel.saveSelectedCellData(outgoingResponseBody)
 
                     if (fromDaybook) {
@@ -1217,14 +1220,14 @@ if(row!= null){
                     } else {
                         navController.navigate(AllScreens.OutgoingSecondScreen.name + "/${accNum}")
                     }
-                   // viewmodel.confirmOutgoingOrderForUi(accNum ,mainOutgoingBody.value)
+                    // viewmodel.confirmOutgoingOrderForUi(accNum ,mainOutgoingBody.value)
 
-                   // viewmodel.clearSelectedCellData()
+                    // viewmodel.clearSelectedCellData()
                     //viewmodel.clearSelectedCells()
-                    Log.d("OutgoingInTry" , "Pressedsffd button")
+                    Log.d("OutgoingInTry", "Pressedsffd button")
 
-                }catch (e:Exception){
-                    Log.d("innnnnn" , e.message.toString())
+                } catch (e: Exception) {
+                    Log.d("innnnnn", e.message.toString())
                 }
             }
 

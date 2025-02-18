@@ -18,12 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun ColdOpTextField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String = "",
+    placeholderFontSize:Int=15,
     modifier: Modifier = Modifier,
     textColor: Color = Color.Black,
     placeholderColor: Color = Color.Gray,
@@ -52,7 +54,8 @@ fun ColdOpTextField(
                 Text(
                     text = placeholder,
                     color = placeholderColor,
-                    textAlign = TextAlign.Start
+                    textAlign = TextAlign.Start,
+                    fontSize = 15.sp
                 )
             }
             innerTextField()

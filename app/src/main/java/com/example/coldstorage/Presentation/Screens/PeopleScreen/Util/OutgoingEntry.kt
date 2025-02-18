@@ -42,6 +42,8 @@ fun outgoingEntry(inputState:MutableState<String>  , reciptRow: ReceiptRow , out
                 OutgoingDataClassItem(
                     orderId = reciptRow.orderId,
                     variety = reciptRow.variety,
+                    address = reciptRow.address,
+                    currQty= reciptRow.size.getOrNull(index)!!.quantity.currentQuantity.toString(),
                     bagUpdates = listOf(
                          BagUpdate(size =  reciptRow.size.getOrNull(index)!!.size, quantityToRemove = inputState.value.toInt())
                     )

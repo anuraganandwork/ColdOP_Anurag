@@ -369,6 +369,8 @@ class FunctionStoreOwner @Inject constructor(
         OutgoingDataClassItem(
             orderId = "",
             variety = "",
+            address="",
+            currQty="",
             bagUpdates = emptyList()
         )
     )
@@ -426,25 +428,10 @@ class FunctionStoreOwner @Inject constructor(
 
                 _outgoingOrderLoader.value = true
                 //val bagUpdates = listOf(BagUpdate( "Goli", 10))
-                val orderItems =
-                    listOf(
-                        OutgoingDataClassItem(
-                            "6713fb4f8082c69227ec72dc", "Pukhraj",
-                            listOf(
-                                BagUpdate("Goli", quantityToRemoveGoli.value),
-                                BagUpdate("Ration", quantityToRemoveRation.value),
-                                BagUpdate("Seed", quantityToRemoveSeed.value),
-                                BagUpdate("Cut-tok", quantityToRemoveCuttok.value),
-                                BagUpdate("Number-12", quantityToRemoveNo12.value)
-                            )
-                        )
-                    )
-                // val outgoingData = OutgoingDataClassBody(orderItems)
 
                 val response = api.confirmOutgoingOrder(farmerId, outgoingRequestBody)
                 Log.d("Oututut", "intry")
                 if (response.isSuccessful) {
-                    //_outgoingOrderLoader.value = false
                     Log.d("qwertyuiB4", "this is running " + _outgoingOrderStatus.value.toString())
 
                     _outgoingOrderStatus.value = true

@@ -69,9 +69,9 @@ fun OutgoingSecondScreen(accNum: String, viewmodel: FunctionStoreOwner, navContr
     var rationBags by remember { mutableStateOf("0") }
     var no12Bags by remember { mutableStateOf("0") }
     var cutTokBags by remember { mutableStateOf("0") }
-    var remarks by remember { mutableStateOf("0") }
+    var remarks by remember { mutableStateOf("") }
     val mainOutgoingBody: MutableState<MainOutgoingOrderClass>  = remember {
-        mutableStateOf(MainOutgoingOrderClass(remarks = "/" , orders = emptyList() ))    }
+        mutableStateOf(MainOutgoingOrderClass(remarks = "" , orders = emptyList() ))    }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val showBottomSheet = remember {
@@ -145,7 +145,6 @@ fun OutgoingSecondScreen(accNum: String, viewmodel: FunctionStoreOwner, navContr
         .padding(paddingValues = paddingValues)) {
         Text("Select Quantities Required for :")
 
-        Spacer(modifier = Modifier.height(16.dp))
 
 //        InputField("Seed Bags", seedBags) { seedBags = it }
 //        InputField("Ration Bags", rationBags) { rationBags = it }
@@ -153,19 +152,51 @@ fun OutgoingSecondScreen(accNum: String, viewmodel: FunctionStoreOwner, navContr
 //        InputField("Cut & Tok Bags", cutTokBags) { cutTokBags = it }
 //        InputField("Goli Bags", goliBags) { goliBags = it }
 
-        Spacer(modifier = Modifier.height(16.dp))
         if(retrievedData != null){
 
-            Spacer(modifier = Modifier.padding(27.dp))
-            Spacer(modifier = Modifier.padding(6.dp))
+
+
+
+
+
+            Spacer(modifier = Modifier.padding(13.dp))
+            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween){
+                Text(text="Bag Size",fontSize = 13.sp,fontWeight = FontWeight.Bold,modifier = Modifier
+                    .weight(1f) , textAlign = TextAlign.Center)
+                Text(text = "Address",fontSize = 13.sp,fontWeight = FontWeight.Bold,modifier = Modifier
+                    .weight(.8f) , textAlign = TextAlign.Center)
+                Text(text ="Curr Qty",fontSize = 13.sp,fontWeight = FontWeight.Bold,modifier = Modifier
+                    .weight(.8f) , textAlign = TextAlign.Center)
+                Text(text= "Removing",fontSize = 13.sp ,fontWeight = FontWeight.Bold, modifier = Modifier
+                    .weight(.8f) , textAlign = TextAlign.Center)
+            }
+
             retrievedData!!.forEach {
               it.bagUpdates.forEach {bags->
                   Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween) {
-                      Text(text = bags.size)
-                      Text(text = bags.quantityToRemove.toString())
+                      Text(text = bags.size,fontSize = 13.sp  ,textAlign = TextAlign.Center, modifier = Modifier
+                          .weight(1f))
+                      Text(text = it.address , fontSize = 13.sp,textAlign = TextAlign.Center,modifier = Modifier
+                          .weight(.8f))
+                      Text(text = it.currQty,fontSize = 13.sp ,textAlign = TextAlign.Center, modifier = Modifier
+                          .weight(.8f))
+                      Text(text = bags.quantityToRemove.toString(),fontSize = 13.sp ,textAlign = TextAlign.Center, modifier = Modifier
+                          .weight(.8f))
                   }
               }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            ColdOpTextField(value = remarks, onValueChange = {
+                remarks = it
+            } ,  placeholder = "Describe any sort of exception to be handelled in\n" +
+                    "the order , could be multiple address allocation." ,
+                modifier = Modifier
+                    .width(370.dp)
+                    .height(125.dp)
+                    .padding(bottom = 10.dp)
+            )
+
             Button(
                 onClick = {
                     Log.d("OutgoingSuccess" , "Pressed button")
@@ -477,6 +508,7 @@ fun StockTablee(accNum: String, viewmodel: FunctionStoreOwner ,navController: Na
      val mainOutgoingBody: MutableState<MainOutgoingOrderClass>  = remember {
                        mutableStateOf(MainOutgoingOrderClass(remarks = "" , orders = emptyList() ))    }
     Column() {
+
         Row(modifier = Modifier.fillMaxWidth()) {
             headers.forEach { header ->
                 Text(
