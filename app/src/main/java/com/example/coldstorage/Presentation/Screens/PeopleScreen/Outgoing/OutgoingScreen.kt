@@ -339,7 +339,7 @@ fun DropdownMenu_(
 
 @Composable
 fun StockTable(selectedVariety:String ,fromDaybook: Boolean,accNum: String,viewmodel: FunctionStoreOwner  , navController: NavController) {
-    val headers = listOf("V No.", "Variety", "Goli", "No.12", "Seed","Ration", "Cut&Tok")
+    val headers = listOf("V No.", "Variety", "Cut&Tok", "Goli", "No.12","Ration", "Seed")
     val selectedBlock =  remember { mutableStateOf(Color.White) }
    val selectedCells  = remember {
        mutableStateMapOf<Pair<Int , Int
@@ -572,46 +572,65 @@ if(row!= null){
                     )
 
                     if(qtyToRemoveZero.value != "0" && qtyToRemoveZero.value.length>0) {
-//                        Surface(
-//                            modifier = Modifier
-//                                .size(18.dp)
-//                                .offset(x = (1).dp, y = 15.dp)  // Changed y offset to positive to move it down
-//                                .align(Alignment.BottomEnd),
-//
-//                            color = Color.Red
-//                        ) {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .offset(
+                                    x = (1).dp,
+                                    y = 15.dp
+                                )
+                                .background(color = Color.Red, shape = CircleShape)
+                                .align(Alignment.BottomEnd),  // Position at top-right corner
+                            contentAlignment = Alignment.Center
+                        ){
                             Text(
                                 text = qtyToRemoveZero.value,
-                                fontSize = 8.sp,
+                                fontSize = 10.sp,
                                 color = Color.White,
                                 modifier = Modifier
-                                    .offset(x = (1).dp, y = 15.dp)
-                                    .align(Alignment.BottomEnd)
-                                    .padding(10.dp)
-                                    .background(
-                                        color = Color.Red, shape = CircleShape
-                                    )  // Changed y offset to positive to move it down
+                                    // Changed y offset to positive to move it down
                             ,
                                 maxLines = 1,
                                 textAlign = TextAlign.Center
 
                             )
-                       // }
+                       }
                     }
                 }
                 if(openDailogForQtyRemovedZero.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedZero.value = false }, confirmButton = { /*TODO*/ } , text={
                          Column {
                              Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                             Spacer(modifier = Modifier.padding(top = 15.dp))
                              Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
                              Text(text = "Current Availble Quantity : ")
                                  Text(text = (row.size.getOrNull(0)?.quantity?.currentQuantity.toString()), color = primeGreen)
                              }
+                             Spacer(modifier = Modifier.padding(top = 10.dp))
+                           Column {
+
+
                              Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
                                  Text(text = "Enter Qty : ")
                              ColdOpTextField(value = qtyToRemoveZero.value , onValueChange = {
                                   qtyToRemoveZero.value = it
                              }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                               val inputQty = qtyToRemoveZero.value.toIntOrNull()
+                               if (inputQty != null && row.size.getOrNull(0)?.quantity?.currentQuantity!! < inputQty) {
+                                   Text(
+                                       text = "Cannot remove more than current qty!",
+                                       color = Color.Red,
+                                       fontWeight = FontWeight.Bold,
+                                       fontSize = 12.sp,
+                                       modifier = Modifier
+                                           .padding(top = 4.dp)
+                                           .fillMaxWidth()
+                                   )                                }
+
+
+                           }
+                             Spacer(modifier = Modifier.padding(top = 10.dp))
+
                              Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
                                  Button(onClick = {
 //
@@ -711,15 +730,38 @@ if(row!= null){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedOne.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
                             Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.padding(top = 15.dp))
+
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
                                 Text(text = "Current Availble Quantity : ")
                                 Text(text = (row.size.getOrNull(1)?.quantity?.currentQuantity.toString()), color = primeGreen)
                             }
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
+                            Spacer(modifier = Modifier.padding(top = 10.dp))
+        Column {
+
+
+            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
                                 Text(text = "Enter Qty : ")
                                 ColdOpTextField(value = qtyToRemoveOne.value , onValueChange = {
                                     qtyToRemoveOne.value = it
                                 }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+            val inputQty = qtyToRemoveOne.value.toIntOrNull()
+            if (inputQty != null && row.size.getOrNull(1)?.quantity?.currentQuantity!! < inputQty) {
+                Text(
+                    text = "Cannot remove more than current qty!",
+                    color = Color.Red,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .fillMaxWidth()
+                )                                }
+
+
+
+        }
+                            Spacer(modifier = Modifier.padding(top = 10.dp))
+
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
                                 Button(onClick = {
 //
@@ -847,15 +889,34 @@ if(row!= null){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedTwo.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
                             Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.padding(top = 15.dp))
+
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
                                 Text(text = "Current Availble Quantity : ")
                                 Text(text = (row.size.getOrNull(2)?.quantity?.currentQuantity.toString()), color = primeGreen)
                             }
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
-                                Text(text = "Enter Qty : ")
-                                ColdOpTextField(value = qtyToRemoveTwo.value , onValueChange = {
-                                    qtyToRemoveTwo.value = it
-                                }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                            Spacer(modifier = Modifier.padding(top = 10.dp))
+                         Column {
+                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
+                                 Text(text = "Enter Qty : ")
+                                 ColdOpTextField(value = qtyToRemoveTwo.value , onValueChange = {
+                                     qtyToRemoveTwo.value = it
+                                 }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                             val inputQty = qtyToRemoveTwo.value.toIntOrNull()
+                             if (inputQty != null && row.size.getOrNull(2)?.quantity?.currentQuantity!! < inputQty) {
+                                 Text(
+                                     text = "Cannot remove more than current qty!",
+                                     color = Color.Red,
+                                     fontWeight = FontWeight.Bold,
+                                     fontSize = 12.sp,
+                                     modifier = Modifier
+                                         .padding(top = 4.dp)
+                                         .fillMaxWidth()
+                                 )                                }
+
+                         }
+                            Spacer(modifier = Modifier.padding(top = 10.dp))
+
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
                                 Button(onClick = {
 //
@@ -982,15 +1043,44 @@ if(row!= null){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedThree.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
                             Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.padding(top = 15.dp))
+
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
                                 Text(text = "Current Availble Quantity : ")
                                 Text(text = (row.size.getOrNull(3)?.quantity?.currentQuantity.toString()), color = primeGreen)
                             }
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
-                                Text(text = "Enter Qty : ")
-                                ColdOpTextField(value = qtyToRemoveThree.value , onValueChange = {
-                                    qtyToRemoveThree.value = it
-                                }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                            Spacer(modifier = Modifier.padding(top = 10.dp))
+                            Column() {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(text = "Enter Qty : ")
+                                    ColdOpTextField(
+                                        value = qtyToRemoveThree.value,
+                                        onValueChange = {
+                                            qtyToRemoveThree.value = it
+                                        },
+                                        placeholder = "Enter Quantity",
+                                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                                    )
+                                }
+                                val inputQty = qtyToRemoveThree.value.toIntOrNull()
+                                if (inputQty != null && row.size.getOrNull(3)?.quantity?.currentQuantity!! < inputQty) {
+                                    Text(
+                                        text = "Cannot remove more than current qty!",
+                                        color = Color.Red,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        modifier = Modifier
+                                            .padding(top = 4.dp)
+                                            .fillMaxWidth()
+                                    )                                }
+
+                            }
+                            Spacer(modifier = Modifier.padding(top = 10.dp))
+
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
                                 Button(onClick = {
 //
@@ -1072,14 +1162,15 @@ if(row!= null){
                                     y = 15.dp
                                 )  // Changed y offset to positive to move it down
                                 .background(color = Color.Red, shape = CircleShape)
-                                .align(Alignment.BottomEnd),  // Position at top-right corner
+                                .align(Alignment.BottomEnd)
+                                .wrapContentSize(Alignment.Center)
+                            ,  // Position at top-right corner
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = qtyToRemoveFour.value,
                                 fontSize = 10.sp,
                                 color = Color.White,
-                                modifier = Modifier.align(Alignment.Center)
                             )
                         }
                     }
@@ -1088,20 +1179,43 @@ if(row!= null){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedFour.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
                             Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.padding(top = 15.dp))
+
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
                                 Text(text = "Current Availble Quantity : ")
                                 Text(text = (row.size.getOrNull(4)?.quantity?.currentQuantity.toString()), color = primeGreen)
                             }
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
-                                Text(text = "Enter Qty : ")
-                                ColdOpTextField(value = qtyToRemoveFour.value , onValueChange = {
-                                    qtyToRemoveFour.value = it
-                                }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                            Spacer(modifier = Modifier.padding(top = 10.dp))
+
+                            Column {
+                                Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
+                                    Text(text = "Enter Qty : ")
+
+                                    ColdOpTextField(value = qtyToRemoveFour.value , onValueChange = {
+                                        qtyToRemoveFour.value = it
+                                    }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
+                                val inputQty = qtyToRemoveFour.value.toIntOrNull()
+                                if (inputQty != null && row.size.getOrNull(4)?.quantity?.currentQuantity!! < inputQty) {
+                                    Text(
+                                        text = "Cannot remove more than current qty!",
+                                        color = Color.Red,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        modifier = Modifier
+                                            .padding(top = 4.dp)
+                                            .fillMaxWidth()
+                                    )                                }
+                            }
+
+
+
+                            Spacer(modifier = Modifier.padding(top = 10.dp))
+
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
                                 Button(onClick = {
 //
                                     CoroutineScope(Dispatchers.Main).launch{
-                                        if(qtyToRemoveFour.value.length > 0){
+                                        if(qtyToRemoveFour.value.trim().length > 0){
                                             outgoingEntry(qtyToRemoveFour ,row , outgoingResponseBody , 4 )}
                                         else {
                                             outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 4 )}

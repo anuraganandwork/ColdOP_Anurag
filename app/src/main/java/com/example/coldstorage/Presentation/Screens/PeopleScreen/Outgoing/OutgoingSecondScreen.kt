@@ -162,25 +162,25 @@ fun OutgoingSecondScreen(accNum: String, viewmodel: FunctionStoreOwner, navContr
             Spacer(modifier = Modifier.padding(13.dp))
             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween){
                 Text(text="Bag Size",fontSize = 13.sp,fontWeight = FontWeight.Bold,modifier = Modifier
-                    .weight(1f) , textAlign = TextAlign.Center)
+                    .weight(1f) , textAlign = TextAlign.Start)
                 Text(text = "Address",fontSize = 13.sp,fontWeight = FontWeight.Bold,modifier = Modifier
-                    .weight(.8f) , textAlign = TextAlign.Center)
+                    .weight(.8f) , textAlign = TextAlign.Start)
                 Text(text ="Curr Qty",fontSize = 13.sp,fontWeight = FontWeight.Bold,modifier = Modifier
-                    .weight(.8f) , textAlign = TextAlign.Center)
+                    .weight(.8f) , textAlign = TextAlign.Start)
                 Text(text= "Removing",fontSize = 13.sp ,fontWeight = FontWeight.Bold, modifier = Modifier
-                    .weight(.8f) , textAlign = TextAlign.Center)
+                    .weight(.8f) , textAlign = TextAlign.Start)
             }
 
             retrievedData!!.forEach {
               it.bagUpdates.forEach {bags->
                   Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween) {
-                      Text(text = bags.size,fontSize = 13.sp  ,textAlign = TextAlign.Center, modifier = Modifier
+                      Text(text = bags.size,fontSize = 13.sp  ,textAlign = TextAlign.Start, modifier = Modifier
                           .weight(1f))
-                      Text(text = it.address , fontSize = 13.sp,textAlign = TextAlign.Center,modifier = Modifier
+                      Text(text = it.address , fontSize = 13.sp,textAlign = TextAlign.Start,modifier = Modifier
                           .weight(.8f))
-                      Text(text = it.currQty,fontSize = 13.sp ,textAlign = TextAlign.Center, modifier = Modifier
+                      Text(text = it.currQty,fontSize = 13.sp ,textAlign = TextAlign.Start, modifier = Modifier
                           .weight(.8f))
-                      Text(text = bags.quantityToRemove.toString(),fontSize = 13.sp ,textAlign = TextAlign.Center, modifier = Modifier
+                      Text(text = bags.quantityToRemove.toString(),fontSize = 13.sp ,textAlign = TextAlign.Start, modifier = Modifier
                           .weight(.8f))
                   }
               }

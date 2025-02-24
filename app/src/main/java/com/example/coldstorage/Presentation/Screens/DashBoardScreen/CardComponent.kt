@@ -204,10 +204,13 @@ ${if (orderDaybook.voucher.type == "RECEIPT") {
                                             "${it.size}: ${it.quantity?.currentQuantity ?: "N/A"}"
                                         }}"
                                     } else {
-                                        "Removed Bags: ${orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
-                                            "${it.size}: ${it.quantityRemoved ?: "N/A"}"
-                                        }}"
-                                    }}
+                                        "Removed Bags: " + orderDaybook.orderDetails.joinToString("\n") { order ->
+                                            order.bagSizes.joinToString("\n") {
+                                                "${it.size}: ${it.quantityRemoved ?: "N/A"}"
+                                            }
+                                        }
+                                    }
+}
 
 Total Bags: ${if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(orderDaybook) else totalOutgoingBags(orderDaybook)}
 
@@ -537,8 +540,11 @@ fun totalIncomingBags(orderDaybook: OrderDaybook):Int{
 
 fun totalOutgoingBags(orderDaybook: OrderDaybook):Int{
     var totalBagsOut = 0;
-    orderDaybook.orderDetails[0].bagSizes.forEach {
-        totalBagsOut += it.quantityRemoved!!
+    Log.d("Outogingngngngnsjsj" , orderDaybook.toString())
+    orderDaybook.orderDetails.forEach {orderDetail->
+        orderDetail.bagSizes.forEach {
+            totalBagsOut += it.quantityRemoved!!
+        }
     }
 
     return totalBagsOut

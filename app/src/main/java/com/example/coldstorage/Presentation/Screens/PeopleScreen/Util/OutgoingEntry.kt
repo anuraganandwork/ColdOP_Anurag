@@ -10,7 +10,7 @@ import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.ReceiptRow
 fun outgoingEntry(inputState:MutableState<String>  , reciptRow: ReceiptRow , outgoingResponseBody: MutableList<OutgoingDataClassItem> , index :Int){
 
 
-    if (inputState.value.toIntOrNull() != null && inputState.value.toIntOrNull()!! < reciptRow.size.getOrNull(index)?.quantity?.currentQuantity?.toInt()!!) {
+    if (inputState.value.toIntOrNull() != null && inputState.value.toIntOrNull()!! <= reciptRow.size.getOrNull(index)?.quantity?.currentQuantity?.toInt()!!) {
 
         val existingItem = outgoingResponseBody.find { it.orderId == reciptRow.orderId }
         if (existingItem != null) {

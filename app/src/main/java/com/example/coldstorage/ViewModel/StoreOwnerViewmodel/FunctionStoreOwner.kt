@@ -210,10 +210,10 @@ class FunctionStoreOwner @Inject constructor(
                             bagSizes = listOf(
                                 BagSize(
                                     quantity = Quantity(
-                                        currentQuantity = seedBags.value.toInt(),
-                                        initialQuantity = seedBags.value.toInt()
+                                        currentQuantity = cuttok.value.toInt(),
+                                        initialQuantity = cuttok.value.toInt()
                                     ),
-                                    size = "Seed"
+                                    size = "Cut-tok"
                                 ),
                                 BagSize(
                                     quantity = Quantity(
@@ -224,6 +224,13 @@ class FunctionStoreOwner @Inject constructor(
                                 ),
                                 BagSize(
                                     quantity = Quantity(
+                                        currentQuantity = twelveNumber.value.toInt(),
+                                        initialQuantity = twelveNumber.value.toInt()
+                                    ),
+                                    size = "Number-12"
+                                ),
+                                BagSize(
+                                    quantity = Quantity(
                                         currentQuantity = Ration.value.toInt(),
                                         initialQuantity = Ration.value.toInt()
                                     ),
@@ -231,18 +238,12 @@ class FunctionStoreOwner @Inject constructor(
                                 ),
                                 BagSize(
                                     quantity = Quantity(
-                                        currentQuantity = cuttok.value.toInt(),
-                                        initialQuantity = cuttok.value.toInt()
+                                        currentQuantity = seedBags.value.toInt(),
+                                        initialQuantity = seedBags.value.toInt()
                                     ),
-                                    size = "Cut-tok"
+                                    size = "Seed"
                                 ),
-                                BagSize(
-                                    quantity = Quantity(
-                                        currentQuantity = twelveNumber.value.toInt(),
-                                        initialQuantity = twelveNumber.value.toInt()
-                                    ),
-                                    size = "Number-12"
-                                )
+
                             ),
                             location = chamber.value,
                             variety = variety.value
