@@ -27,7 +27,7 @@ interface ColdOpApi {
 
 
   @POST("/api/store-admin/send-otp")
-  suspend fun sendOtpToStoreOwner( @Body MobileNum: String) : Response<sendOtpResponse>
+  suspend fun sendOtpToStoreOwner( @Body sendOtpReq: sendOtpReq) : Response<sendOtpResponse>
 
   @POST("/api/store-admin/verify-mobile?")
   suspend fun verifyMobile(@Body credentials:verifyMobile ) : Response<sendOtpResponse>

@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,25 +66,29 @@ class FunctionStoreOwner @Inject constructor(
     private val _variety = MutableStateFlow<String>("")
     val variety :StateFlow<String> = _variety.asStateFlow()
 
+
+    private val _query = MutableStateFlow<String>("")
+    val queryy :StateFlow<String> = _query.asStateFlow()
     private val _lotSize = MutableStateFlow<String>("")
     val lotsize :StateFlow<String> = _lotSize.asStateFlow()
-
-    private val _Ration = MutableStateFlow<String>("0")
+     private val _isNameSelected = MutableStateFlow<Boolean>(false)
+    val isNameSelected:StateFlow<Boolean> =  _isNameSelected.asStateFlow()
+    private val _Ration = MutableStateFlow<String>("")
     val Ration:StateFlow<String> = _Ration.asStateFlow()
 
-    private val _seedBags = MutableStateFlow<String>("0")
+    private val _seedBags = MutableStateFlow<String>("")
     val seedBags :StateFlow<String> = _seedBags.asStateFlow()
 
     private val _remarks = MutableStateFlow<String>(" ")
     val remarks :StateFlow<String> =  _remarks.asStateFlow()
 
-    private val _goli  = MutableStateFlow<String>("0")
+    private val _goli  = MutableStateFlow<String>("")
     val goli :StateFlow<String> = _goli.asStateFlow()
 
-    private val _twelveNumber = MutableStateFlow<String>("0")
+    private val _twelveNumber = MutableStateFlow<String>("")
     val twelveNumber :StateFlow<String> = _twelveNumber.asStateFlow()
 
-    private val _cuttok = MutableStateFlow<String>("0")
+    private val _cuttok = MutableStateFlow<String>("")
     val cuttok :StateFlow<String> = _cuttok.asStateFlow()
 
     private val _chamber =  MutableStateFlow<String>("")
@@ -110,6 +116,8 @@ class FunctionStoreOwner @Inject constructor(
     fun updateGoli(value: String) { _goli.value = value }
     fun updateCutAndTok(value: String) { _cuttok.value = value }
 
+    fun updateIsNameSelected(value :Boolean){ _isNameSelected.value = value}
+    fun updateQuery(value: String){_query.value = value}
     fun updateFloor(value: String){ _floor.value = value}
     fun updateChamber(value: String) {_chamber.value = value }
 
@@ -210,36 +218,37 @@ class FunctionStoreOwner @Inject constructor(
                             bagSizes = listOf(
                                 BagSize(
                                     quantity = Quantity(
-                                        currentQuantity = cuttok.value.toInt(),
-                                        initialQuantity = cuttok.value.toInt()
+                                        currentQuantity = cuttok.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
+                                        ,
+                                        initialQuantity = cuttok.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
                                     ),
                                     size = "Cut-tok"
                                 ),
                                 BagSize(
                                     quantity = Quantity(
-                                        currentQuantity = goli.value.toInt(),
-                                        initialQuantity = goli.value.toInt()
+                                        currentQuantity = goli.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 },
+                                        initialQuantity = goli.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
                                     ),
                                     size = "Goli"
                                 ),
                                 BagSize(
                                     quantity = Quantity(
-                                        currentQuantity = twelveNumber.value.toInt(),
-                                        initialQuantity = twelveNumber.value.toInt()
+                                        currentQuantity = twelveNumber.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 },
+                                        initialQuantity = twelveNumber.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
                                     ),
                                     size = "Number-12"
                                 ),
                                 BagSize(
                                     quantity = Quantity(
-                                        currentQuantity = Ration.value.toInt(),
-                                        initialQuantity = Ration.value.toInt()
+                                        currentQuantity = Ration.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 },
+                                        initialQuantity = Ration.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
                                     ),
                                     size = "Ration"
                                 ),
                                 BagSize(
                                     quantity = Quantity(
-                                        currentQuantity = seedBags.value.toInt(),
-                                        initialQuantity = seedBags.value.toInt()
+                                        currentQuantity = seedBags.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 },
+                                        initialQuantity = seedBags.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
                                     ),
                                     size = "Seed"
                                 ),
@@ -259,11 +268,23 @@ class FunctionStoreOwner @Inject constructor(
                 if (response.isSuccessful) {
                     Log.d("Success", "Order created successfully")
                     _incomingOrderStatus.value = true
+                    updateRation("")
+                    updateGoli("")
+                    updateCutAndTok("")
+                    updateSeedBags("")
+                    updateTwelveNumber("")
+                    updateQuery("")
+                    updateChamber("")
+                    updateFarmerAcc("")
+                    updateIsNameSelected(false)
+                    updateVariety("")
                     Result.success(Unit)
+
                 } else {
                     Log.d("ErrorOrder",
                         "Order not created successfully. Error: ${response.errorBody()?.string()} - ${response.message()}"
                     )
+
                     Result.failure(Exception("Failed to create order :("))
                 }
             } catch (e: Exception) {

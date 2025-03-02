@@ -1,5 +1,6 @@
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -31,6 +32,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -91,9 +93,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner  , viewModel: AuthViewmodel = hiltViewModel()) {
-    var query by remember {
-        mutableStateOf("")
-    }
+
+    val querry = viewmodel.queryy.collectAsState()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val variety = viewmodel.variety.collectAsState()
@@ -104,7 +105,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
     val Goli = viewmodel.goli.collectAsState()
     val cutAndTok = viewmodel.cuttok.collectAsState()
     val currentReceiptNum by viewmodel.currentRecieptNum.collectAsState(0)
-    val isNameSelected = remember { mutableStateOf(false) }
+    val isNameSelected = viewmodel.isNameSelected.collectAsState()
 
 
     val scrollState = rememberScrollState()
@@ -118,6 +119,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
     var imageUrl by remember { mutableStateOf("") }
     var mobileNumberr by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
+
     var password by remember { mutableStateOf("") }
     var mobileNumberError by remember { mutableStateOf("") }
     val loading = viewModel.loadingAddFarmer.collectAsState()
@@ -135,6 +137,9 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
         viewmodel.getRecieptNumbers()
         viewmodel.resetSearchResult()
     }
+  val   showNoBagsAlert = remember {
+      mutableStateOf(false)
+  }
 
     LaunchedEffect(statusAdding.value ){
         if(statusAdding.value){
@@ -149,12 +154,42 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
     val openAddFarmerDailog = remember{
         mutableStateOf(false)
     }
+    BackHandler(enabled = true) {
+        viewmodel.updateRation("")
+        viewmodel.updateGoli("")
+        viewmodel.updateCutAndTok("")
+        viewmodel.updateSeedBags("")
+        viewmodel.updateTwelveNumber("")
+        viewmodel.updateQuery("")
+        viewmodel.updateIsNameSelected(false)
+        viewmodel.updateFarmerAcc("")
+        viewmodel.updateVariety("")
+        viewmodel.updateChamber("")
+        navController.popBackStack()
+        viewmodel.resetSearchResult()
+
+    }
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Incoming Stock") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack()
+                    IconButton(onClick = {
+                       viewmodel.updateRation("")
+                        viewmodel.updateGoli("")
+                        viewmodel.updateCutAndTok("")
+                        viewmodel.updateSeedBags("")
+                        viewmodel.updateTwelveNumber("")
+                        viewmodel.updateQuery("")
+                        viewmodel.updateIsNameSelected(false)
+                        viewmodel.updateFarmerAcc("")
+                        viewmodel.updateVariety("")
+                        viewmodel.updateChamber("")
+
+
+
+
+                        navController.popBackStack()
 //                    viewmodel.searchResults.collectAsState() = emptyList()
                         viewmodel.resetSearchResult()
                     }) {
@@ -167,7 +202,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp , vertical = it.calculateBottomPadding())
+            .padding(horizontal = 16.dp, vertical = it.calculateBottomPadding())
             .imePadding()
            // .verticalScroll(scrollState)
 
@@ -201,10 +236,12 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
             Text(text = "Enter Account Name (search and select)")
             Row(modifier = Modifier.fillMaxWidth() , verticalAlignment = Alignment.CenterVertically , horizontalArrangement = Arrangement.SpaceBetween) {
                 OutlinedTextField(
-                    value = query,
+                    value = querry.value,
                     onValueChange = {
-                        query = it
-                        viewmodel.onSearchQuery(query)
+                        viewmodel.updateQuery(it)
+
+
+                        viewmodel.onSearchQuery(querry.value)
                     },
                     modifier = Modifier.weight(.9f),
                     label = { Text("Search farmers") },
@@ -245,13 +282,50 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                // add dialog here
            if(openAddFarmerDailog.value){
                AlertDialog(onDismissRequest = {
+                   name=""
+                   address=""
+                   mobileNumberr=""
                    openAddFarmerDailog.value = false
                    viewModel.resetAddFarmerStatus()
                                               }, confirmButton = { /*TODO*/ } ,
-               title = { Text(text = "Create New Account")} , text = {
-                   Column(modifier = Modifier.padding(top = 20.dp)) {
+                   icon = {
 
-                       Row {
+                   },
+                   title = {
+                       Row(
+                           modifier = Modifier.fillMaxWidth(),
+                           verticalAlignment = Alignment.CenterVertically,
+                           horizontalArrangement = Arrangement.SpaceBetween
+                       ) {
+                           Text(
+                               text = "Create New Account",
+                               fontSize = 18.sp,
+                               fontWeight = FontWeight.Medium
+                           )
+
+                           // Add close icon here
+                           IconButton(
+                               onClick = {
+                                   name=""
+                                   address=""
+                                   mobileNumberr=""
+                                   openAddFarmerDailog.value = false
+                                   viewModel.resetAddFarmerStatus()
+                               },
+                               modifier = Modifier
+                                   .size(24.dp)
+                           ) {
+                               Icon(
+                                   imageVector = Icons.Default.Close,
+                                   contentDescription = "Close dialog",
+                                   tint = Color.Gray
+                               )
+                           }
+                       }
+                   } , text = {
+                   Column(modifier = Modifier.padding(top = 12.dp)) {
+
+                       Row(verticalAlignment = Alignment.CenterVertically) {
                            Text(
                                text = "Name:",
                                modifier = Modifier
@@ -269,7 +343,28 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                                placeholder = "Enter name"
                            )
                        }
-          Spacer(modifier = Modifier.padding(5.dp))
+                       Spacer(modifier = Modifier.padding(5.dp))
+                       Row(verticalAlignment = Alignment.CenterVertically){
+                           Text(
+                               text = "Address:",
+                               modifier = Modifier
+                                   .weight(0.3f)
+                                   .padding(end = 8.dp),
+                           )
+
+                           // Input TextField
+                           ColdOpTextField(
+                               value = address,
+                               onValueChange = { text ->
+                                   address = text
+                               },
+                               modifier = Modifier.weight(0.7f),
+                               placeholder = "Enter address"
+                           )
+                       }
+
+                       Spacer(modifier = Modifier.padding(5.dp))
+
                        Column {
                            Row(
                                modifier = Modifier.fillMaxWidth(),
@@ -314,7 +409,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                                    val farmerData = FarmerData(
                                        name = name,
                                        mobileNumber = mobileNumberr,
-                                       address = "Added from quickest route",
+                                       address = address,
                                        password = "Added from quickest route",
                                        imageUrl = "Added from quickest route"
                                    )
@@ -363,7 +458,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
         }
 
         // Search Results
-        if (!isNameSelected.value && query.length>2) {
+        if (!isNameSelected.value && querry.value.length>2) {
 //            item{
 //                Column {
 //
@@ -451,9 +546,10 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                                             )
                                         }
                                         .clickable {
-                                            query = result.name
-                                            isNameSelected.value = true
+                                            // query = result.name
+                                            viewmodel.updateQuery(result.name)
                                             viewmodel.updateFarmerAcc(result._id)
+                                            viewmodel.updateIsNameSelected(true)
                                         }
                                         .padding(vertical = 8.dp)
                                 ) {
@@ -556,9 +652,30 @@ Log.d("ghghgfh" , "NO search results")
                     .fillMaxWidth()
                     .height(48.dp)
                     .clickable {
-                       // onContinue()
-                        navController.navigate(AllScreens.SecondBottomSheetIncoming.name)
-                               },
+                        // onContinue()
+                        if (
+                            Ration.value
+                                .trim()
+                                .isNotEmpty() ||
+                            seedBags.value
+                                .trim()
+                                .isNotEmpty() ||
+                            Goli.value
+                                .trim()
+                                .isNotEmpty() ||
+                            cutAndTok.value
+                                .trim()
+                                .isNotEmpty() ||
+                            twelveNumber.value
+                                .trim()
+                                .isNotEmpty()
+                        ) {
+                            navController.navigate(AllScreens.SecondBottomSheetIncoming.name)
+
+                        } else {
+                            showNoBagsAlert.value = true
+                        }
+                    },
                 shape = RoundedCornerShape(10.dp),
                 color = primeGreen
             ) {
@@ -571,6 +688,18 @@ Log.d("ghghgfh" , "NO search results")
                         fontWeight = FontWeight.Medium
                     )
                 }
+            }
+            if (showNoBagsAlert.value) {
+                AlertDialog(
+                    onDismissRequest = { showNoBagsAlert.value = false },
+                    confirmButton = {
+                        Button(onClick = { showNoBagsAlert.value = false }) {
+                            Text("OK")
+                        }
+                    },
+                    title = { Text("Alert") },
+                    text = { Text("All bag sizes cannot be empty!") }
+                )
             }
             // Add some bottom padding to ensure the button is not too close to the bottom
             Spacer(modifier = Modifier.height(216.dp))
@@ -597,30 +726,16 @@ private fun QuantityInputField(
                 .weight(1f)
                 .align(Alignment.CenterVertically)
         )
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Number
-            ),
-            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+        ColdOpTextField(value = value, onValueChange =onValueChange,
             modifier = Modifier
-                .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
-                .border(
-                    BorderStroke(1.dp, SolidColor(Color.Gray)),
-                    shape = MaterialTheme.shapes.small
-                )
-                .padding(horizontal = 5.dp, vertical = 3.dp)
-
                 .width(134.dp)
                 .height(40.dp),
-            singleLine = true,
-            maxLines = 1,
-            textStyle = TextStyle(fontSize = 18.sp, textAlign = TextAlign.Center , ),
-
-
+            keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Number
+        ),            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
         )
+
     }
 }
 

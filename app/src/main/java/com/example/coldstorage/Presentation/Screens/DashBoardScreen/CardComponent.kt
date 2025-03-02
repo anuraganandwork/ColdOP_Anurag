@@ -201,7 +201,7 @@ Variety: ${orderDaybook.orderDetails[0].variety}
 
 ${if (orderDaybook.voucher.type == "RECEIPT") {
                                         "Added Bags: ${orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
-                                            "${it.size}: ${it.quantity?.currentQuantity ?: "N/A"}"
+                                            "${it.size}: ${it.quantity?.initialQuantity ?: "N/A"}"
                                         }}"
                                     } else {
                                         "Removed Bags: " + orderDaybook.orderDetails.joinToString("\n") { order ->
@@ -221,7 +221,7 @@ Farmer: ${orderDaybook.farmerId.name } , Acc: ${orderDaybook.farmerId._id.take(5
                                     )
                                     val bitmap = stringToImage(context = context,  // `this` is the activity context
                                         text = formattedString,
-                                        backgroundResId = R.drawable.cardbg,
+                                        backgroundResId = R.drawable.bolinanewfarms,
                                         width = 400,
                                         height = 400)
                                     val file = File(context.cacheDir, "shared_card.png")

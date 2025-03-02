@@ -83,6 +83,15 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
        Icon(imageVector = Icons.Default.Close, contentDescription ="Close sheet " ,
            modifier = Modifier.clickable {
                onClick()
+               viewmodel.updateRation("")
+               viewmodel.updateGoli("")
+               viewmodel.updateCutAndTok("")
+               viewmodel.updateSeedBags("")
+               viewmodel.updateTwelveNumber("")
+               viewmodel.updateVariety("")
+               viewmodel.updateChamber("")
+
+
            })}
   Spacer(modifier = Modifier.padding(20.dp))
 

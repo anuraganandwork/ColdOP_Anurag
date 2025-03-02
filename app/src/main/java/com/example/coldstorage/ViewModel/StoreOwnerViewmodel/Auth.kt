@@ -14,6 +14,7 @@ import com.example.coldstorage.DataLayer.Api.ColdOpApi
 import com.example.coldstorage.DataLayer.Api.FarmerData
 import com.example.coldstorage.DataLayer.Api.StoreAdminFormData
 import com.example.coldstorage.DataLayer.Api.logInData
+import com.example.coldstorage.DataLayer.Api.sendOtpReq
 import com.example.coldstorage.DataLayer.Api.sendOtpResponse
 import com.example.coldstorage.DataLayer.Auth.AuthManager
 import com.example.coldstorage.DataLayer.Di.AuthInterceptor
@@ -42,9 +43,12 @@ class AuthViewmodel @Inject constructor(
     fun sendOtp(mobileNumber: String) {
         viewModelScope.launch {
             try {
-                val response = api.sendOtpToStoreOwner(mobileNumber)
+                val response = api.sendOtpToStoreOwner(sendOtpReq(mobileNumber= mobileNumber))
+            Log.d("Otp route response" , response.toString() + mobileNumber)
                 otpResponse = response
             } catch (e: Exception) {
+                Log.d("Otp error response" , e.toString())
+
                 // Handle error, e.g., log or show error message
                 e.printStackTrace()
             }
@@ -57,16 +61,17 @@ class AuthViewmodel @Inject constructor(
               val response=   api.verifyMobile(com.example.coldstorage.DataLayer.Api.verifyMobile(mobileNumber, otp))
                if(response.isSuccessful){
                     val responseBody = response.body()
-                   if(responseBody?.status=="Success"){
                        _verificationResult.postValue(true)
-                   }
-                   else{
-                       _verificationResult.postValue(false)
-                   }
+                   Log.d("verification" ,responseBody.toString())
+
                } else{
                    _verificationResult.postValue(false)
+                   Log.d("verificationem" ,response.toString())
+
                }
-            } catch (e:Exception){
+            } catch (e:Error){
+                Log.d("verificatione" ,e.toString())
+
                 _verificationResult.postValue(false)
             }
         }

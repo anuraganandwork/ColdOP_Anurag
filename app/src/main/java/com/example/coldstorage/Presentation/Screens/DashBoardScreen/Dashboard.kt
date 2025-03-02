@@ -101,14 +101,14 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
         Log.d("asdfghjk",typeOfCard.value)
         Log.d("qwertyu" , sortingOrder.value)
        if(typeOfCard.value === "Outgoing"){
-           viewmodel.getOrdersDayBook("outgoing" , sortingOrder.value , 1,50)
+           viewmodel.getOrdersDayBook("outgoing" , sortingOrder.value , 1,500)
 
        }
        else if(typeOfCard.value === "Incoming"){
-           viewmodel.getOrdersDayBook("incoming" , sortingOrder.value , 1,50)
+           viewmodel.getOrdersDayBook("incoming" , sortingOrder.value , 1,500)
        }
         else{
-           viewmodel.getOrdersDayBook("all" , sortingOrder.value , 1,50)
+           viewmodel.getOrdersDayBook("all" , sortingOrder.value , 1,500)
 
        }
     }

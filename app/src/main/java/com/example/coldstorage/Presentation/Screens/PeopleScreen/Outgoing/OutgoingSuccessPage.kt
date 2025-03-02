@@ -1,6 +1,7 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -39,6 +40,10 @@ fun OutgoingOrderSuccess(viewmodel:FunctionStoreOwner , navController: NavContro
     LaunchedEffect( outgoingOrderResult){
          
         Log.d("xczxas","assaasaa")
+    }
+
+    BackHandler(enabled = true) {
+        navController.navigate(AllScreens.Dashboard.name)
     }
     Box(modifier = Modifier
         .fillMaxHeight()

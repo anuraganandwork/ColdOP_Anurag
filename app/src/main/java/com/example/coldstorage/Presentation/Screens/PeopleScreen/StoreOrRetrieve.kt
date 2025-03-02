@@ -617,7 +617,18 @@ fun storeOrRetrieve(accountNumber: String,totalIncoming:String? , totalOutgoing:
     }
     if (showBottomSheet.value) {
         ModalBottomSheet(
-            onDismissRequest = { showBottomSheet.value = false },
+            onDismissRequest = { showBottomSheet.value = false
+                viewmodel.updateRation("")
+                viewmodel.updateGoli("")
+                viewmodel.updateCutAndTok("")
+                viewmodel.updateSeedBags("")
+                viewmodel.updateTwelveNumber("")
+                viewmodel.updateVariety("")
+                viewmodel.updateChamber("")
+
+
+
+            },
             sheetState = sheetState, modifier = Modifier.height(700.dp),
             properties = ModalBottomSheetProperties(
                 securePolicy = SecureFlagPolicy.Inherit,

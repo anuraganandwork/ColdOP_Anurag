@@ -15,3 +15,7 @@ data class verifyMobile(
    val mobileNum:String,
     val otp:String
 )
+
+data class sendOtpReq(
+    val mobileNumber :String
+)

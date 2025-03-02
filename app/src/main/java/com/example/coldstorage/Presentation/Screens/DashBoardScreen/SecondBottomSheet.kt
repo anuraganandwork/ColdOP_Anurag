@@ -259,6 +259,7 @@ fun  SecondBottomSheet( navController: NavController, viewmodel:FunctionStoreOwn
                         .background(primeGreen, RoundedCornerShape(10.dp))
                         .clickable {
                             viewmodel.createIncomingOrderForUi()
+
                             // onContinue()
                         },
                     color = primeGreen,
@@ -289,6 +290,7 @@ fun  SecondBottomSheet( navController: NavController, viewmodel:FunctionStoreOwn
         }
     }
     if (showAlert) {
+
         AlertDialog(
             onDismissRequest = { showAlert = false },
             title = { Text("Failed order creation!") },

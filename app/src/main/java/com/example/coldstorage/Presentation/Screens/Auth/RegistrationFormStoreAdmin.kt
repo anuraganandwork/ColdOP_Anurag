@@ -1,9 +1,11 @@
 package com.example.coldstorage.Presentation.Screens.Auth
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -38,6 +40,14 @@ fun StoreAdminRegistrationForm(navController: NavController, viewModel: AuthView
     var password by remember { mutableStateOf("") }
     var personalAddress by remember { mutableStateOf("") }
     var ActualOtp by remember { mutableStateOf("") }
+  var verificationLoader by remember { mutableStateOf(false) }
+
+    LaunchedEffect( viewModel.verificationResult.value){
+        if(viewModel.verificationResult.value == true){
+            verificationLoader = false
+        }
+        isVerified = viewModel.verificationResult.value == true
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -94,6 +104,7 @@ fun StoreAdminRegistrationForm(navController: NavController, viewModel: AuthView
             modifier = Modifier.fillMaxWidth()
         )
         Button(onClick={
+            Log.d("Otp" , mobileNumber)
             viewModel.sendOtp(mobileNumber)
 
 
@@ -108,14 +119,18 @@ fun StoreAdminRegistrationForm(navController: NavController, viewModel: AuthView
             modifier = Modifier.fillMaxWidth()
         )
         Button(onClick={
+            verificationLoader= true
             viewModel.verifyMobile(mobileNumber,EnteredOtp)
 
-            isVerified = viewModel.verificationResult.value!!
+         //   isVerified = viewModel.verificationResult.value!!
         }, modifier = Modifier.fillMaxWidth()){
-            Text(text = "Verify mobile")
+         if(verificationLoader == true){
+             CircularProgressIndicator()
+         } else{
+            Text(text = "Verify mobile")}
         }
-
-
+        if(isVerified == true){
+        Text(text = "Verified")}
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
