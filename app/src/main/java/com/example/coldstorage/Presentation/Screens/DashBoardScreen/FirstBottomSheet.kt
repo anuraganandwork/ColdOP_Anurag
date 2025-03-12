@@ -131,6 +131,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
     val statusAdding = viewModel.farmerAddStatus.collectAsState()
     var showMobileError by remember { mutableStateOf(false) }
 
+    var showExistingAccError by remember { mutableStateOf(false) }
 
 //    LaunchedEffect(key1 = keyboardHeight) {
 //        coroutineScope.launch {
@@ -151,6 +152,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
             address = ""
             name = ""
             accNum=""
+            showExistingAccError= false
             mobileNumberr = ""
             imageUrl = ""
             password = ""
@@ -179,7 +181,6 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
    val listOfVarieties = viewmodel.allVarities.collectAsState()
     val fetchedListOfFarmerIds = viewmodel.listOfExistingIds.collectAsState()
     val coroutineScopeExistingAcc = rememberCoroutineScope()
-    var showExistingAccError by remember { mutableStateOf(false) }
     var errorCheckingJobExistingId by remember { mutableStateOf<Job?>(null) }
     LaunchedEffect(Unit){
         viewmodel.getAllVarietiesForOrders()
@@ -302,6 +303,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                    address=""
                    accNum=""
                    mobileNumberr=""
+                   showExistingAccError= false
                    openAddFarmerDailog.value = false
                    viewModel.resetAddFarmerStatus()
                                               }, confirmButton = { /*TODO*/ } ,
@@ -327,6 +329,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                                    address=""
                                    mobileNumberr=""
                                    accNum=""
+                                   showExistingAccError= false
                                    openAddFarmerDailog.value = false
                                    viewModel.resetAddFarmerStatus()
                                },
@@ -342,7 +345,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                        }
                    } , text = {
                    Column(modifier = Modifier.padding(top = 12.dp)) {
-                       Row(){
+                       Row(verticalAlignment = Alignment.CenterVertically){
                            Text(text = "Acc No. :",modifier = Modifier
                                .weight(0.3f)
                                .padding(end = 8.dp))
@@ -460,7 +463,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                                onClick = {
                                    val farmerData = FarmerData(
                                        name = name,
-                                       accNum = accNum,
+                                       farmerId = accNum.toInt(),
                                        mobileNumber = mobileNumberr,
                                        address = address,
                                        password = "Added from quickest route",
@@ -473,7 +476,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                                        Log.d("ErrorLog", e.message.toString())
                                    }
                                },
-                               enabled = (mobileNumberr.length == 10 && name.isNotBlank()) || statusAdding.value,
+                               enabled = (mobileNumberr.length == 10 && name.isNotBlank() && !showExistingAccError) || statusAdding.value,
                                colors = ButtonDefaults.buttonColors(
                                    contentColor = Color.Black,
                                    containerColor = primeGreen,

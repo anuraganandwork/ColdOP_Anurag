@@ -255,7 +255,7 @@ fun FarmerQuickAddInputForm(navController: NavController, viewModel: AuthViewmod
                             imageUrl = imageUrl,
                             mobileNumber = mobileNumber,
                             password = password,
-                            accNum = accNum
+                            farmerId = accNum.toInt()
                         )
                         viewModel.quickRegister(farmerData)
                         address = ""
