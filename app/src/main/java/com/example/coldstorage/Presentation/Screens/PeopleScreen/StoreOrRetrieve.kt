@@ -461,9 +461,9 @@ fun storeOrRetrieve(accountNumber: String,totalIncoming:String? , totalOutgoing:
 //            )
             Row(modifier = Modifier.padding(horizontal = 10.dp) , horizontalArrangement = Arrangement.SpaceAround) {
 
-                ColdOpDropDown(label = "Sort", options = listOf("Latest" , "Oldest"), onSelect = { selected -> sortingOrder.value = selected.toLowerCase()} )
+                ColdOpDropDown(stateToUpdate = null , label = "Sort", options = listOf("Latest" , "Oldest"), onSelect = { selected -> sortingOrder.value = selected.toLowerCase()} )
                 Spacer(modifier = Modifier.padding(8.dp))
-                ColdOpDropDown(label = "Filter", options = listOf("Incoming" , "Outgoing" , "Show All"), onSelect = { selected -> typeOfCard.value = selected} )
+                ColdOpDropDown(stateToUpdate = null, label = "Filter", options = listOf("Incoming" , "Outgoing" , "Show All"), onSelect = { selected -> typeOfCard.value = selected} )
 
             }
 
@@ -625,6 +625,7 @@ fun storeOrRetrieve(accountNumber: String,totalIncoming:String? , totalOutgoing:
                 viewmodel.updateTwelveNumber("")
                 viewmodel.updateVariety("")
                 viewmodel.updateChamber("")
+                viewmodel.updateRemarks("")
 
 
 

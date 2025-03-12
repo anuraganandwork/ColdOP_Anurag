@@ -276,6 +276,8 @@ class FunctionStoreOwner @Inject constructor(
                     updateQuery("")
                     updateChamber("")
                     updateFarmerAcc("")
+
+                    updateRemarks("")
                     updateIsNameSelected(false)
                     updateVariety("")
                     Result.success(Unit)
@@ -331,6 +333,24 @@ class FunctionStoreOwner @Inject constructor(
              }
 
         }
+    }
+
+    private val _allVarities = MutableStateFlow<List<String>?>(emptyList())
+    val allVarities = _allVarities.asStateFlow()
+    @SuppressLint("LongLogTag")
+    fun getAllVarietiesForOrders(){
+        viewModelScope.launch {
+
+            try{
+            val response = api.getAllVarities()
+            if(response.isSuccessful){
+                if(response.body()?.status == "Success"){
+                    _allVarities.value = response.body()?.varieties
+                }
+            }
+        } catch (e: Exception){
+                e.message?.let { Log.d("ErrorInFetchingVarieties" , it) }
+        }}
     }
     fun saveSelectedCellData(
         selectedCellsList : List<OutgoingDataClassItem>
@@ -543,6 +563,27 @@ class FunctionStoreOwner @Inject constructor(
             }
         }
     }
+
+    // fetch all existing ids
+
+    private  val _listOfExistingIds = MutableStateFlow<List<String>?>(emptyList())
+    val listOfExistingIds = _listOfExistingIds.asStateFlow()
+
+    @SuppressLint("LongLogTag")
+    fun fetchListOfAllIds(){
+        viewModelScope.launch {
+            try {
+                val response = api.getAllFarmerIds()
+                if(response.isSuccessful){
+                    if(response.body()?.data != null){
+                    _listOfExistingIds.value = response?.body()?.data?.registeredFarmers}
+                }
+            }catch (e:Exception){
+                e.message?.let { Log.d("Error in fetching id list" , it) }
+            }
+        }
+    }
+
 
    //daybook orders
 

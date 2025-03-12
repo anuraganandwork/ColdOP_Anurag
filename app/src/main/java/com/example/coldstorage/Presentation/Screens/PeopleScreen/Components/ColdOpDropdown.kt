@@ -15,6 +15,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,7 +32,7 @@ import com.example.coldstorage.ui.theme.lightGrayBorder
 import com.example.coldstorage.ui.theme.textBrown
 
 @Composable
-fun ColdOpDropDown(label: String, options: List<String>, onSelect: (String) -> Unit) {
+fun ColdOpDropDown(stateToUpdate : State<String>?, label: String, options: List<String>, onSelect: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(label) }
 
@@ -45,7 +47,12 @@ fun ColdOpDropDown(label: String, options: List<String>, onSelect: (String) -> U
             ) , border = BorderStroke(width = .9.dp, lightGrayBorder)
             ) {
             
-            Text(text = selectedOption)
+            if (stateToUpdate != null && stateToUpdate.value.length>0) {
+                Text(text = stateToUpdate.value )
+            } else{
+                Text(text = selectedOption )
+
+            }
             Icon(painter = painterResource(id = R.drawable.down) ,
                  contentDescription ="dropdown" ,modifier = Modifier.width(30.dp).height(20.dp),
                 tint = textBrown)
@@ -58,6 +65,7 @@ fun ColdOpDropDown(label: String, options: List<String>, onSelect: (String) -> U
                 DropdownMenuItem(
                     text = { Text(text = option)} , onClick = {
                         selectedOption = option
+
                         expanded = false
                         onSelect(option)}
                 )

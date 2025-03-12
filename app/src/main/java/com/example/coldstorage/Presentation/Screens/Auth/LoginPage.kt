@@ -38,11 +38,13 @@ fun CustomLoginPage(navController: NavController, viewModel: AuthViewmodel = hil
     val loadingLogIn  = viewModel.loadingLogIn.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
-    LaunchedEffect(Unit ){
-
+    LaunchedEffect(viewModel.logInStatus.value ){
+        if(viewModel.logInStatus.value == "Success"){
+            Log.d("ErrorLogIn",viewModel.logInStatus.value)
+            navController.navigate(Sections.StoreOwner.route)}
     }
  //  var sharedPreference =
-    if (errorMessage != null) {
+    if (errorMessage != null  ) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissError() },
             title = {
@@ -126,13 +128,8 @@ fun CustomLoginPage(navController: NavController, viewModel: AuthViewmodel = hil
 
                     )
                     viewModel.logInStoreOwner(data)
-                    if(viewModel.logInStatus.value == "Success"){
-                        Log.d("ErrorLogIn",viewModel.logInStatus.value)
 
-                    navController.navigate(Sections.StoreOwner.route)}
-                    else{
-                        Log.d("Loginerror"," "+viewModel.logInStatus.value)
-                    }
+
 
                           },loadingLogIn = loadingLogIn.value ,
                 text = "Log In"

@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,6 +48,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -54,10 +56,13 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.BagSizeDaybook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpAlertMessage
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.stringToImage
 import com.example.coldstorage.R
+import com.example.coldstorage.ui.theme.dropdownGrey
 import com.example.coldstorage.ui.theme.primeGreen
 import com.example.coldstorage.ui.theme.primeRed
+import com.example.coldstorage.ui.theme.textBrown
 import java.io.File
 import java.io.FileOutputStream
 
@@ -130,8 +135,7 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
                     
                     Row(modifier = Modifier.weight(.5f),verticalAlignment = Alignment.CenterVertically,
                        horizontalArrangement = Arrangement.SpaceBetween) {
-
-                       Text(text = orderDaybook.orderDetails[0].variety , fontSize = 13.sp , fontWeight = FontWeight.Bold)
+                       Text(text = "Curr : ${orderDaybook.currentStockAtThatTime ?: "N/A"}" ,fontSize = 13.sp , fontWeight = FontWeight.Bold )
                        //Icon(imageVector = Icon)
 
                        Spacer(modifier = Modifier.padding( start = 8.dp))
@@ -188,45 +192,65 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
                                 .padding(end = 3.dp)
                                 .size(17.dp)
                                 .clickable {
-                                    Log.d("outgoingcard crash" ,"Type: ${orderDaybook.voucher.type} \n" +
-                                            "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
-                                            "Variety: ${orderDaybook.orderDetails[0].variety} \n"
+                                    Log.d(
+                                        "outgoingcard crash",
+                                        "Type: ${orderDaybook.voucher.type} \n" +
+                                                "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
+                                                "Variety: ${orderDaybook.orderDetails[0].variety} \n"
                                     )
                                     val formattedString = """
-Date: ${if(orderDaybook.voucher.type == "RECEIPT") orderDaybook.dateOfSubmission else orderDaybook.dateOfExtraction}                                        
+Date: ${if (orderDaybook.voucher.type == "RECEIPT") orderDaybook.dateOfSubmission else orderDaybook.dateOfExtraction}                                        
 Type: ${orderDaybook.voucher.type} 
 Voucher No.: ${orderDaybook.voucher.voucherNumber} 
 Variety: ${orderDaybook.orderDetails[0].variety} 
 
 
-${if (orderDaybook.voucher.type == "RECEIPT") {
-                                        "Added Bags: ${orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
-                                            "${it.size}: ${it.quantity?.initialQuantity ?: "N/A"}"
-                                        }}"
-                                    } else {
-                                        "Removed Bags: " + orderDaybook.orderDetails.joinToString("\n") { order ->
-                                            order.bagSizes.joinToString("\n") {
-                                                "${it.size}: ${it.quantityRemoved ?: "N/A"}"
+${
+                                        if (orderDaybook.voucher.type == "RECEIPT") {
+                                            "Added Bags: ${
+                                                orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
+                                                    "${it.size}: ${it.quantity?.initialQuantity ?: "N/A"}"
+                                                }
+                                            }"
+                                        } else {
+                                            "Removed Bags: " + orderDaybook.orderDetails.joinToString(
+                                                "\n"
+                                            ) { order ->
+                                                order.bagSizes.joinToString("\n") {
+                                                    "${it.size}: ${it.quantityRemoved ?: "N/A"}"
+                                                }
                                             }
                                         }
                                     }
-}
 
-Total Bags: ${if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(orderDaybook) else totalOutgoingBags(orderDaybook)}
+Total Bags: ${
+                                        if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(
+                                            orderDaybook
+                                        ) else totalOutgoingBags(
+                                            orderDaybook
+                                        )
+                                    }
 
-Farmer: ${orderDaybook.farmerId.name } , Acc: ${orderDaybook.farmerId._id.take(5)}
+Farmer: ${orderDaybook.farmerId.name} , Acc: ${orderDaybook.farmerId._id.take(5)}
 
 """.trimIndent()
-                                    Log.d("outgoingcard crash" ,formattedString
+                                    Log.d(
+                                        "outgoingcard crash", formattedString
                                     )
-                                    val bitmap = stringToImage(context = context,  // `this` is the activity context
+                                    val bitmap = stringToImage(
+                                        context = context,  // `this` is the activity context
                                         text = formattedString,
                                         backgroundResId = R.drawable.bolinanewfarms,
                                         width = 400,
-                                        height = 400)
+                                        height = 400
+                                    )
                                     val file = File(context.cacheDir, "shared_card.png")
                                     FileOutputStream(file).use { outputStream ->
-                                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                                        bitmap.compress(
+                                            Bitmap.CompressFormat.PNG,
+                                            100,
+                                            outputStream
+                                        )
                                     }
 
                                     // Get a URI for the file using FileProvider
@@ -242,7 +266,12 @@ Farmer: ${orderDaybook.farmerId.name } , Acc: ${orderDaybook.farmerId._id.take(5
                                     }
 
                                     // Start the share intent
-                                    context.startActivity(Intent.createChooser(intent, "Share Receipt"))
+                                    context.startActivity(
+                                        Intent.createChooser(
+                                            intent,
+                                            "Share Receipt"
+                                        )
+                                    )
 //                                    shareCardInfoMessage(
 //                                        context,
 //                                        "Type: ${orderDaybook.voucher.type} \n" +
@@ -334,6 +363,7 @@ Farmer: ${orderDaybook.farmerId.name } , Acc: ${orderDaybook.farmerId._id.take(5
 
 @Composable
 fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook>) {
+     var showRemarksPopop by remember{ mutableStateOf(false) }
     Surface(
         modifier = Modifier
             .fillMaxWidth() ,
@@ -377,7 +407,12 @@ fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook
             ) {
                 // Location Details
                 Column {
+                    Text(text = "Variety : ${orderDaybook.orderDetails[0].variety}" , fontSize = 13.sp , fontWeight = FontWeight.Bold)
                     Text(text = "Location : ${orderDaybook.orderDetails[0].location}" , fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(text = "Show Remarks", fontSize = 13.sp , fontStyle = FontStyle.Italic, modifier = Modifier.clickable {
+                        showRemarksPopop = true
+                    } , color = textBrown)
+
 //                    orderDaybook.orderDetails[0].location?.let { DetailRow("Chamber", it.chamber) }
 //                    orderDaybook.orderDetails[0].location?.let { DetailRow("Floor", it.floor) }
 //                    orderDaybook.orderDetails[0].location?.let { DetailRow("Row", it.row) }
@@ -390,7 +425,14 @@ fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook
                     DetailRow("Name", orderDaybook.farmerId.name)
                     DetailRow("Acc No", orderDaybook.farmerId._id.take(3))
                 }
-            }} else{
+            }
+                if(showRemarksPopop == true){
+                    ColdOpAlertMessage(title = "Remarks for ${orderDaybook.voucher.voucherNumber}", message = "${orderDaybook.remarks?: "No remarks was entered!"}", acceptAction = { showRemarksPopop= false }) {
+                        showRemarksPopop = false
+                    }
+                }
+
+            } else{
                 OutgoingCard(orderDaybook)
 
             }

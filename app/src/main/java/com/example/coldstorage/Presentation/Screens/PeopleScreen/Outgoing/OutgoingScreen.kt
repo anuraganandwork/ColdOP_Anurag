@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -511,7 +512,7 @@ Column(modifier = Modifier
             val row = rows.filter { it.variety == selectedVariety }.getOrNull(rowIndex)
             //val row = _row[rowIndex]
             Log.d("Outgoingggrgrgrgrgrgrgr", row.toString())
-if(row!= null){
+       if(row!= null){
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -600,8 +601,30 @@ if(row!= null){
                 if(openDailogForQtyRemovedZero.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedZero.value = false }, confirmButton = { /*TODO*/ } , text={
                          Column {
-                             Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
-                             Spacer(modifier = Modifier.padding(top = 15.dp))
+                             Row(
+                                 modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
+                                 verticalAlignment = Alignment.CenterVertically,
+                                 horizontalArrangement = Arrangement.SpaceBetween
+                             ) {
+                                 Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+
+
+                                 // Add close icon here
+                                 IconButton(
+                                     onClick = {
+                                         qtyToRemoveZero.value=""
+                                         openDailogForQtyRemovedZero.value = false
+                                     },
+                                     modifier = Modifier
+                                         .size(24.dp)
+                                 ) {
+                                     Icon(
+                                         imageVector = Icons.Default.Close,
+                                         contentDescription = "Close dialog",
+                                         tint = Color.Gray
+                                     )
+                                 }
+                             }
                              Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
                              Text(text = "Current Availble Quantity : ")
                                  Text(text = (row.size.getOrNull(0)?.quantity?.currentQuantity.toString()), color = primeGreen)
@@ -729,8 +752,30 @@ if(row!= null){
                 if(openDailogForQtyRemovedOne.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedOne.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
-                            Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.padding(top = 15.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+
+
+                                // Add close icon here
+                                IconButton(
+                                    onClick = {
+                                        qtyToRemoveOne.value=""
+                                        openDailogForQtyRemovedOne.value = false
+                                    },
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Close dialog",
+                                        tint = Color.Gray
+                                    )
+                                }
+                            }
 
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
                                 Text(text = "Current Availble Quantity : ")
@@ -888,8 +933,30 @@ if(row!= null){
                 if(openDailogForQtyRemovedTwo.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedTwo.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
-                            Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.padding(top = 15.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+
+
+                                // Add close icon here
+                                IconButton(
+                                    onClick = {
+                                        qtyToRemoveTwo.value=""
+                                        openDailogForQtyRemovedTwo.value = false
+                                    },
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Close dialog",
+                                        tint = Color.Gray
+                                    )
+                                }
+                            }
 
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
                                 Text(text = "Current Availble Quantity : ")
@@ -1042,9 +1109,30 @@ if(row!= null){
                 if(openDailogForQtyRemovedThree.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedThree.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
-                            Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.padding(top = 15.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
 
+
+                                // Add close icon here
+                                IconButton(
+                                    onClick = {
+                                        qtyToRemoveThree.value=""
+                                        openDailogForQtyRemovedThree.value = false
+                                    },
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Close dialog",
+                                        tint = Color.Gray
+                                    )
+                                }
+                            }
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
                                 Text(text = "Current Availble Quantity : ")
                                 Text(text = (row.size.getOrNull(3)?.quantity?.currentQuantity.toString()), color = primeGreen)
@@ -1178,9 +1266,32 @@ if(row!= null){
                 if(openDailogForQtyRemovedFour.value){
                     AlertDialog(onDismissRequest = { openDailogForQtyRemovedFour.value = false }, confirmButton = { /*TODO*/ } , text={
                         Column {
-                            Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.padding(top = 15.dp))
 
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+
+
+                                // Add close icon here
+                                IconButton(
+                                    onClick = {
+                                        qtyToRemoveFour.value=""
+                                        openDailogForQtyRemovedFour.value = false
+                                    },
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Close dialog",
+                                        tint = Color.Gray
+                                    )
+                                }
+                            }
                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
                                 Text(text = "Current Availble Quantity : ")
                                 Text(text = (row.size.getOrNull(4)?.quantity?.currentQuantity.toString()), color = primeGreen)

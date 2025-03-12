@@ -5,12 +5,14 @@ import com.example.coldstorage.DataLayer.Api.OutgoingData.MainOutgoingOrderClass
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseDayBook
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ResponseAllFarmerIds
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.IncomingOrderResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.OutgoingApiCallResponse.OutgoingOrderApiResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.ResponseVariety.ResponseVariety
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.ResponseStockSummary
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.StockSummaryDetailedResponse
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.VarietiesResponse
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import retrofit2.Response
 import retrofit2.http.Body
@@ -59,7 +61,8 @@ interface ColdOpApi {
   @GET("api/store-admin/farmers/{id}/orders/incoming")
   suspend fun getOldReciepts(@Path("id") farmerId: String):Response<GetAllReciptResponse>
 
-
+  @GET("api/store-admin/varities")
+  suspend fun getAllVarities():Response<VarietiesResponse>
 
  @POST("api/store-admin/farmers/{id}/outgoing") //create new outgoing order
  suspend fun confirmOutgoingOrder(@Path("id") farmerId: String ,  @Body requestBody :  MainOutgoingOrderClass) : Response<OutgoingOrderApiResponse>
@@ -82,6 +85,9 @@ interface ColdOpApi {
 @GET("api/store-admin/farmers/{id}/orders")
   suspend fun getSingleFarmerTransaction(@Path("id") farmerId: String):Response<ApiResponseDayBook>
 
+
+  @GET("api/store-admin/farmerid/check")
+  suspend fun getAllFarmerIds():Response<ResponseAllFarmerIds>
 
 
   @GET("api/store-admin/farmers/{id}/stock-summary")

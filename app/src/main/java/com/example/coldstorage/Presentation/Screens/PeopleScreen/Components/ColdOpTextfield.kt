@@ -27,6 +27,7 @@ fun ColdOpTextField(
     placeholder: String = "",
     placeholderFontSize:Int=15,
     modifier: Modifier = Modifier,
+    readOnly :Boolean = false,
     textColor: Color = Color.Black,
     placeholderColor: Color = Color.Gray,
     backgroundColor: Color = Color.Transparent,
@@ -49,6 +50,7 @@ fun ColdOpTextField(
         keyboardActions = keyboardActions,
         visualTransformation = visualTransformation,
         singleLine = true,
+        readOnly = readOnly ,
         decorationBox = { innerTextField ->
             if (value.isEmpty()) {
                 Text(

@@ -11,5 +11,6 @@ data class Data(
     val remarks:String,
     val orderDetails: List<OrderDetail>,
     val updatedAt: String,
-    val voucher: Voucher
+    val voucher: Voucher,
+    val currentStockAtThatTime:Int? = null,
 )

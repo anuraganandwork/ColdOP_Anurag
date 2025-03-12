@@ -90,7 +90,7 @@ fun ManageStocks(onContinue: ()->Unit, viewmodel:FunctionStoreOwner= hiltViewMod
                viewmodel.updateTwelveNumber("")
                viewmodel.updateVariety("")
                viewmodel.updateChamber("")
-
+               viewmodel.updateRemarks("")
 
            })}
   Spacer(modifier = Modifier.padding(20.dp))

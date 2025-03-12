@@ -4,5 +4,6 @@ data class SearchResultsData(
 
     val _id:String,
     val mobileNumber: String,
-    val name: String
+    val name: String,
+    val address:String
 )

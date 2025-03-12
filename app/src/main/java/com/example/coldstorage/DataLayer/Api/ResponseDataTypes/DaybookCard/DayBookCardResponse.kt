@@ -14,6 +14,7 @@ data class OrderDaybook(
     val dateOfSubmission: String? = null,
     val dateOfExtraction: String? = null,
     val remarks:String? = null,
+    val currentStockAtThatTime:Int? = null,
     val orderDetails: List<OrderDetailDaybook>
 )
 
@@ -77,4 +78,13 @@ data class IncomingBagSizeDaybook(
     val currentQuantity: Int,
     val initialQuantity: Int,
     val _id: String
+)
+
+
+data class ResponseAllFarmerIds(
+    val status :String,
+    val data : DataID?
+)
+data class DataID(
+    val registeredFarmers: List<String>?
 )

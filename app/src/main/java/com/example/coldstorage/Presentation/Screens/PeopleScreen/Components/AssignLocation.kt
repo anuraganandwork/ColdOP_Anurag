@@ -1,5 +1,7 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen.Components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,6 +44,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,6 +55,7 @@ import com.example.coldstorage.ui.theme.lightGrayBorder
 import com.example.coldstorage.ui.theme.primeGreen
 import com.example.coldstorage.ui.theme.primeRed
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AssignLocation(onContinue:()->Unit, viewmodel:FunctionStoreOwner= hiltViewModel(), onClick:()->Unit){
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -112,7 +116,8 @@ fun AssignLocation(onContinue:()->Unit, viewmodel:FunctionStoreOwner= hiltViewMo
                     onValueChange = { text -> viewmodel.updateChamber(text) },
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Text
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Characters
                     ),
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                     modifier = Modifier

@@ -17,12 +17,16 @@ fun outgoingEntry(inputState:MutableState<String>  , reciptRow: ReceiptRow , out
             val existingBagSize = existingItem.bagUpdates.find { it?.size == reciptRow.size.getOrNull(index)?.size }
             Log.d("Outgoingsecscrn" ,existingBagSize.toString() )
             if (existingBagSize != null) {
+                val currQtyExisting = existingItem.currQty
+
                 val updatedBagWithOldBag = existingBagSize.copy(quantityToRemove = inputState.value.toInt())
                 val updatedBagUpdates = existingItem.bagUpdates.toMutableList().apply {
                     val indexOfBag = indexOf(existingBagSize)
                     if (indexOfBag != -1) this[indexOfBag] = updatedBagWithOldBag
                 }
-                val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
+                val updatedElement = existingItem.copy(currQty = reciptRow.size.getOrNull(index)!!.quantity.currentQuantity.toString()
+                    , bagUpdates = updatedBagUpdates)
+                Log.d("cucucucucrrr" , reciptRow.size.getOrNull(index)!!.quantity.currentQuantity.toString())
                 val index = outgoingResponseBody.indexOf(existingItem)
                 if (index != -1) outgoingResponseBody[index] = updatedElement
 
@@ -31,7 +35,8 @@ fun outgoingEntry(inputState:MutableState<String>  , reciptRow: ReceiptRow , out
                     reciptRow.size.getOrNull(index)?.size?.let { add(BagUpdate(size = it, quantityToRemove = inputState.value.toInt())) }
                 }
 
-                val updatedElement = existingItem.copy(bagUpdates = updatedBagUpdates)
+                val updatedElement = existingItem.copy(currQty = reciptRow.size.getOrNull(index)!!.quantity.currentQuantity.toString()
+                    ,bagUpdates = updatedBagUpdates)
                 val index = outgoingResponseBody.indexOf(existingItem)
                 if (index != -1) outgoingResponseBody[index] = updatedElement
             }

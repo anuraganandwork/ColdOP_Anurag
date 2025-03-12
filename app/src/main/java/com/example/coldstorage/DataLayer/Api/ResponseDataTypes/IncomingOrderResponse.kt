@@ -6,3 +6,8 @@ data class IncomingOrderResponse(
     val status: String,
     val errorMessage :String?
 )
+
+data class VarietiesResponse(
+    val status: String,
+    val varieties: List<String>
+)

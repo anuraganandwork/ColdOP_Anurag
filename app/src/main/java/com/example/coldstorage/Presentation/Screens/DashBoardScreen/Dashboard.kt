@@ -204,9 +204,9 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
         Text(text = "Transactions", fontWeight = FontWeight.Bold , fontSize = 20.sp ,  modifier = Modifier.padding(horizontal = 15.dp , vertical = 10.dp))
         Row(modifier = Modifier.padding(horizontal = 10.dp) , horizontalArrangement = Arrangement.SpaceAround) {
             
-            ColdOpDropDown(label = "Sort", options = listOf("Latest" , "Oldest"), onSelect = { selected -> sortingOrder.value = selected.toLowerCase()} )
+            ColdOpDropDown(stateToUpdate = null , label = "Sort", options = listOf("Latest" , "Oldest"), onSelect = { selected -> sortingOrder.value = selected.toLowerCase()} )
             Spacer(modifier = Modifier.padding(8.dp))
-            ColdOpDropDown(label = "Filter", options = listOf("Incoming" , "Outgoing" , "Show All"), onSelect = { selected -> typeOfCard.value = selected} )
+            ColdOpDropDown(stateToUpdate = null , label = "Filter", options = listOf("Incoming" , "Outgoing" , "Show All"), onSelect = { selected -> typeOfCard.value = selected} )
 
         }
             when (state) {

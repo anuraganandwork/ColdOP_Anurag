@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.FarmerData
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ImageUploadComponent
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
@@ -55,13 +56,14 @@ fun FarmerQuickAddInputForm(navController: NavController, viewModel: AuthViewmod
     var imageUrl by remember { mutableStateOf("") }
     var mobileNumber by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
+    var accNum by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var mobileNumberError by remember { mutableStateOf("") } // Error message for mobile number
     var enabledButton = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
    val loading = viewModel.loadingAddFarmer.collectAsState()
     val statusAdding = viewModel.farmerAddStatus.collectAsState()
-    LaunchedEffect(address, imageUrl, mobileNumber, name, password) {
+    LaunchedEffect(address, imageUrl, mobileNumber, name, password, accNum) {
         // Validate mobile number and other fields
         mobileNumberError = if (mobileNumber.length in 1..9) {
             "Mobile number must be 10 digits"
@@ -74,7 +76,8 @@ fun FarmerQuickAddInputForm(navController: NavController, viewModel: AuthViewmod
                 imageUrl.isNotEmpty() &&
                 mobileNumber.length == 10 &&
                 name.isNotEmpty() &&
-                password.isNotEmpty()
+                password.isNotEmpty() &&
+                accNum.isNotEmpty()
     }
 
     Scaffold(topBar = {
@@ -93,6 +96,15 @@ fun FarmerQuickAddInputForm(navController: NavController, viewModel: AuthViewmod
                 .padding(paddingValues)
                 .padding(horizontal = 15.dp)
         ) {
+
+            item{
+                ColdOpTextField(value = accNum, onValueChange ={ acc->
+                    accNum = acc
+
+                } , placeholder = "Enter account number",
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                )
+            }
             item {
 
                 // Name Input
@@ -242,7 +254,8 @@ fun FarmerQuickAddInputForm(navController: NavController, viewModel: AuthViewmod
                             address = address,
                             imageUrl = imageUrl,
                             mobileNumber = mobileNumber,
-                            password = password
+                            password = password,
+                            accNum = accNum
                         )
                         viewModel.quickRegister(farmerData)
                         address = ""

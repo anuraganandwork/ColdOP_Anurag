@@ -38,6 +38,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -83,11 +84,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.FarmerData
 import com.example.coldstorage.Presentation.Screens.AllScreens
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpDropDown
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.R
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.primeGreen
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,6 +102,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val variety = viewmodel.variety.collectAsState()
+    var expandedVaritiesList  by remember { mutableStateOf(false) }
     val lotSize = viewmodel.lotsize.collectAsState()
     val Ration = viewmodel.Ration.collectAsState()
     val seedBags = viewmodel.seedBags.collectAsState()
@@ -119,7 +124,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
     var imageUrl by remember { mutableStateOf("") }
     var mobileNumberr by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
-
+    var accNum by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var mobileNumberError by remember { mutableStateOf("") }
     val loading = viewModel.loadingAddFarmer.collectAsState()
@@ -145,6 +150,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
         if(statusAdding.value){
             address = ""
             name = ""
+            accNum=""
             mobileNumberr = ""
             imageUrl = ""
             password = ""
@@ -165,9 +171,19 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
         viewmodel.updateFarmerAcc("")
         viewmodel.updateVariety("")
         viewmodel.updateChamber("")
-        navController.popBackStack()
+        navController.navigate(AllScreens.Dashboard.name)
         viewmodel.resetSearchResult()
+        viewmodel.updateRemarks("")
 
+    }
+   val listOfVarieties = viewmodel.allVarities.collectAsState()
+    val fetchedListOfFarmerIds = viewmodel.listOfExistingIds.collectAsState()
+    val coroutineScopeExistingAcc = rememberCoroutineScope()
+    var showExistingAccError by remember { mutableStateOf(false) }
+    var errorCheckingJobExistingId by remember { mutableStateOf<Job?>(null) }
+    LaunchedEffect(Unit){
+        viewmodel.getAllVarietiesForOrders()
+        viewmodel.fetchListOfAllIds()
     }
     Scaffold(
         topBar = {
@@ -186,10 +202,10 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                         viewmodel.updateVariety("")
                         viewmodel.updateChamber("")
 
+                        viewmodel.updateRemarks("")
 
 
-
-                        navController.popBackStack()
+                        navController.navigate(AllScreens.Dashboard.name)
 //                    viewmodel.searchResults.collectAsState() = emptyList()
                         viewmodel.resetSearchResult()
                     }) {
@@ -217,7 +233,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
 //                fontSize = 30.sp,
 //                fontWeight = FontWeight.Bold
 //            )
-            Spacer(modifier = Modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(75.dp))
             Row(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
@@ -233,7 +249,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
 
         // Account Name Section
         item {
-            Text(text = "Enter Account Name (search and select)")
+            Text(text = "Enter Account Name")
             Row(modifier = Modifier.fillMaxWidth() , verticalAlignment = Alignment.CenterVertically , horizontalArrangement = Arrangement.SpaceBetween) {
                 OutlinedTextField(
                     value = querry.value,
@@ -284,6 +300,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                AlertDialog(onDismissRequest = {
                    name=""
                    address=""
+                   accNum=""
                    mobileNumberr=""
                    openAddFarmerDailog.value = false
                    viewModel.resetAddFarmerStatus()
@@ -309,6 +326,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                                    name=""
                                    address=""
                                    mobileNumberr=""
+                                   accNum=""
                                    openAddFarmerDailog.value = false
                                    viewModel.resetAddFarmerStatus()
                                },
@@ -324,6 +342,40 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                        }
                    } , text = {
                    Column(modifier = Modifier.padding(top = 12.dp)) {
+                       Row(){
+                           Text(text = "Acc No. :",modifier = Modifier
+                               .weight(0.3f)
+                               .padding(end = 8.dp))
+                           Column(modifier = Modifier.weight(0.7f),
+                           ) {
+                               ColdOpTextField(
+                                   value = accNum,
+                                   onValueChange = { text ->
+                                       accNum = text
+                                       errorCheckingJobExistingId?.cancel()
+                                       if(showExistingAccError){
+                                           showExistingAccError = false
+                                       }
+                                       errorCheckingJobExistingId = coroutineScopeExistingAcc.launch {
+                                           delay(200)
+                                           showExistingAccError = text.isNotEmpty() && fetchedListOfFarmerIds.value?.contains(text) == true
+                                       }
+                                   },
+                                   placeholder = "Enter acc no."
+                               )
+                               if (showExistingAccError) {
+                                   Text(
+                                       text = "Acc no. is already taken!",
+                                       color = Color.Red,
+                                       fontSize = 12.sp,
+                                       modifier = Modifier.padding(top = 4.dp)
+                                   )
+                               }
+                           }
+
+
+                       }
+                       Spacer(modifier = Modifier.padding(5.dp))
 
                        Row(verticalAlignment = Alignment.CenterVertically) {
                            Text(
@@ -408,6 +460,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                                onClick = {
                                    val farmerData = FarmerData(
                                        name = name,
+                                       accNum = accNum,
                                        mobileNumber = mobileNumberr,
                                        address = address,
                                        password = "Added from quickest route",
@@ -554,7 +607,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                                         .padding(vertical = 8.dp)
                                 ) {
                                     Text(text = result.name)
-                                    Text(text = result.mobileNumber)
+                                    Text(text = result.address)
                                 }
                             }
 
@@ -572,29 +625,36 @@ Log.d("ghghgfh" , "NO search results")
         // Lot Number Section
         item {
             Text(text = "Enter Variety")
-            OutlinedTextField(
-                value = variety.value,
-                onValueChange = {
-                    viewmodel.updateVariety(it)
-                },
-                label = { Text("Enter Variety") },
-                modifier = Modifier.fillMaxWidth() ,
-                colors = TextFieldDefaults.textFieldColors(
-                    focusedTextColor = Color.Black, // Text color inside the TextField
-                    disabledTextColor = Color.Gray,
-                    cursorColor = Color.Black, // Cursor color
-                    containerColor = Color.Transparent ,
-                    errorCursorColor = Color.Red, // Cursor color in error state
-                    focusedIndicatorColor = primeGreen, // Border color when focused
-                    unfocusedIndicatorColor = Color.Gray, // Border color when not focused
-                    errorIndicatorColor = Color.Red, // Border color in error state
-                    focusedLeadingIconColor = Color.Black,
-                    focusedTrailingIconColor = Color.Black,
-                    focusedLabelColor = primeGreen, // Label color when focused
-                    unfocusedLabelColor = Color.Gray, // Label color when not focused
-                    errorLabelColor = Color.Red // Label color in error state
+//            OutlinedTextField(
+//                value = variety.value,
+//                onValueChange = {
+//                    viewmodel.updateVariety(it)
+//                },
+//                label = { Text("Enter Variety") },
+//                modifier = Modifier.fillMaxWidth() ,
+//                keyboardOptions = KeyboardOptions(
+//                    imeAction = ImeAction.Done),
+//                colors = TextFieldDefaults.textFieldColors(
+//                    focusedTextColor = Color.Black, // Text color inside the TextField
+//                    disabledTextColor = Color.Gray,
+//                    cursorColor = Color.Black, // Cursor color
+//                    containerColor = Color.Transparent ,
+//                    errorCursorColor = Color.Red, // Cursor color in error state
+//                    focusedIndicatorColor = primeGreen, // Border color when focused
+//                    unfocusedIndicatorColor = Color.Gray, // Border color when not focused
+//                    errorIndicatorColor = Color.Red, // Border color in error state
+//                    focusedLeadingIconColor = Color.Black,
+//                    focusedTrailingIconColor = Color.Black,
+//                    focusedLabelColor = primeGreen, // Label color when focused
+//                    unfocusedLabelColor = Color.Gray, // Label color when not focused
+//                    errorLabelColor = Color.Red // Label color in error state
+//                )
+//            )
+            listOfVarieties.value?.let { it1 ->
+                ColdOpDropDown(   stateToUpdate = viewmodel.variety.collectAsState(), label = "Select Variety", options =
+                it1, onSelect = {selectedVariety -> viewmodel.updateVariety(selectedVariety)}
                 )
-            )
+            }
             Spacer(modifier = Modifier.height(16.dp))
         }
 
