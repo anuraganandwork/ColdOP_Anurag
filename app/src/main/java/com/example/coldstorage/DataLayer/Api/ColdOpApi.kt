@@ -5,19 +5,24 @@ import com.example.coldstorage.DataLayer.Api.OutgoingData.MainOutgoingOrderClass
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseDayBook
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseSingleOrder
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ResponseAllFarmerIds
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.UpdateOrderRequest
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.IncomingOrderResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.OutgoingApiCallResponse.OutgoingOrderApiResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.ResponseVariety.ResponseVariety
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.ResponseStockSummary
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.StockSummaryDetailedResponse
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StoreSummaryResponse.StockSummaryResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.VarietiesResponse
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -67,9 +72,15 @@ interface ColdOpApi {
  @POST("api/store-admin/farmers/{id}/outgoing") //create new outgoing order
  suspend fun confirmOutgoingOrder(@Path("id") farmerId: String ,  @Body requestBody :  MainOutgoingOrderClass) : Response<OutgoingOrderApiResponse>
 
+ @PUT("api/store-admin/incoming-orders/{id}")
+  suspend fun  editIncomingOrder(@Path("id") orderId:String , @Body requestBody : UpdateOrderRequest  ) : Response<Any>
 
-  @GET("api/store-admin/66e1f22d782bbd67d3446805/farmers/search")
-  suspend fun searchFarmers(@Query("query") query: String): List<SearchResultsData>
+  @GET("api/store-admin/orders/{id}/incoming")
+  suspend fun  getSingleOrder(@Path("id") orderId: String) : Response <ApiResponseSingleOrder>
+  @GET("api/store-admin/{storeId}/farmers/search")
+  suspend fun searchFarmers(
+      @Path("storeId") storeId :String,
+      @Query("query") query: String): List<SearchResultsData>
 
   @GET("api/store-admin/receipt-number")
   suspend fun getRecieptNum():Response<RecieptNumData>
@@ -99,6 +110,9 @@ interface ColdOpApi {
   @GET("api/store-admin/farmers/{id}/stock-summary")
   suspend fun getDetailedStockSummary(@Path("id") farmerId: String):Response<StockSummaryDetailedResponse>
 
+
+  @GET("api/store-admin/cold-storage-summary")
+  suspend fun getColdStorageCapacitySummary(): Response<StockSummaryResponse>
 }
 
 //1149

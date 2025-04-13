@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -25,11 +26,17 @@ import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.DataLayer.Api.PopulatedFarmer
 import com.example.coldstorage.DataLayer.Api.Quantity
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseDayBook
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.BagSizeRequest
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDetailRequest
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.QuantityRequest
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.UpdateOrderRequest
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.Order
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.ResponseVariety.ResponseVariety
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.ResponseStockSummary
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StockSummary.StockSummary
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StoreSummaryResponse.StockSummaryResponse
+import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.StoreSummaryResponse.StoreStockItem
 import com.example.coldstorage.DataLayer.Api.SearchFarmerData.SearchResultsData
 import com.example.coldstorage.DataLayer.Di.AuthInterceptor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -69,6 +76,9 @@ class FunctionStoreOwner @Inject constructor(
 
     private val _query = MutableStateFlow<String>("")
     val queryy :StateFlow<String> = _query.asStateFlow()
+
+    private val _OutgoingQuery = MutableStateFlow<String>("")
+    val OutgoingQueryy :StateFlow<String> = _OutgoingQuery.asStateFlow()
     private val _lotSize = MutableStateFlow<String>("")
     val lotsize :StateFlow<String> = _lotSize.asStateFlow()
      private val _isNameSelected = MutableStateFlow<Boolean>(false)
@@ -79,7 +89,7 @@ class FunctionStoreOwner @Inject constructor(
     private val _seedBags = MutableStateFlow<String>("")
     val seedBags :StateFlow<String> = _seedBags.asStateFlow()
 
-    private val _remarks = MutableStateFlow<String>(" ")
+    private val _remarks = MutableStateFlow<String>("")
     val remarks :StateFlow<String> =  _remarks.asStateFlow()
 
     private val _goli  = MutableStateFlow<String>("")
@@ -113,17 +123,26 @@ class FunctionStoreOwner @Inject constructor(
     fun updateRation(value: String) { _Ration.value = value }
     fun updateSeedBags(value: String) { _seedBags.value = value }
     fun updateTwelveNumber(value: String) { _twelveNumber.value = value }
-    fun updateGoli(value: String) { _goli.value = value }
+    fun updateGoli(value: String) {
+        _goli.value = value
+        Log.d("goli value", value)
+    }
     fun updateCutAndTok(value: String) { _cuttok.value = value }
 
     fun updateIsNameSelected(value :Boolean){ _isNameSelected.value = value}
     fun updateQuery(value: String){_query.value = value}
+
+    fun updateOutgoingQuery(value: String){_OutgoingQuery.value = value}
     fun updateFloor(value: String){ _floor.value = value}
     fun updateChamber(value: String) {_chamber.value = value }
 
     fun updateRow(value: String){_row.value = value}
 
-    fun updateFarmerAcc(value: String){ _farmerAcc.value = value}
+    fun updateFarmerAcc(value: String){
+        Log.d("FarmerIDUpdated" , value)
+        _farmerAcc.value = value
+
+    }
 
     fun updateRemarks(value: String){
         _remarks.value = value
@@ -194,8 +213,159 @@ class FunctionStoreOwner @Inject constructor(
     val incomingOrderStatus : StateFlow<Boolean> =  _incomingOrderStatus.asStateFlow()
   private val _orderResult = MutableStateFlow<Result<Unit>?>(null)
     val orderResult = _orderResult.asStateFlow()
+    private val _orderId = mutableStateOf("")
+    val orderId: State<String> = _orderId
+    private val _currentReceiptNum = mutableStateOf("")
+    val currentReceiptNum: State<String> = _currentReceiptNum
+    private val _coldStorageId = mutableStateOf("")
+    val coldStorageId: State<String> = _coldStorageId
+    private val _farmerName = mutableStateOf("")
+    val farmerName: State<String> = _farmerName
+    private val _dateOfSubmission = mutableStateOf("")
+    val dateOfSubmission: State<String> = _dateOfSubmission
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
+    private val _updateSuccess = MutableStateFlow(false)
+    val updateSuccess: StateFlow<Boolean> = _updateSuccess
 
     @RequiresApi(Build.VERSION_CODES.O)
+    fun loadOrderData(orderData: OrderDaybook) {
+        _orderId.value = orderData._id
+        _currentReceiptNum.value = orderData.voucher.voucherNumber.toString()
+        _coldStorageId.value = orderData.coldStorageId
+        _farmerAcc.value = orderData.farmerId._id
+        _farmerName.value = orderData.farmerId.name
+        _dateOfSubmission.value = orderData.dateOfSubmission ?: getCurrentDate()
+        _remarks.value = orderData.remarks ?: ""
+
+        if (orderData.orderDetails.isNotEmpty()) {
+            val details = orderData.orderDetails[0]
+            _chamber.value = details.location!!
+            _variety.value = details.variety
+
+            // Set bag quantities
+            for (bagSize in details.bagSizes) {
+                when (bagSize.size) {
+                    "Cut-tok" -> _cuttok.value = bagSize.quantity?.currentQuantity.toString()
+                    "Goli" -> _goli.value = bagSize.quantity?.currentQuantity.toString()
+                    "Number-12" -> _twelveNumber.value = bagSize.quantity?.currentQuantity.toString()
+                    "Ration" -> _Ration.value = bagSize.quantity?.currentQuantity.toString()
+                    "Seed" -> _seedBags.value = bagSize.quantity?.currentQuantity.toString()
+                }
+            }
+        }
+    }
+
+
+
+    private val _singleOrderDetail = MutableStateFlow<OrderDaybook?>(null)
+    val singleOrderDetail: StateFlow<OrderDaybook?> = _singleOrderDetail.asStateFlow()
+
+    @SuppressLint("LongLogTag")
+    fun getSingleOrder(orderId: String) {
+        viewModelScope.launch {
+            try {
+                val response = api.getSingleOrder(orderId)
+                if (response.isSuccessful) {
+                    val orderData = response.body()?.data
+                    Log.d("OrderSuccess", orderData.toString())
+                    if (orderData != null) {
+                        _singleOrderDetail.value = orderData
+                    }
+                } else {
+                    Log.d("OrderError", "Error response: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.d("OrderException", "Exception: ${e.message}")
+            }
+        }
+    }
+
+
+    suspend fun updateOrder(): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                _loading.value = true
+                _errorMessage.value = null
+
+                val updateOrderData = UpdateOrderRequest(
+                    coldStorageId = coldStorageId.value,
+                    dateOfSubmission = dateOfSubmission.value,
+                    farmerId = farmerAcc.value,
+                    remarks = if (remarks.value.isEmpty()) "No remarks was entered!" else remarks.value,
+                    orderDetails = listOf(
+                        OrderDetailRequest(
+                            bagSizes = listOf(
+                                BagSizeRequest(
+                                    quantity = QuantityRequest(
+                                        currentQuantity = cuttok.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 },
+                                        initialQuantity = cuttok.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
+                                    ),
+                                    size = "Cut-tok"
+                                ),
+                                BagSizeRequest(
+                                    quantity = QuantityRequest(
+                                        currentQuantity = goli.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 },
+                                        initialQuantity = goli.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
+                                    ),
+                                    size = "Goli"
+                                ),
+                                BagSizeRequest(
+                                    quantity = QuantityRequest(
+                                        currentQuantity = twelveNumber.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 },
+                                        initialQuantity = twelveNumber.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
+                                    ),
+                                    size = "Number-12"
+                                ),
+                                BagSizeRequest(
+                                    quantity = QuantityRequest(
+                                        currentQuantity = Ration.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 },
+                                        initialQuantity = Ration.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
+                                    ),
+                                    size = "Ration"
+                                ),
+                                BagSizeRequest(
+                                    quantity = QuantityRequest(
+                                        currentQuantity = seedBags.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 },
+                                        initialQuantity = seedBags.value.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() ?: 0 }
+                                    ),
+                                    size = "Seed"
+                                )
+                            ),
+                            location = chamber.value,
+                            variety = variety.value
+                        )
+                    ),
+                    voucherNumber = currentReceiptNum.value
+                )
+
+                val response = api.editIncomingOrder(orderId.value, updateOrderData)
+
+                if (response.isSuccessful) {
+                    Log.d("Success", "Order updated successfully")
+                    _updateSuccess.value = true
+                    Result.success(Unit)
+                } else {
+                    Log.d("ErrorOrder",
+                        "Order not updated successfully. Error: ${response.errorBody()?.string()} - ${response.message()}"
+                    )
+                    _errorMessage.value = "Failed to update order: ${response.message()}"
+                    Result.failure(Exception("Failed to update order"))
+                }
+            } catch (e: Exception) {
+                Log.d("ErrorLog", "Update order error: $e")
+                _errorMessage.value = "Error: ${e.message}"
+                Result.failure(e)
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+    fun clearUpdateStatus() {
+        _updateSuccess.value = false
+        _errorMessage.value = null
+    }
+        @RequiresApi(Build.VERSION_CODES.O)
     fun createIncomingOrderForUi(){
         viewModelScope.launch {
            val result = createIncomingOrder()
@@ -212,7 +382,7 @@ class FunctionStoreOwner @Inject constructor(
                     coldStorageId = authIntercepter.getStore_id("store")!!,
                     dateOfSubmission = getCurrentDate(),
                     farmerId = farmerAcc.value,
-                    remarks = remarks.value,
+                    remarks = if (remarks.value.isEmpty()) "No remarks was entered!" else remarks.value,
                     orderDetails = listOf(
                         OrderDetail(
                             bagSizes = listOf(
@@ -456,7 +626,33 @@ class FunctionStoreOwner @Inject constructor(
     val outgoingOrderStatus : StateFlow<Boolean> = _outgoingOrderStatus.asStateFlow()
     private val _orderOutgoingResult = MutableStateFlow<Result<Unit>?>(null)
     val orderOutgoingResult: StateFlow<Result<Unit>?> = _orderOutgoingResult.asStateFlow()
+   private val _qtyToRemoveZero = MutableStateFlow<String>("")
+    val qtyToRemoveZero = _qtyToRemoveZero.asStateFlow()
+    fun updateQtyToRemoveZero(value: String){ _qtyToRemoveZero.value = value}
 
+    private val _qtyToRemoveOne = MutableStateFlow<String>("")
+    val qtyToRemoveOne = _qtyToRemoveOne.asStateFlow()
+    fun updateQtyToRemoveOne(value: String){ _qtyToRemoveOne.value = value}
+
+    private val _qtyToRemoveTwo = MutableStateFlow<String>("")
+    val qtyToRemoveTwo = _qtyToRemoveTwo.asStateFlow()
+    fun updateQtyToRemoveTwo(value: String){ _qtyToRemoveTwo.value = value}
+
+    private val _qtyToRemoveThree = MutableStateFlow<String>("")
+    val qtyToRemoveThree = _qtyToRemoveThree.asStateFlow()
+    fun updateQtyToRemoveThree(value: String){ _qtyToRemoveThree.value = value}
+
+    private val _qtyToRemoveFour = MutableStateFlow<String>("")
+    val qtyToRemoveFour = _qtyToRemoveFour.asStateFlow()
+    fun updateQtyToRemoveFour(value: String){ _qtyToRemoveFour.value = value}
+
+
+   private val _selectedVariety = MutableStateFlow<String>("")
+    val selectedVariety = _selectedVariety.asStateFlow()
+
+    fun updateSelectedVariety(value: String){
+        _selectedVariety.value = value
+    }
     fun confirmOutgoingOrderForUi(farmerId: String ,outgoingRequestBody: MainOutgoingOrderClass){
         viewModelScope.launch {
             val result = confirmOutgoingOrder(farmerId,outgoingRequestBody)
@@ -477,6 +673,7 @@ class FunctionStoreOwner @Inject constructor(
                     Log.d("qwertyuiB4", "this is running " + _outgoingOrderStatus.value.toString())
 
                     _outgoingOrderStatus.value = true
+                    updateOutgoingQuery("")
                     Result.success(Unit)
                  //   Log.d("qwertyui", "this is running " + _outgoingOrderStatus.value.toString())
 //                    withContext(Dispatchers.Main) {
@@ -534,7 +731,8 @@ class FunctionStoreOwner @Inject constructor(
 
     private suspend fun searchFarmers(query:String){
      try{
-        val response = api.searchFarmers(query)
+        val response = api.searchFarmers(authIntercepter.getStore_id("store")!!,
+            query)
          _searchResults.value = response
      } catch (e : Exception){
           Log.d("Searching" , "Error is "+e)
@@ -730,8 +928,47 @@ class FunctionStoreOwner @Inject constructor(
         }
     }
 
+    private val _StoreSummaryData = MutableStateFlow<StockSummaryResponse>(StockSummaryResponse("" , emptyList()))
+    val StoreSummaryData :StateFlow<StockSummaryResponse> = _StoreSummaryData.asStateFlow()
 
-}
+    private val _totalQuantity = MutableStateFlow(0)
+    val totalQuantity: StateFlow<Int> = _totalQuantity.asStateFlow()
+
+    private val _varietyQuantities = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val varietyQuantities: StateFlow<Map<String, Int>> = _varietyQuantities.asStateFlow()
+
+    fun getStoreStockSummary(){
+        viewModelScope.launch {
+            try {
+
+                val response = api.getColdStorageCapacitySummary()
+                if(response.isSuccessful){
+                    _StoreSummaryData.value = response?.body()!!
+                    response?.body()?.let { calculateQuantities(it) }
+                }
+
+               }catch (e: Exception){
+
+               }
+
+        }
+    }
+    private fun calculateQuantities(data: StockSummaryResponse) {
+        var total = 0
+        val varietyMap = mutableMapOf<String, Int>()
+
+        data.stockSummary?.forEach { stockItem ->
+            // Replace sumOf with traditional sum calculation
+            val varietyTotal = stockItem.sizes?.forEach{ qty ->
+                total += qty.currentQuantity
+        }
+
+        }
+
+        _totalQuantity.value = total
+        _varietyQuantities.value = varietyMap
+    }}
+
 
 //learnt new thing
 sealed class FarmerApiState{

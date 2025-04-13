@@ -236,7 +236,7 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
                         LazyColumn {
                             if (data!= null) {
                                 items(data.data) {
-                                    cardWrapper(context , it)
+                                    cardWrapper(context , it , navController)
                                 }
                             }
                         }
@@ -331,7 +331,7 @@ fun Dashboard( navController: NavController, viewmodel: FunctionStoreOwner = hil
 //1223- 123
 
 @Composable
-fun cardWrapper(context: Context,orderDaybook: OrderDaybook){
+fun cardWrapper(context: Context,orderDaybook: OrderDaybook , navController: NavController){
 //    val view = ComposeView(context).apply {
 //        setContent {         CardComponentDaybook(orderDaybook = orderDaybook)
 //        }
@@ -342,7 +342,7 @@ fun cardWrapper(context: Context,orderDaybook: OrderDaybook){
 //    ) { CardComponentDaybook(orderDaybook = orderDaybook) }
 
     Column {
-        CardComponentDaybook(orderDaybook = orderDaybook)
+        CardComponentDaybook(orderDaybook = orderDaybook , navController)
 //        PdfButton(
 //            content = { CardComponentDaybook(orderDaybook = orderDaybook) },
 //

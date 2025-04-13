@@ -14,6 +14,7 @@ val primeGreen = Color(0xFF23C45E)
 val dropdownGrey = Color(0xFFF5F4F5)
 val textBrown = Color(0xFF372D29)
 val lightGrayBorder = Color(0xFFB0B0B0)
+val bgWhite = Color(0xFFF5F4F5)
 
 
 

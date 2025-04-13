@@ -1,6 +1,7 @@
 package com.example.coldstorage.Presentation.Navigation
 
 import FirstBottomSheet
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
@@ -38,6 +39,7 @@ import androidx.navigation.navArgument
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.Auth.FarmerQuickAddInputForm
 import com.example.coldstorage.Presentation.Screens.DashBoardScreen.Dashboard
+import com.example.coldstorage.Presentation.Screens.DashBoardScreen.EditOrderScreen
 import com.example.coldstorage.Presentation.Screens.DashBoardScreen.SecondBottomSheet
 import com.example.coldstorage.Presentation.Screens.OfflineScreen.Offline
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing.OutgoingOrderSuccess
@@ -51,6 +53,7 @@ import com.example.coldstorage.R
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ui.theme.primeGreen
 
+@SuppressLint("SuspiciousIndentation")
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -276,7 +279,22 @@ fun bottomNav(navControllerMain: NavController){
                     viewmodel = viewmodel
                 )
             }
+            composable("${AllScreens.EditIncomingScreen.name}/{orderId}" , arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                // Get order data from previous screen or API
+                val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
 
+
+                    EditOrderScreen(
+                        orderId = orderId,
+                        viewmodel = viewmodel,
+                        onBackClick = { navHostController.popBackStack() },
+                        onUpdateSuccess = {
+                            navHostController.popBackStack()
+                            // Show success toast or navigate to another screen
+                        }
+                    )
+            }
 
 
 

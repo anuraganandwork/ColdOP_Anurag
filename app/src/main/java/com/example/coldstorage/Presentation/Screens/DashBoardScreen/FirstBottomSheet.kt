@@ -99,7 +99,6 @@ import kotlinx.coroutines.launch
 fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner  , viewModel: AuthViewmodel = hiltViewModel()) {
 
     val querry = viewmodel.queryy.collectAsState()
-
     val keyboardController = LocalSoftwareKeyboardController.current
     val variety = viewmodel.variety.collectAsState()
     var expandedVaritiesList  by remember { mutableStateOf(false) }

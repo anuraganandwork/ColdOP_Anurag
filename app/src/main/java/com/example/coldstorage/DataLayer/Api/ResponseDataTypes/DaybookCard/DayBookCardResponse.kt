@@ -5,6 +5,11 @@ data class ApiResponseDayBook(
     val message: String? = null,
     val data: List<OrderDaybook>
 )
+data class ApiResponseSingleOrder(
+    val status: String,
+    val message: String? = null,
+    val data:OrderDaybook? = null
+)
 
 data class OrderDaybook(
     val voucher: VoucherDaybook,
@@ -87,4 +92,28 @@ data class ResponseAllFarmerIds(
 )
 data class DataID(
     val registeredFarmers: List<String>?
+)
+
+data class UpdateOrderRequest(
+    val coldStorageId: String,
+    val dateOfSubmission: String,
+    val farmerId: String,
+    val remarks: String,
+    val orderDetails: List<OrderDetailRequest>,
+    val voucherNumber: String
+)
+
+data class OrderDetailRequest(
+    val bagSizes: List<BagSizeRequest>,
+    val location: String,
+    val variety: String
+)
+
+data class BagSizeRequest(
+    val quantity: QuantityRequest,
+    val size: String
+)
+data class QuantityRequest(
+    val currentQuantity: Int,
+    val initialQuantity: Int
 )

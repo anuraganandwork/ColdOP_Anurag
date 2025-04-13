@@ -1,6 +1,7 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -52,6 +53,7 @@ import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ClickableBlock
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
+import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.QuantityRemovalComponent
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Util.outgoingEntry
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.FunctionStoreOwner
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.ReceiptRow
@@ -67,20 +69,23 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: FunctionStoreOwner = hiltViewModel() ,navController: NavController) {
-    var selectedVariety by remember { mutableStateOf("") }
+    val selectedVariety by  viewmodel.selectedVariety.collectAsState()
     var selectedBagSize by remember { mutableStateOf("") }
     var query by remember {
         mutableStateOf("")
     }
+    var outgoingQuery = viewmodel.OutgoingQueryy.collectAsState()
     LaunchedEffect(Unit ){
         Log.d("fromDayBook" ,fromDaybook.toString())
         if(fromDaybook) {
             viewmodel.resetSearchResult()
         }
     }
+    val allVarieties = viewmodel.allVarieties.collectAsState()
+
     val isNameSelected = remember { mutableStateOf(false) }
      if(fromDaybook){
-    LaunchedEffect(query){
+    LaunchedEffect(viewmodel.farmerAcc.value){
         if(fromDaybook){
             viewmodel.getAllVarieties(viewmodel.farmerAcc.value)
         }else{
@@ -99,7 +104,11 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
 
     val searchResults = viewmodel.searchResults.collectAsState()
 
-    val allVarieties = viewmodel.allVarieties.collectAsState()
+
+    BackHandler(enabled = true) {
+        viewmodel.resetSearchResult()
+        viewmodel.updateOutgoingQuery("")
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -108,6 +117,7 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
                     IconButton(onClick = { navController.popBackStack()
 //                    viewmodel.searchResults.collectAsState() = emptyList()
                         viewmodel.resetSearchResult()
+                        viewmodel.updateOutgoingQuery("")
                     }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
@@ -126,10 +136,11 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
             if(fromDaybook){
                 Text(text = "Enter Account Name (search and select)")
                 OutlinedTextField(
-                    value = query,
-                    onValueChange = {
-                        query = it
-                        viewmodel.onSearchQuery(query)
+                    value = outgoingQuery.value,
+                    onValueChange =
+                    {
+                        viewmodel.updateOutgoingQuery(it)
+                        viewmodel.onSearchQuery(outgoingQuery.value)
                     },
                     label = { Text("Search farmers") },
                     modifier = Modifier.fillMaxWidth(),
@@ -152,7 +163,7 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
 
 
             LazyColumn(){
-                if (!isNameSelected.value && query.length>2) {
+                if (!isNameSelected.value && outgoingQuery.value.length>2) {
 //            item{
 //                Column {
 //
@@ -241,7 +252,7 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
                                                     )
                                                 }
                                                 .clickable {
-                                                    query = result.name
+                                                    viewmodel.updateOutgoingQuery(result.name)
                                                     isNameSelected.value = true
                                                     viewmodel.updateFarmerAcc(result._id)
                                                 }
@@ -271,7 +282,7 @@ fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: Function
                 label = "Which variety would you like to take?",
                 options = if(allVarieties.value.status!="") allVarieties.value.varieties else listOf("Please select farmer"),
                 selectedOption = selectedVariety,
-                onOptionSelected = { selectedVariety = it }
+                onOptionSelected = { viewmodel.updateSelectedVariety(it) }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -551,821 +562,127 @@ Column(modifier = Modifier
                 val openDailogForQtyRemovedZero = remember {
                     mutableStateOf(false)
                 }
-                val qtyToRemoveZero = remember{
-                    mutableStateOf("")
+                val qtyToRemoveZeroPersisted = viewmodel.qtyToRemoveZero.collectAsState()
+                val qtyToRemoveZero = remember {
+                    mutableStateOf(qtyToRemoveZeroPersisted.value)
                 }
-                Box(modifier = Modifier
-                    .wrapContentSize()
-                    .weight(.8f)) {  // Wrap everything in a Box for overlay positioning
-                    ClickableBlock(
-                        cell = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0",
-                        cellTwo = row.size.getOrNull(0)?.quantity?.initialQuantity?.toString() ?: "0",
-                        qtyToRemove = qtyToRemoveZero.value,
-                        isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
-                        onToggle = { isSelected ->
-                           // selectedCells[Pair(rowIndex, 2)] = isSelected
-                            openDailogForQtyRemovedZero.value = true
-                        },
-
-                        saveSelected = {
-
-                        }
-                    )
-
-                    if(qtyToRemoveZero.value != "0" && qtyToRemoveZero.value.length>0) {
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .offset(
-                                    x = (1).dp,
-                                    y = 15.dp
-                                )
-                                .background(color = Color.Red, shape = CircleShape)
-                                .align(Alignment.BottomEnd),  // Position at top-right corner
-                            contentAlignment = Alignment.Center
-                        ){
-                            Text(
-                                text = qtyToRemoveZero.value,
-                                fontSize = 10.sp,
-                                color = Color.White,
-                                modifier = Modifier
-                                    // Changed y offset to positive to move it down
-                            ,
-                                maxLines = 1,
-                                textAlign = TextAlign.Center
-
-                            )
-                       }
-                    }
+                LaunchedEffect(qtyToRemoveZeroPersisted ){
+                    qtyToRemoveZero.value = qtyToRemoveZeroPersisted.value
                 }
-                if(openDailogForQtyRemovedZero.value){
-                    AlertDialog(onDismissRequest = { openDailogForQtyRemovedZero.value = false }, confirmButton = { /*TODO*/ } , text={
-                         Column {
-                             Row(
-                                 modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
-                                 verticalAlignment = Alignment.CenterVertically,
-                                 horizontalArrangement = Arrangement.SpaceBetween
-                             ) {
-                                 Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                QuantityRemovalComponent(
+                    rowIndex = 0,
+                    currentQuantity = row.size.getOrNull(0)?.quantity?.currentQuantity?.toString() ?: "0",
+                    initialQuantity = row.size.getOrNull(0)?.quantity?.initialQuantity?.toString() ?: "0",
+                    openDialogState = openDailogForQtyRemovedZero,
+                    qtyToRemoveState = qtyToRemoveZero ,
+                    primeGreen = primeGreen ,
+                    row = row,
+                    outgoingResponseBody = outgoingResponseBody,
+                    columnIndex = 0,
+                    modifier = Modifier,
+                    updateStateFunction = { viewmodel.updateQtyToRemoveZero(qtyToRemoveZero.value) }
 
 
-                                 // Add close icon here
-                                 IconButton(
-                                     onClick = {
-                                         qtyToRemoveZero.value=""
-                                         openDailogForQtyRemovedZero.value = false
-                                     },
-                                     modifier = Modifier
-                                         .size(24.dp)
-                                 ) {
-                                     Icon(
-                                         imageVector = Icons.Default.Close,
-                                         contentDescription = "Close dialog",
-                                         tint = Color.Gray
-                                     )
-                                 }
-                             }
-                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
-                             Text(text = "Current Availble Quantity : ")
-                                 Text(text = (row.size.getOrNull(0)?.quantity?.currentQuantity.toString()), color = primeGreen)
-                             }
-                             Spacer(modifier = Modifier.padding(top = 10.dp))
-                           Column {
-
-
-                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
-                                 Text(text = "Enter Qty : ")
-                             ColdOpTextField(value = qtyToRemoveZero.value , onValueChange = {
-                                  qtyToRemoveZero.value = it
-                             }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
-                               val inputQty = qtyToRemoveZero.value.toIntOrNull()
-                               if (inputQty != null && row.size.getOrNull(0)?.quantity?.currentQuantity!! < inputQty) {
-                                   Text(
-                                       text = "Cannot remove more than current qty!",
-                                       color = Color.Red,
-                                       fontWeight = FontWeight.Bold,
-                                       fontSize = 12.sp,
-                                       modifier = Modifier
-                                           .padding(top = 4.dp)
-                                           .fillMaxWidth()
-                                   )                                }
-
-
-                           }
-                             Spacer(modifier = Modifier.padding(top = 10.dp))
-
-                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
-                                 Button(onClick = {
-//
-                                     CoroutineScope(Dispatchers.Main).launch{
-                                         if(qtyToRemoveZero.value.length > 0){
-                                             outgoingEntry(qtyToRemoveZero ,row , outgoingResponseBody , 0 )}
-                                         else {
-                                             outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 0 )}
-
-
-                                         delay(300)
-                                         openDailogForQtyRemovedZero.value = false
-                                     }
-
-
-                                 } , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContentColor = Color.White, disabledContainerColor = Color.Gray)) {
-                                     Text(text = "Save")
-                                 }
-                             }
-
-                         }
-
-
-                    })
-
-
-                }
-//                if(qtyToRemoveZero.value !== "0"){
-//                    Box(
-//                        modifier = Modifier
-//                            .size(20.dp) // Badge size
-//                            .background(
-//                                color = Color.Red,
-//                                shape = CircleShape
-//                            )
-//                    ) {
-//                        Text(
-//                            text = qtyToRemoveZero.value,
-//                            fontSize = 10.sp,
-//                            color = Color.White,
-//                            modifier = Modifier.align(Alignment.Center)
-//                        )
-//                    }
-//                }
-
-
-
-
-
+                )
 
 // second cell
 
                 val openDailogForQtyRemovedOne = remember {
                     mutableStateOf(false)
                 }
-                val qtyToRemoveOne = remember{
-                    mutableStateOf("")
+                val qtyToRemoveOnePersisted = viewmodel.qtyToRemoveOne.collectAsState()
+                val qtyToRemoveOne = remember { mutableStateOf(qtyToRemoveOnePersisted.value) }
+                LaunchedEffect(qtyToRemoveOne ){
+                     viewmodel.updateQtyToRemoveOne(qtyToRemoveOne.value)
                 }
-                Box(modifier = Modifier
-                    .wrapContentSize()
-                    .weight(.8f)) {  // Wrap everything in a Box for overlay positioning
-                    ClickableBlock(
-                        cell = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0",
-                        cellTwo = row.size.getOrNull(1)?.quantity?.initialQuantity?.toString() ?: "0",
-                        qtyToRemove = qtyToRemoveOne.value,
-                        isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
-                        onToggle = { isSelected ->
-                            //selectedCells[Pair(rowIndex, 2)] = isSelected
-                            openDailogForQtyRemovedOne.value = true
-                        }, saveSelected = {
+                QuantityRemovalComponent(
+                    rowIndex = 1,
+                    currentQuantity = row.size.getOrNull(1)?.quantity?.currentQuantity?.toString() ?: "0",
+                    initialQuantity =row.size.getOrNull(1)?.quantity?.initialQuantity?.toString() ?: "0" ,
+                    openDialogState = openDailogForQtyRemovedOne,
+                    qtyToRemoveState = qtyToRemoveOne,
+                    primeGreen = primeGreen,
+                    row = row ,
+                    outgoingResponseBody = outgoingResponseBody,
+                    columnIndex = 1,
+                    updateStateFunction = { viewmodel.updateQtyToRemoveOne(qtyToRemoveOne.value) }
 
-                        }
-                    )
-
-                    if(qtyToRemoveOne.value != "0" && qtyToRemoveOne.value.length>0) {
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .offset(
-                                    x = (1).dp,
-                                    y = 15.dp
-                                )  // Changed y offset to positive to move it down
-                                .background(color = Color.Red, shape = CircleShape)
-                                .align(Alignment.BottomEnd),  // Position at top-right corner
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = qtyToRemoveOne.value,
-                                fontSize = 10.sp,
-                                color = Color.White,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                    }
-                }
-                if(openDailogForQtyRemovedOne.value){
-                    AlertDialog(onDismissRequest = { openDailogForQtyRemovedOne.value = false }, confirmButton = { /*TODO*/ } , text={
-                        Column {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
-
-
-                                // Add close icon here
-                                IconButton(
-                                    onClick = {
-                                        qtyToRemoveOne.value=""
-                                        openDailogForQtyRemovedOne.value = false
-                                    },
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = "Close dialog",
-                                        tint = Color.Gray
-                                    )
-                                }
-                            }
-
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
-                                Text(text = "Current Availble Quantity : ")
-                                Text(text = (row.size.getOrNull(1)?.quantity?.currentQuantity.toString()), color = primeGreen)
-                            }
-                            Spacer(modifier = Modifier.padding(top = 10.dp))
-        Column {
-
-
-            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
-                                Text(text = "Enter Qty : ")
-                                ColdOpTextField(value = qtyToRemoveOne.value , onValueChange = {
-                                    qtyToRemoveOne.value = it
-                                }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
-            val inputQty = qtyToRemoveOne.value.toIntOrNull()
-            if (inputQty != null && row.size.getOrNull(1)?.quantity?.currentQuantity!! < inputQty) {
-                Text(
-                    text = "Cannot remove more than current qty!",
-                    color = Color.Red,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp,
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .fillMaxWidth()
-                )                                }
-
-
-
-        }
-                            Spacer(modifier = Modifier.padding(top = 10.dp))
-
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
-                                Button(onClick = {
-//
-                                    CoroutineScope(Dispatchers.Main).launch{
-                                        if(qtyToRemoveOne.value.length > 0){
-                                            outgoingEntry(qtyToRemoveOne ,row , outgoingResponseBody , 1 )}
-                                        else {
-                                            outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 1 )}
-
-
-                                        delay(300)
-                                        openDailogForQtyRemovedOne.value = false
-                                    }
-
-
-                                } , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContentColor = Color.White, disabledContainerColor = Color.Gray)) {
-                                    Text(text = "Save")
-                                }
-                            }
-
-                        }
-
-
-                    })
-
-
-                }
-//                if(qtyToRemoveOne.value !== "0"){
-//                    Box(
-//                        modifier = Modifier
-//                            .size(20.dp) // Badge size
-//                            .background(
-//                                color = Color.Red,
-//                                shape = CircleShape
-//                            )
-//                    ) {
-//                        Text(
-//                            text = qtyToRemoveOne.value,
-//                            fontSize = 10.sp,
-//                            color = Color.White,
-//                            modifier = Modifier.align(Alignment.Center)
-//                        )
-//                    }
-//                }
-
+                )
+                //Third cell
 
                 val openDailogForQtyRemovedTwo = remember {
                     mutableStateOf(false)
                 }
+                val qtyToRemoveTwoPersisted = viewmodel.qtyToRemoveTwo.collectAsState()
                 val qtyToRemoveTwo = remember{
-                    mutableStateOf("")
+                    mutableStateOf(qtyToRemoveTwoPersisted.value)
                 }
 
-                Box(modifier = Modifier
-                    .wrapContentSize()
-                    .weight(.8f)) {  // Wrap everything in a Box for overlay positioning
-                    if (row != null) {
-                        ClickableBlock(
-                            cell = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0",
-                            cellTwo = row.size.getOrNull(2)?.quantity?.initialQuantity?.toString() ?: "0",
-                            qtyToRemove = qtyToRemoveTwo.value,
-                            isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
-                            onToggle = { isSelected ->
-                                //  selectedCells[Pair(rowIndex, 2)] = isSelected
-                                openDailogForQtyRemovedTwo.value = true
-                            },
-                            saveSelected = {
-                //                            if(selectedCellsList.contains(SelectedCellData(
-                //                                    orderId = row.orderId,
-                //                                    voucherNumber = row.voucherNumber,
-                //                                    variety = row.variety,
-                //                                    size = row.size.getOrNull(2)?.size?.toString(),
-                //                                    address = row.address,
-                //                                    dateOfSubmission = row.dateOfSubmission,
-                //                                    currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
-                //                                ))){
-                //                                selectedCellsList.remove(SelectedCellData(
-                //                                    orderId = row.orderId,
-                //                                    voucherNumber = row.voucherNumber,
-                //                                    variety = row.variety,
-                //                                    size = row.size.getOrNull(2)?.size?.toString(),
-                //                                    address = row.address,
-                //                                    dateOfSubmission = row.dateOfSubmission,
-                //                                    currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
-                //                                ))
-                //                            } else {
-                //                                selectedCellsList.add(
-                //                                    SelectedCellData(
-                //                                        orderId = row.orderId,
-                //                                        voucherNumber = row.voucherNumber,
-                //                                        variety = row.variety,
-                //                                        size = row.size.getOrNull(2)?.size?.toString(),
-                //                                        address = row.address,
-                //                                        dateOfSubmission = row.dateOfSubmission,
-                //                                        currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0"
-                //                                    )
-                //                                )
-                //                            }
-                            }
-                        )
-                    }
-
-                    if(qtyToRemoveTwo.value != "0"  && qtyToRemoveTwo.value.length>0) {
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .offset(
-                                    x = (1).dp,
-                                    y = 15.dp
-                                )  // Changed y offset to positive to move it down
-                                .background(color = Color.Red, shape = CircleShape)
-                                .align(Alignment.BottomEnd),  // Position at top-right corner
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = qtyToRemoveTwo.value,
-                                fontSize = 10.sp,
-                                color = Color.White,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                    }
+                LaunchedEffect(qtyToRemoveTwoPersisted ){
+                    qtyToRemoveTwo.value = qtyToRemoveTwoPersisted.value
                 }
-                if(openDailogForQtyRemovedTwo.value){
-                    AlertDialog(onDismissRequest = { openDailogForQtyRemovedTwo.value = false }, confirmButton = { /*TODO*/ } , text={
-                        Column {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                QuantityRemovalComponent(
+                    rowIndex = 2,
+                    currentQuantity = row.size.getOrNull(2)?.quantity?.currentQuantity?.toString() ?: "0",
+                    initialQuantity = row.size.getOrNull(2)?.quantity?.initialQuantity?.toString() ?: "0",
+                    openDialogState = openDailogForQtyRemovedTwo,
+                    qtyToRemoveState = qtyToRemoveTwo,
+                    primeGreen = primeGreen ,
+                    row = row,
+                    outgoingResponseBody = outgoingResponseBody,
+                    columnIndex = 2
+                )
 
 
-                                // Add close icon here
-                                IconButton(
-                                    onClick = {
-                                        qtyToRemoveTwo.value=""
-                                        openDailogForQtyRemovedTwo.value = false
-                                    },
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = "Close dialog",
-                                        tint = Color.Gray
-                                    )
-                                }
-                            }
-
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
-                                Text(text = "Current Availble Quantity : ")
-                                Text(text = (row.size.getOrNull(2)?.quantity?.currentQuantity.toString()), color = primeGreen)
-                            }
-                            Spacer(modifier = Modifier.padding(top = 10.dp))
-                         Column {
-                             Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
-                                 Text(text = "Enter Qty : ")
-                                 ColdOpTextField(value = qtyToRemoveTwo.value , onValueChange = {
-                                     qtyToRemoveTwo.value = it
-                                 }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
-                             val inputQty = qtyToRemoveTwo.value.toIntOrNull()
-                             if (inputQty != null && row.size.getOrNull(2)?.quantity?.currentQuantity!! < inputQty) {
-                                 Text(
-                                     text = "Cannot remove more than current qty!",
-                                     color = Color.Red,
-                                     fontWeight = FontWeight.Bold,
-                                     fontSize = 12.sp,
-                                     modifier = Modifier
-                                         .padding(top = 4.dp)
-                                         .fillMaxWidth()
-                                 )                                }
-
-                         }
-                            Spacer(modifier = Modifier.padding(top = 10.dp))
-
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
-                                Button(onClick = {
-//
-                                    CoroutineScope(Dispatchers.Main).launch{
-                                        if(qtyToRemoveTwo.value.length > 0){
-                                            outgoingEntry(qtyToRemoveTwo ,row , outgoingResponseBody , 2 )}
-                                        else {
-                                            outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 2 )}
-
-
-                                        delay(300)
-                                        openDailogForQtyRemovedTwo.value = false
-                                    }
-
-
-                                } , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContentColor = Color.White, disabledContainerColor = Color.Gray)) {
-                                    Text(text = "Save")
-                                }
-                            }
-
-                        }
-
-
-                    })
-
-
-                }
-//                if(qtyToRemoveTwo.value !== "0"){
-//                    Box(
-//                        modifier = Modifier
-//                            .size(20.dp) // Badge size
-//                            .background(
-//                                color = Color.Red,
-//                                shape = CircleShape
-//                            )
-//                    ) {
-//                        Text(
-//                            text = qtyToRemoveTwo.value,
-//                            fontSize = 10.sp,
-//                            color = Color.White,
-//                            modifier = Modifier.align(Alignment.Center)
-//                        )
-//                    }
-//                }
-
+               //Forth cell
 
                 val openDailogForQtyRemovedThree = remember {
                     mutableStateOf(false)
                 }
-                val qtyToRemoveThree = remember{
-                    mutableStateOf("")
+                val qtyToRemoveThreePersisted = viewmodel.qtyToRemoveThree.collectAsState()
+                val qtyToRemoveThree = remember {
+                    mutableStateOf(qtyToRemoveThreePersisted.value)
                 }
-
-                Box(modifier = Modifier
-                    .wrapContentSize()
-                    .weight(.8f)) {  // Wrap everything in a Box for overlay positioning
-                    ClickableBlock(
-                        cell = row?.size?.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0",
-                        cellTwo = row?.size?.getOrNull(3)?.quantity?.initialQuantity?.toString() ?: "0",
-                        qtyToRemove = qtyToRemoveThree.value,
-                        isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
-                        onToggle = { isSelected ->
-                           // selectedCells[Pair(rowIndex, 2)] = isSelected
-                            openDailogForQtyRemovedThree.value = true
-                        },
-                        saveSelected = {
-//                            if(selectedCellsList.contains(SelectedCellData(
-//                                    orderId = row.orderId,
-//                                    voucherNumber = row.voucherNumber,
-//                                    variety = row.variety,
-//                                    size = row.size.getOrNull(3)?.size?.toString(),
-//                                    address = row.address,
-//                                    dateOfSubmission = row.dateOfSubmission,
-//                                    currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
-//                                ))){
-//                                selectedCellsList.remove(SelectedCellData(
-//                                    orderId = row.orderId,
-//                                    voucherNumber = row.voucherNumber,
-//                                    variety = row.variety,
-//                                    size = row.size.getOrNull(3)?.size?.toString(),
-//                                    address = row.address,
-//                                    dateOfSubmission = row.dateOfSubmission,
-//                                    currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
-//                                ))
-//                            } else {
-//                                selectedCellsList.add(
-//                                    SelectedCellData(
-//                                        orderId = row.orderId,
-//                                        voucherNumber = row.voucherNumber,
-//                                        variety = row.variety,
-//                                        size = row.size.getOrNull(3)?.size?.toString(),
-//                                        address = row.address,
-//                                        dateOfSubmission = row.dateOfSubmission,
-//                                        currentQuantity = row.size.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0"
-//                                    )
-//                                )
-                           // }
-                        }
-                    )
-
-                    if(qtyToRemoveThree.value != "0" && qtyToRemoveThree.value.length>0) {
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .offset(
-                                    x = (1).dp,
-                                    y = 15.dp
-                                )  // Changed y offset to positive to move it down
-                                .background(color = Color.Red, shape = CircleShape)
-                                .align(Alignment.BottomEnd),  // Position at top-right corner
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = qtyToRemoveThree.value,
-                                fontSize = 10.sp,
-                                color = Color.White,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                    }
+                LaunchedEffect(qtyToRemoveThreePersisted )
+                {
+                    qtyToRemoveThree.value = qtyToRemoveThreePersisted.value
                 }
-                //Spacer(modifier = Modifier.padding(start = 3.dp))
-                if(openDailogForQtyRemovedThree.value){
-                    AlertDialog(onDismissRequest = { openDailogForQtyRemovedThree.value = false }, confirmButton = { /*TODO*/ } , text={
-                        Column {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                QuantityRemovalComponent(
+                    rowIndex = 3,
+                    currentQuantity = row?.size?.getOrNull(3)?.quantity?.currentQuantity?.toString() ?: "0",
+                    initialQuantity = row?.size?.getOrNull(3)?.quantity?.initialQuantity?.toString() ?: "0",
+                    openDialogState = openDailogForQtyRemovedThree,
+                    qtyToRemoveState = qtyToRemoveThree ,
+                    primeGreen = primeGreen,
+                    row = row ,
+                    outgoingResponseBody = outgoingResponseBody,
+                    columnIndex = 3
+                )
 
-
-                                // Add close icon here
-                                IconButton(
-                                    onClick = {
-                                        qtyToRemoveThree.value=""
-                                        openDailogForQtyRemovedThree.value = false
-                                    },
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = "Close dialog",
-                                        tint = Color.Gray
-                                    )
-                                }
-                            }
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
-                                Text(text = "Current Availble Quantity : ")
-                                Text(text = (row.size.getOrNull(3)?.quantity?.currentQuantity.toString()), color = primeGreen)
-                            }
-                            Spacer(modifier = Modifier.padding(top = 10.dp))
-                            Column() {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(text = "Enter Qty : ")
-                                    ColdOpTextField(
-                                        value = qtyToRemoveThree.value,
-                                        onValueChange = {
-                                            qtyToRemoveThree.value = it
-                                        },
-                                        placeholder = "Enter Quantity",
-                                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-                                    )
-                                }
-                                val inputQty = qtyToRemoveThree.value.toIntOrNull()
-                                if (inputQty != null && row.size.getOrNull(3)?.quantity?.currentQuantity!! < inputQty) {
-                                    Text(
-                                        text = "Cannot remove more than current qty!",
-                                        color = Color.Red,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp,
-                                        modifier = Modifier
-                                            .padding(top = 4.dp)
-                                            .fillMaxWidth()
-                                    )                                }
-
-                            }
-                            Spacer(modifier = Modifier.padding(top = 10.dp))
-
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
-                                Button(onClick = {
-//
-                                    CoroutineScope(Dispatchers.Main).launch{
-                                        if(qtyToRemoveThree.value.length > 0){
-                                            outgoingEntry(qtyToRemoveThree ,row , outgoingResponseBody , 3 )}
-                                        else {
-                                            outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 3 )}
-
-
-                                        delay(300)
-                                        openDailogForQtyRemovedThree.value = false
-                                    }
-
-
-                                } , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContentColor = Color.White, disabledContainerColor = Color.Gray)) {
-                                    Text(text = "Save")
-                                }
-                            }
-
-                        }
-
-
-                    })
-
-
-                }
-//                if(qtyToRemoveThree.value !== "0"){
-//                    Box(
-//                        modifier = Modifier
-//                            .size(20.dp) // Badge size
-//                            .background(
-//                                color = Color.Red,
-//                                shape = CircleShape
-//                            )
-//                    ) {
-//                        Text(
-//                            text = qtyToRemoveThree.value,
-//                            fontSize = 10.sp,
-//                            color = Color.White,
-//                            modifier = Modifier.align(Alignment.Center)
-//                        )
-//                    }
-//                }
-
-
-
+               //Fifth cell
 
                 val openDailogForQtyRemovedFour = remember {
                     mutableStateOf(false)
                 }
-                val qtyToRemoveFour : MutableState<String> = remember{
-                    mutableStateOf("")
+                val qtyToRemoveFourPersisted = viewmodel.qtyToRemoveFour.collectAsState()
+                val qtyToRemoveFour = remember {
+                    mutableStateOf(qtyToRemoveFourPersisted.value)
                 }
-
-                Box(modifier = Modifier
-                    .wrapContentSize()
-                    .weight(.8f)) {  // Wrap everything in a Box for overlay positioning
-                    ClickableBlock(
-                        cell = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0",
-                        cellTwo = row.size.getOrNull(4)?.quantity?.initialQuantity?.toString() ?: "0",
-                        qtyToRemove = qtyToRemoveZero.value,
-                        isSelected = selectedCells[Pair(rowIndex, 2)] ?: false,
-                        onToggle = { isSelected ->
-                            //selectedCells[Pair(rowIndex, 2)] = isSelected
-                            openDailogForQtyRemovedFour.value = true
-                        },
-                        saveSelected = {
-
-                        }
-                    )
-
-                    if(qtyToRemoveFour.value != "0" && qtyToRemoveFour.value.length>0) {
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .offset(
-                                    x = (1).dp,
-                                    y = 15.dp
-                                )  // Changed y offset to positive to move it down
-                                .background(color = Color.Red, shape = CircleShape)
-                                .align(Alignment.BottomEnd)
-                                .wrapContentSize(Alignment.Center)
-                            ,  // Position at top-right corner
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = qtyToRemoveFour.value,
-                                fontSize = 10.sp,
-                                color = Color.White,
-                            )
-                        }
-                    }
+                LaunchedEffect(qtyToRemoveFourPersisted ){
+                    qtyToRemoveFour.value = qtyToRemoveFourPersisted.value
                 }
-                if(openDailogForQtyRemovedFour.value){
-                    AlertDialog(onDismissRequest = { openDailogForQtyRemovedFour.value = false }, confirmButton = { /*TODO*/ } , text={
-                        Column {
+                QuantityRemovalComponent(
+                    rowIndex = 4,
+                    currentQuantity = row.size.getOrNull(4)?.quantity?.currentQuantity?.toString() ?: "0",
+                    initialQuantity = row.size.getOrNull(4)?.quantity?.initialQuantity?.toString() ?: "0",
+                    openDialogState = openDailogForQtyRemovedFour ,
+                    qtyToRemoveState = qtyToRemoveFour,
+                    primeGreen = primeGreen,
+                    row =  row,
+                    outgoingResponseBody = outgoingResponseBody,
+                    columnIndex = 4
+                )
 
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = "Quantity to be removed", fontSize = 18.sp , fontWeight = FontWeight.Bold)
-
-
-                                // Add close icon here
-                                IconButton(
-                                    onClick = {
-                                        qtyToRemoveFour.value=""
-                                        openDailogForQtyRemovedFour.value = false
-                                    },
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = "Close dialog",
-                                        tint = Color.Gray
-                                    )
-                                }
-                            }
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start){
-                                Text(text = "Current Availble Quantity : ")
-                                Text(text = (row.size.getOrNull(4)?.quantity?.currentQuantity.toString()), color = primeGreen)
-                            }
-                            Spacer(modifier = Modifier.padding(top = 10.dp))
-
-                            Column {
-                                Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.SpaceBetween , verticalAlignment = Alignment.CenterVertically){
-                                    Text(text = "Enter Qty : ")
-
-                                    ColdOpTextField(value = qtyToRemoveFour.value , onValueChange = {
-                                        qtyToRemoveFour.value = it
-                                    }, placeholder = "Enter Quantity" , keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))}
-                                val inputQty = qtyToRemoveFour.value.toIntOrNull()
-                                if (inputQty != null && row.size.getOrNull(4)?.quantity?.currentQuantity!! < inputQty) {
-                                    Text(
-                                        text = "Cannot remove more than current qty!",
-                                        color = Color.Red,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp,
-                                        modifier = Modifier
-                                            .padding(top = 4.dp)
-                                            .fillMaxWidth()
-                                    )                                }
-                            }
-
-
-
-                            Spacer(modifier = Modifier.padding(top = 10.dp))
-
-                            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
-                                Button(onClick = {
-//
-                                    CoroutineScope(Dispatchers.Main).launch{
-                                        if(qtyToRemoveFour.value.trim().length > 0){
-                                            outgoingEntry(qtyToRemoveFour ,row , outgoingResponseBody , 4 )}
-                                        else {
-                                            outgoingEntry(mutableStateOf("0") ,row , outgoingResponseBody , 4 )}
-
-
-                                        delay(300)
-                                        openDailogForQtyRemovedFour.value = false
-                                    }
-
-
-                                } , colors = ButtonColors(containerColor = primeGreen , contentColor = Color.White , disabledContentColor = Color.White, disabledContainerColor = Color.Gray)) {
-                                    Text(text = "Save")
-                                }
-                            }
-
-                        }
-
-
-                    })
-
-
-                }
-//                if(qtyToRemoveFour.value !== "0"){
-//                    Box(
-//                        modifier = Modifier
-//                            .size(20.dp) // Badge size
-//                            .background(
-//                                color = Color.Red,
-//                                shape = CircleShape
-//                            )
-//                    ) {
-//                        Text(
-//                            text = qtyToRemoveFour.value,
-//                            fontSize = 10.sp,
-//                            color = Color.White,
-//                            modifier = Modifier.align(Alignment.Center)
-//                        )
-//                    }
-//                }
 
 //                val totalQuantity = row.size
 //                    .take(5) // Take the first 5 elements or fewer if the list is smaller

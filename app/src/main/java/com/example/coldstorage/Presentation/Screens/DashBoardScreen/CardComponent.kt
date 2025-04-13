@@ -15,6 +15,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,8 +55,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.BagSizeDaybook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
+import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpAlertMessage
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.stringToImage
 import com.example.coldstorage.R
@@ -69,7 +72,7 @@ import java.io.FileOutputStream
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun CardComponentDaybook(orderDaybook: OrderDaybook){
+fun CardComponentDaybook(orderDaybook: OrderDaybook , navController: NavController){
     Log.d("ordrererer" , orderDaybook.toString())
     var incomingSum = mutableStateOf(0)
     var outgoingSum = mutableStateOf(0)
@@ -111,7 +114,6 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
         val expandedString = "It consists of a reactive programming model with conciseness and ease of Kotlin programming language. It is fully declarative so that you can describe your UI by calling some series of functions that will transform your data into a UI hierarchy. When the data changes or is updated then the framework automatically recalls these functions and updates the view for you.\n" +
                 "\n" +
                 "Composable Function is represented in code by using @Composable annotation to the function name. This function will let you define your app’s UI programmatically by describing its shape and data dependencies rather than focusing on the UI construction process. "
-        val context = LocalContext.current
 
         Column(
             modifier = Modifier
@@ -187,18 +189,159 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook){
                             Text(text = if(orderDaybook.voucher.type == "RECEIPT")  totalIncomingBags(orderDaybook).toString() else totalOutgoingBags(orderDaybook).toString(), fontSize = 13.sp , fontWeight = FontWeight.Medium)
 
                         }
-                          Icon(painter = painterResource(id = R.drawable.sharingg), contentDescription = "share card",
-                            modifier = Modifier
-                                .padding(end = 3.dp)
-                                .size(17.dp)
-                                .clickable {
-                                    Log.d(
-                                        "outgoingcard crash",
-                                        "Type: ${orderDaybook.voucher.type} \n" +
-                                                "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
-                                                "Variety: ${orderDaybook.orderDetails[0].variety} \n"
-                                    )
-                                    val formattedString = """
+
+                    }
+                    
+//                    PdfButton(
+//                        view = LocalView.current,
+//                        context = LocalContext.current,
+//                        contentWidth = 200.dp,
+//                        contentHeight = 200.dp,
+//                        density = LocalDensity.current
+//                    )
+                }
+                if(expanded){
+                    //make this a lazyrow with bagsizes
+                //StockDetailsScreen(orderDaybook , orderDaybook.orderDetails[0].bagSizes )
+                    AnimatedVisibility(
+                        visible = expanded,
+                        enter = fadeIn(animationSpec = tween(300)) + expandVertically(animationSpec = tween(300)),
+                        exit = fadeOut(animationSpec = tween(300)) + shrinkVertically(animationSpec = tween(300))
+                    ) {
+                        StockDetailsScreen(
+                            orderDaybook = orderDaybook,
+                            bagsizes = orderDaybook.orderDetails[0].bagSizes,
+                            navController = navController
+                        )
+                    }
+
+
+
+
+
+
+                }
+
+
+
+            }
+        }
+
+
+    }
+}
+
+
+@Composable
+fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook>, navController: NavController) {
+     var showRemarksPopop by remember{ mutableStateOf(false) }
+    val context = LocalContext.current
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth() ,
+        color = Color.White
+            //.padding(16.dp)
+            //.border(1.dp, Color.Black)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            // Header Text
+            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start) {
+                Text(
+                    text = "Stock Details",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier
+                )
+            }
+
+
+            if(orderDaybook.voucher.type == "RECEIPT"){
+
+
+            // Stock Table Row
+            StockTableRow(
+                orderDaybook,
+                headers = bagsizes,
+                values = bagsizes
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Location and Farmer Data
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Location Details
+                Column(modifier = Modifier.weight(.5f)) {
+                    Text(text = "Party details: " , fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    DetailRow("Name", orderDaybook.farmerId.name)
+                    DetailRow("Acc No", orderDaybook.farmerId._id.take(3))}
+                Column(modifier = Modifier.weight(.5f)) {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Variety : ")
+                            }
+                            append(orderDaybook.orderDetails[0].variety)
+                        },
+                        fontSize = 13.sp
+                    )
+
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Location : ")
+                            }
+                            append(orderDaybook.orderDetails[0].location)
+                        },
+                        fontSize = 13.sp
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.clickable {
+                            showRemarksPopop = true
+                        }, horizontalAlignment = Alignment.CenterHorizontally) {
+                            Image(
+                                painter = painterResource(id = R.drawable.infoicon),
+                                contentDescription = "Info Icon",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(text = "Info" , fontSize = 12.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.padding(5.dp))
+                        Column( modifier = Modifier.clickable {
+                            navController.navigate("${AllScreens.EditIncomingScreen.name}/${orderDaybook._id}")
+                        }, horizontalAlignment = Alignment.CenterHorizontally) {
+                            Image(
+                                painter = painterResource(id = R.drawable.editicon),
+                                contentDescription = "Edit Icon",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(text = "Edit", fontSize = 12.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.padding(5.dp))
+
+                        Column(modifier = Modifier  .clickable {
+                            Log.d(
+                                "outgoingcard crash",
+                                "Type: ${orderDaybook.voucher.type} \n" +
+                                        "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
+                                        "Variety: ${orderDaybook.orderDetails[0].variety} \n"
+                            )
+                            val formattedString = """
 Date: ${if (orderDaybook.voucher.type == "RECEIPT") orderDaybook.dateOfSubmission else orderDaybook.dateOfExtraction}                                        
 Type: ${orderDaybook.voucher.type} 
 Voucher No.: ${orderDaybook.voucher.voucherNumber} 
@@ -206,72 +349,72 @@ Variety: ${orderDaybook.orderDetails[0].variety}
 
 
 ${
-                                        if (orderDaybook.voucher.type == "RECEIPT") {
-                                            "Added Bags: ${
-                                                orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
-                                                    "${it.size}: ${it.quantity?.initialQuantity ?: "N/A"}"
-                                                }
-                                            }"
-                                        } else {
-                                            "Removed Bags: " + orderDaybook.orderDetails.joinToString(
-                                                "\n"
-                                            ) { order ->
-                                                order.bagSizes.joinToString("\n") {
-                                                    "${it.size}: ${it.quantityRemoved ?: "N/A"}"
-                                                }
-                                            }
+                                if (orderDaybook.voucher.type == "RECEIPT") {
+                                    "Added Bags: ${
+                                        orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
+                                            "${it.size}: ${it.quantity?.initialQuantity ?: "N/A"}"
+                                        }
+                                    }"
+                                } else {
+                                    "Removed Bags: " + orderDaybook.orderDetails.joinToString(
+                                        "\n"
+                                    ) { order ->
+                                        order.bagSizes.joinToString("\n") {
+                                            "${it.size}: ${it.quantityRemoved ?: "N/A"}"
                                         }
                                     }
+                                }
+                            }
 
 Total Bags: ${
-                                        if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(
-                                            orderDaybook
-                                        ) else totalOutgoingBags(
-                                            orderDaybook
-                                        )
-                                    }
+                                if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(
+                                    orderDaybook
+                                ) else totalOutgoingBags(
+                                    orderDaybook
+                                )
+                            }
 
 Farmer: ${orderDaybook.farmerId.name} , Acc: ${orderDaybook.farmerId._id.take(5)}
 
 """.trimIndent()
-                                    Log.d(
-                                        "outgoingcard crash", formattedString
-                                    )
-                                    val bitmap = stringToImage(
-                                        context = context,  // `this` is the activity context
-                                        text = formattedString,
-                                        backgroundResId = R.drawable.bolinanewfarms,
-                                        width = 400,
-                                        height = 400
-                                    )
-                                    val file = File(context.cacheDir, "shared_card.png")
-                                    FileOutputStream(file).use { outputStream ->
-                                        bitmap.compress(
-                                            Bitmap.CompressFormat.PNG,
-                                            100,
-                                            outputStream
-                                        )
-                                    }
+                            Log.d(
+                                "outgoingcard crash", formattedString
+                            )
+                            val bitmap = stringToImage(
+                                context = context,  // `this` is the activity context
+                                text = formattedString,
+                                backgroundResId = R.drawable.bolinanewfarms,
+                                width = 400,
+                                height = 400
+                            )
+                            val file = File(context.cacheDir, "shared_card.png")
+                            FileOutputStream(file).use { outputStream ->
+                                bitmap.compress(
+                                    Bitmap.CompressFormat.PNG,
+                                    100,
+                                    outputStream
+                                )
+                            }
 
-                                    // Get a URI for the file using FileProvider
-                                    val uri: Uri = FileProvider.getUriForFile(
-                                        context,
-                                        "${context.packageName}.fileprovider",
-                                        file
-                                    )
-                                    val intent = Intent(Intent.ACTION_SEND).apply {
-                                        type = "image/png"
-                                        putExtra(Intent.EXTRA_STREAM, uri)
-                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                    }
+                            // Get a URI for the file using FileProvider
+                            val uri: Uri = FileProvider.getUriForFile(
+                                context,
+                                "${context.packageName}.fileprovider",
+                                file
+                            )
+                            val intent = Intent(Intent.ACTION_SEND).apply {
+                                type = "image/png"
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
 
-                                    // Start the share intent
-                                    context.startActivity(
-                                        Intent.createChooser(
-                                            intent,
-                                            "Share Receipt"
-                                        )
-                                    )
+                            // Start the share intent
+                            context.startActivity(
+                                Intent.createChooser(
+                                    intent,
+                                    "Share Receipt"
+                                )
+                            )
 //                                    shareCardInfoMessage(
 //                                        context,
 //                                        "Type: ${orderDaybook.voucher.type} \n" +
@@ -318,100 +461,20 @@ Farmer: ${orderDaybook.farmerId.name} , Acc: ${orderDaybook.farmerId._id.take(5)
 //                                                    }
 //                                                }"
 //                                    )
-                                }
-                        )
+                        },
+
+                                horizontalAlignment = Alignment.CenterHorizontally) {
+                            Image(
+                                painter = painterResource(id = R.drawable.sharecard),
+                                contentDescription = "Share Icon",
+                                modifier = Modifier
+                                    .width(20.dp)
+                                    .height(19.dp)
+                            )
+                            Text(text = "Share",fontSize = 12.sp
+                            )
+                        }
                     }
-                    
-//                    PdfButton(
-//                        view = LocalView.current,
-//                        context = LocalContext.current,
-//                        contentWidth = 200.dp,
-//                        contentHeight = 200.dp,
-//                        density = LocalDensity.current
-//                    )
-                }
-                if(expanded){
-                    //make this a lazyrow with bagsizes
-                //StockDetailsScreen(orderDaybook , orderDaybook.orderDetails[0].bagSizes )
-                    AnimatedVisibility(
-                        visible = expanded,
-                        enter = fadeIn(animationSpec = tween(300)) + expandVertically(animationSpec = tween(300)),
-                        exit = fadeOut(animationSpec = tween(300)) + shrinkVertically(animationSpec = tween(300))
-                    ) {
-                        StockDetailsScreen(
-                            orderDaybook = orderDaybook,
-                            bagsizes = orderDaybook.orderDetails[0].bagSizes
-                        )
-                    }
-
-
-
-
-
-
-                }
-
-
-
-            }
-        }
-
-
-    }
-}
-
-
-@Composable
-fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook>) {
-     var showRemarksPopop by remember{ mutableStateOf(false) }
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth() ,
-        color = Color.White
-            //.padding(16.dp)
-            //.border(1.dp, Color.Black)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            // Header Text
-            Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.Start) {
-                Text(
-                    text = "Stock Details",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    modifier = Modifier
-                )
-            }
-
-
-            if(orderDaybook.voucher.type == "RECEIPT"){
-
-
-            // Stock Table Row
-            StockTableRow(
-                orderDaybook,
-                headers = bagsizes,
-                values = bagsizes
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Location and Farmer Data
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Location Details
-                Column {
-                    Text(text = "Variety : ${orderDaybook.orderDetails[0].variety}" , fontSize = 13.sp , fontWeight = FontWeight.Bold)
-                    Text(text = "Location : ${orderDaybook.orderDetails[0].location}" , fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    Text(text = "Show Remarks", fontSize = 13.sp , fontStyle = FontStyle.Italic, modifier = Modifier.clickable {
-                        showRemarksPopop = true
-                    } , color = textBrown)
 
 //                    orderDaybook.orderDetails[0].location?.let { DetailRow("Chamber", it.chamber) }
 //                    orderDaybook.orderDetails[0].location?.let { DetailRow("Floor", it.floor) }
@@ -420,11 +483,7 @@ fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook
                 }
 
                 // Farmer Data
-                Column {
-                    Text(text = "Farmer Data" , fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    DetailRow("Name", orderDaybook.farmerId.name)
-                    DetailRow("Acc No", orderDaybook.farmerId._id.take(3))
-                }
+
             }
                 if(showRemarksPopop == true){
                     ColdOpAlertMessage(title = "Remarks for ${orderDaybook.voucher.voucherNumber}", message = "${orderDaybook.remarks?: "No remarks was entered!"}", acceptAction = { showRemarksPopop= false }) {

@@ -499,7 +499,7 @@ fun storeOrRetrieve(accountNumber: String,totalIncoming:String? , totalOutgoing:
 //                    }
                     if(state.data != null){
                     state.data.forEach {
-                        CardComponentDaybook(orderDaybook = it )
+                        CardComponentDaybook(orderDaybook = it , navController)
                     }} else {
                         Text(text = "No previous transactions" )
 

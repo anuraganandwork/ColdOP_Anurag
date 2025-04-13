@@ -44,13 +44,13 @@ fun ClickableBlock(
 ) {
     // Individual state for each block's background color
     var selectedBlock = remember { mutableStateOf(Color.White) }
-
+    var isEnabled = cell.toInt() > 0
     Surface(
         modifier = Modifier
             .width(43.dp)
             .height(43.dp)
             .padding(start = 6.dp, top = 3.dp, end = 4.dp)
-            .clickable {
+            .clickable(enabled = isEnabled ) {
                 onToggle(!isSelected)
                 saveSelected()
             }
