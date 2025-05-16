@@ -1,5 +1,6 @@
 package com.example.coldstorage.Presentation.Navigation
 
+import SecondOnboardingPage
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -7,11 +8,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.Auth.CustomLoginPage
 import com.example.coldstorage.Presentation.Screens.Auth.FarmerQuickAddInputForm
+import com.example.coldstorage.Presentation.Screens.Auth.OnBoardingFirstPage
 import com.example.coldstorage.Presentation.Screens.Auth.StoreAdminRegistrationForm
 import com.example.coldstorage.Presentation.Screens.OnboardingScreens.pickYourRole
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
@@ -45,15 +49,32 @@ fun Nav(navHostContorller : NavHostController){
      }
 
      composable(route = AllScreens.StoreAdminRegistrationForm.name){
-         StoreAdminRegistrationForm(navController = navHostContorller )
+         OnBoardingFirstPage(navHostContorller , authViewmodel)
+        // StoreAdminRegistrationForm(navController = navHostContorller )
      }
 
+         composable(
+             route = "${AllScreens.SecondOutgoingScreen.name}/{mobileNumber}/{password}",
+             arguments = listOf(
+                 navArgument("mobileNumber") { type = NavType.StringType  },
+                 navArgument("password") { type = NavType.StringType  }
+             )){ backStackEntry ->
+             val mobileNumber = backStackEntry.arguments?.getString("mobileNumber")
+             val password = backStackEntry.arguments?.getString("password")
+
+             SecondOnboardingPage(navHostContorller, authViewmodel ,
+                 mobileNumber.toString(), password.toString()
+             )
+
+         }
 
 
      composable(route = AllScreens.LogIn.name){
 
          CustomLoginPage(navController = navHostContorller)
      }
+
+
 
  }
 }

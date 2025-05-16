@@ -2,11 +2,8 @@ package com.example.coldstorage.DataLayer.Api
 
 import com.example.coldstorage.DataLayer.Api.GetRecieptNumberdata.RecieptNumData
 import com.example.coldstorage.DataLayer.Api.OutgoingData.MainOutgoingOrderClass
-import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingDataClassItem
-import com.example.coldstorage.DataLayer.Api.OutgoingData.OutgoingResponse
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseDayBook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ApiResponseSingleOrder
-import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.OrderDaybook
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.ResponseAllFarmerIds
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.UpdateOrderRequest
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.GetAllOrderResponse.GetAllReciptResponse
@@ -29,15 +26,15 @@ import retrofit2.http.Query
 interface ColdOpApi {
 
     @POST("/api/store-admin/register")
-  suspend  fun registerStoreAdmin( @Body FormData: StoreAdminFormData):Response<StoreOwnerRegisteredDetails>
+  suspend  fun registerStoreAdmin( @Body FormData: StoreAdminFormData):Response<StoreAdminResponse>
 
 
 
   @POST("/api/store-admin/send-otp")
   suspend fun sendOtpToStoreOwner( @Body sendOtpReq: sendOtpReq) : Response<sendOtpResponse>
 
-  @POST("/api/store-admin/verify-mobile?")
-  suspend fun verifyMobile(@Body credentials:verifyMobile ) : Response<sendOtpResponse>
+  @POST("/api/store-admin/verify-mobile")
+  suspend fun verifyMobile(@Body credentials: verifyMobiledata) : Response<sendOtpResponse>
 
 
 //  @POST("/api/store-admin/register")
@@ -45,7 +42,7 @@ interface ColdOpApi {
 
 
   @POST("/api/store-admin/quick-register?=")
-  suspend fun quickRegister(@Body farmerData:FarmerData) :Response<sendOtpResponse>
+  suspend fun quickRegister(@Body farmerData: FarmerDataSave) :Response<sendOtpResponse>
 
 
   @POST("api/store-admin/login?")

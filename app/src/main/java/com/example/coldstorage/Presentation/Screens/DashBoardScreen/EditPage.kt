@@ -236,7 +236,8 @@ fun EditOrderScreen(
 //                )
                 listOfVarieties.value?.let { it1 ->
                     ColdOpDropDown(   stateToUpdate = viewmodel.variety.collectAsState(), label = "Select Variety", options =
-                    it1, onSelect = {selectedVariety -> viewmodel.updateVariety(selectedVariety)}
+                    it1, onSelect = {selectedVariety -> viewmodel.updateVariety(selectedVariety)},
+                        isSearchable = true
                     )
                 }
                 // Remarks Field

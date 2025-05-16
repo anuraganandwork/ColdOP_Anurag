@@ -57,6 +57,15 @@ android {
         }
     }
 }
+//kapt {
+//    correctErrorTypes = true
+//    javacOptions {
+//        // These options are normally set automatically by the Kotlin Gradle plugin
+//        // for Kotlin/Java sources, but we need to set them manually for Java-only kapt stubs
+//        option("-source", "17")
+//        option("-target", "17")
+//    }
+//}
 
 dependencies {
 
@@ -88,6 +97,7 @@ dependencies {
 
     //coil
     implementation("io.coil-kt:coil-compose:2.6.0")
+
 
     //lottie
     implementation ("com.airbnb.android:lottie-compose:6.1.0")

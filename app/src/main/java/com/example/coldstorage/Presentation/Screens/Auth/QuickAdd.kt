@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.coldstorage.DataLayer.Api.FarmerData
+import com.example.coldstorage.DataLayer.Api.FarmerDataSave
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ImageUploadComponent
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
@@ -249,7 +249,7 @@ fun FarmerQuickAddInputForm(navController: NavController, viewModel: AuthViewmod
             item {
                 Button(
                     onClick = {
-                        val farmerData = FarmerData(
+                        val farmerData = FarmerDataSave(
                             name = name,
                             address = address,
                             imageUrl = imageUrl,

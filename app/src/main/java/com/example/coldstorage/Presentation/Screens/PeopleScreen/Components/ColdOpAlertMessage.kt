@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.coldstorage.DataLayer.Api.FarmerData
+import com.example.coldstorage.DataLayer.Api.FarmerDataSave
 import com.example.coldstorage.ui.theme.primeGreen
 
 @Composable

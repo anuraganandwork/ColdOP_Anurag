@@ -82,7 +82,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.coldstorage.DataLayer.Api.FarmerData
+import com.example.coldstorage.DataLayer.Api.FarmerDataSave
 import com.example.coldstorage.Presentation.Screens.AllScreens
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpDropDown
 import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.ColdOpTextField
@@ -460,7 +460,7 @@ fun FirstBottomSheet(navController: NavController, viewmodel: FunctionStoreOwner
                        Row(modifier = Modifier.fillMaxWidth() , horizontalArrangement = Arrangement.End) {
                            Button(
                                onClick = {
-                                   val farmerData = FarmerData(
+                                   val farmerData = FarmerDataSave(
                                        name = name,
                                        farmerId = accNum.toInt(),
                                        mobileNumber = mobileNumberr,
@@ -654,7 +654,8 @@ Log.d("ghghgfh" , "NO search results")
 //            )
             listOfVarieties.value?.let { it1 ->
                 ColdOpDropDown(   stateToUpdate = viewmodel.variety.collectAsState(), label = "Select Variety", options =
-                it1, onSelect = {selectedVariety -> viewmodel.updateVariety(selectedVariety)}
+                it1, onSelect = {selectedVariety -> viewmodel.updateVariety(selectedVariety)},
+                    isSearchable = true
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))

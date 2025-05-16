@@ -1,5 +1,6 @@
 package com.example.coldstorage.Presentation.Screens.Auth
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,6 +32,7 @@ import com.example.coldstorage.Presentation.Screens.PeopleScreen.Components.Cold
 import com.example.coldstorage.ViewModel.StoreOwnerViewmodel.AuthViewmodel
 import com.example.coldstorage.ui.theme.primeGreen
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun CustomLoginPage(navController: NavController, viewModel: AuthViewmodel = hiltViewModel()) {
     var mobileNumber by remember { mutableStateOf("") }

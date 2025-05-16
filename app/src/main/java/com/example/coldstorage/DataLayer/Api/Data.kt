@@ -1,5 +1,7 @@
 package com.example.coldstorage.DataLayer.Api
 
+import android.os.Message
+
 data class DataStoreOwner(
     val _id: String,
     val coldStorageDetails: ColdStorageDetailsX,
@@ -17,7 +19,8 @@ data class DataStoreOwner(
 // Main response data class
 data class StoreAdminResponse(
     val status: String,   // "Success"
-    val data: StoreAdminDetails // Nested object representing the "data" field
+    val data: StoreAdminDetails,
+    val message: String?// Nested object representing the "data" field
 )
 
 // Data class representing the "data" field

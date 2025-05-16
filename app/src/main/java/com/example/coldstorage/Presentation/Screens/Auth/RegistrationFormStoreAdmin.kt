@@ -56,7 +56,7 @@ fun StoreAdminRegistrationForm(navController: NavController, viewModel: AuthView
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Store Admin Registration")
+        Text("Store Admin Registrationnnnnnnnnnn")
 
         OutlinedTextField(
             value = coldStorageAddress,

@@ -11,9 +11,9 @@ data class sendOtpResponse(
     val message: String
 )
 
-data class verifyMobile(
-   val mobileNum:String,
-    val otp:String
+data class verifyMobiledata(
+   val mobileNumber:String,
+    val enteredOtp:String
 )
 
 data class sendOtpReq(

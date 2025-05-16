@@ -17,6 +17,7 @@ enum class AllScreens {
     OutgoingScreenSuccess,
     FirstBottomSheetIncoming,
     SecondBottomSheetIncoming,
-    EditIncomingScreen
+    EditIncomingScreen,
+    SecondOutgoingScreen
 
 }

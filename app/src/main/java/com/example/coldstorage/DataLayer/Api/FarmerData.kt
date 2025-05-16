@@ -1,6 +1,6 @@
 package com.example.coldstorage.DataLayer.Api
 
-data class FarmerData(
+data class FarmerDataSave(
     val name: String,
     val farmerId :Int,
     val address: String,
