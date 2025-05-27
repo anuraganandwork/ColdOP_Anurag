@@ -798,10 +798,14 @@ class FunctionStoreOwner @Inject constructor(
                     _dayBookOrdersData.value = ApiStateDaybook.success(response.body())
                     Log.d("xcxcxcxcx" , _dayBookOrdersData.value.toString())
                 } else {
+                    Log.d("xcxcxcxcx" , response.body().toString())
+
                     // Emit error state with error message
                     _dayBookOrdersData.value = ApiStateDaybook.Error("Error: ${response.code()} - ${response.message()}")
                 }
             } catch (e: Exception) {
+                Log.d("xcxcxcxcxcatch" , e.message.toString() )
+
                 // Emit error state with exception message
                 _dayBookOrdersData.value = ApiStateDaybook.Error("Exception: ${e.localizedMessage}")
             }

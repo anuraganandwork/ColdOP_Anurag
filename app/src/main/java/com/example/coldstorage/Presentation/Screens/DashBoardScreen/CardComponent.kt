@@ -1,5 +1,6 @@
 package com.example.coldstorage.Presentation.Screens.DashBoardScreen
 
+import ThermalPrinterUtils.Companion.printReceipt
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -54,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import com.example.coldstorage.DataLayer.Api.ResponseDataTypes.DaybookCard.BagSizeDaybook
@@ -70,7 +73,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 
-@SuppressLint("SuspiciousIndentation")
+@SuppressLint("SuspiciousIndentation", "UnrememberedMutableState")
 @Composable
 fun CardComponentDaybook(orderDaybook: OrderDaybook , navController: NavController){
     Log.d("ordrererer" , orderDaybook.toString())
@@ -236,6 +239,7 @@ fun CardComponentDaybook(orderDaybook: OrderDaybook , navController: NavControll
 fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook>, navController: NavController) {
      var showRemarksPopop by remember{ mutableStateOf(false) }
     val context = LocalContext.current
+    var showPrintDialog by remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier
@@ -283,65 +287,85 @@ fun StockDetailsScreen(orderDaybook: OrderDaybook, bagsizes: List<BagSizeDaybook
                     Text(text = "Party details: " , fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     DetailRow("Name", orderDaybook.farmerId.name)
                     DetailRow("Acc No", orderDaybook.farmerId._id.take(3))}
-                Column(modifier = Modifier.weight(.5f)) {
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("Variety : ")
-                            }
-                            append(orderDaybook.orderDetails[0].variety)
-                        },
-                        fontSize = 13.sp
-                    )
 
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("Location : ")
-                            }
-                            append(orderDaybook.orderDetails[0].location)
-                        },
-                        fontSize = 13.sp
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.clickable {
-                            showRemarksPopop = true
-                        }, horizontalAlignment = Alignment.CenterHorizontally) {
-                            Image(
-                                painter = painterResource(id = R.drawable.infoicon),
-                                contentDescription = "Info Icon",
-                                modifier = Modifier.size(20.dp)
+// Modify your existing UI code to add the print button
+                        Column(modifier = Modifier.weight(.5f)) {
+                            Text(
+                                text = buildAnnotatedString {
+                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                        append("Variety : ")
+                                    }
+                                    append(orderDaybook.orderDetails[0].variety)
+                                },
+                                fontSize = 13.sp
                             )
-                            Text(text = "Info" , fontSize = 12.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.padding(5.dp))
-                        Column( modifier = Modifier.clickable {
-                            navController.navigate("${AllScreens.EditIncomingScreen.name}/${orderDaybook._id}")
-                        }, horizontalAlignment = Alignment.CenterHorizontally) {
-                            Image(
-                                painter = painterResource(id = R.drawable.editicon),
-                                contentDescription = "Edit Icon",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Text(text = "Edit", fontSize = 12.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.padding(5.dp))
 
-                        Column(modifier = Modifier  .clickable {
-                            Log.d(
-                                "outgoingcard crash",
-                                "Type: ${orderDaybook.voucher.type} \n" +
-                                        "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
-                                        "Variety: ${orderDaybook.orderDetails[0].variety} \n"
+                            Text(
+                                text = buildAnnotatedString {
+                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                        append("Location : ")
+                                    }
+                                    append(orderDaybook.orderDetails[0].location)
+                                },
+                                fontSize = 13.sp
                             )
-                            val formattedString = """
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Info Button
+                                Column(
+                                    modifier = Modifier.clickable {
+                                        showRemarksPopop = true
+                                    },
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.infoicon),
+                                        contentDescription = "Info Icon",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Text(
+                                        text = "Info",
+                                        fontSize = 12.sp
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.padding(5.dp))
+
+                                // Edit Button
+                                Column(
+                                    modifier = Modifier.clickable {
+                                        navController.navigate("${AllScreens.EditIncomingScreen.name}/${orderDaybook._id}")
+                                    },
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.editicon),
+                                        contentDescription = "Edit Icon",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Text(
+                                        text = "Edit",
+                                        fontSize = 12.sp
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.padding(5.dp))
+
+                                // Share Button
+                                Column(
+                                    modifier = Modifier.clickable {
+                                        // Existing share functionality
+                                        Log.d(
+                                            "outgoingcard crash",
+                                            "Type: ${orderDaybook.voucher.type} \n" +
+                                                    "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
+                                                    "Variety: ${orderDaybook.orderDetails[0].variety} \n"
+                                        )
+                                        val formattedString = """
 Date: ${if (orderDaybook.voucher.type == "RECEIPT") orderDaybook.dateOfSubmission else orderDaybook.dateOfExtraction}                                        
 Type: ${orderDaybook.voucher.type} 
 Voucher No.: ${orderDaybook.voucher.voucherNumber} 
@@ -349,139 +373,116 @@ Variety: ${orderDaybook.orderDetails[0].variety}
 
 
 ${
-                                if (orderDaybook.voucher.type == "RECEIPT") {
-                                    "Added Bags: ${
-                                        orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
-                                            "${it.size}: ${it.quantity?.initialQuantity ?: "N/A"}"
+                                            if (orderDaybook.voucher.type == "RECEIPT") {
+                                                "Added Bags: ${
+                                                    orderDaybook.orderDetails[0].bagSizes.joinToString("\n ") {
+                                                        "${it.size}: ${it.quantity?.initialQuantity ?: "N/A"}"
+                                                    }
+                                                }"
+                                            } else {
+                                                "Removed Bags: " + orderDaybook.orderDetails.joinToString("\n") { order ->
+                                                    order.bagSizes.joinToString("\n") {
+                                                        "${it.size}: ${it.quantityRemoved ?: "N/A"}"
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }"
-                                } else {
-                                    "Removed Bags: " + orderDaybook.orderDetails.joinToString(
-                                        "\n"
-                                    ) { order ->
-                                        order.bagSizes.joinToString("\n") {
-                                            "${it.size}: ${it.quantityRemoved ?: "N/A"}"
-                                        }
-                                    }
-                                }
-                            }
 
 Total Bags: ${
-                                if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(
-                                    orderDaybook
-                                ) else totalOutgoingBags(
-                                    orderDaybook
-                                )
-                            }
+                                            if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(orderDaybook)
+                                            else totalOutgoingBags(orderDaybook)
+                                        }
 
 Farmer: ${orderDaybook.farmerId.name} , Acc: ${orderDaybook.farmerId._id.take(5)}
 
 """.trimIndent()
-                            Log.d(
-                                "outgoingcard crash", formattedString
-                            )
-                            val bitmap = stringToImage(
-                                context = context,  // `this` is the activity context
-                                text = formattedString,
-                                backgroundResId = R.drawable.bolinanewfarms,
-                                width = 400,
-                                height = 400
-                            )
-                            val file = File(context.cacheDir, "shared_card.png")
-                            FileOutputStream(file).use { outputStream ->
-                                bitmap.compress(
-                                    Bitmap.CompressFormat.PNG,
-                                    100,
-                                    outputStream
-                                )
+                                        Log.d("outgoingcard crash", formattedString)
+
+                                        val bitmap = stringToImage(
+                                            context = context,
+                                            text = formattedString,
+                                            backgroundResId = R.drawable.bolinanewfarms,
+                                            width = 400,
+                                            height = 400
+                                        )
+                                        val file = File(context.cacheDir, "shared_card.png")
+                                        FileOutputStream(file).use { outputStream ->
+                                            bitmap.compress(
+                                                Bitmap.CompressFormat.PNG,
+                                                100,
+                                                outputStream
+                                            )
+                                        }
+
+                                        // Get a URI for the file using FileProvider
+                                        val uri: Uri = FileProvider.getUriForFile(
+                                            context,
+                                            "${context.packageName}.fileprovider",
+                                            file
+                                        )
+                                        val intent = Intent(Intent.ACTION_SEND).apply {
+                                            type = "image/png"
+                                            putExtra(Intent.EXTRA_STREAM, uri)
+                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        }
+
+                                        // Start the share intent
+                                        context.startActivity(
+                                            Intent.createChooser(
+                                                intent,
+                                                "Share Receipt"
+                                            )
+                                        )
+                                    },
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.sharecard),
+                                        contentDescription = "Share Icon",
+                                        modifier = Modifier
+                                            .width(20.dp)
+                                            .height(19.dp)
+                                    )
+                                    Text(
+                                        text = "Share",
+                                        fontSize = 12.sp
+                                    )
+                                }
+
+                                // Add a spacer between Share and Print buttons
+                                Spacer(modifier = Modifier.padding(5.dp))
+
+                                // NEW: Print Button
+
+
+                                Column(
+                                    modifier = Modifier.clickable {
+                                        showPrintDialog = true
+                                    },
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.social),
+                                        contentDescription = "Print Icon",
+                                        modifier = Modifier
+                                            .width(20.dp)
+                                            .height(19.dp)
+                                    )
+                                    Text(
+                                        text = "Print",
+                                        fontSize = 12.sp
+                                    )
+                                }
+
+// Add this at the end of your composable function
+                                if (showPrintDialog) {
+                                    PrintDialog(
+                                        orderDaybook = orderDaybook,
+                                        onDismiss = { showPrintDialog = false }
+                                    )
+                                }
                             }
-
-                            // Get a URI for the file using FileProvider
-                            val uri: Uri = FileProvider.getUriForFile(
-                                context,
-                                "${context.packageName}.fileprovider",
-                                file
-                            )
-                            val intent = Intent(Intent.ACTION_SEND).apply {
-                                type = "image/png"
-                                putExtra(Intent.EXTRA_STREAM, uri)
-                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            }
-
-                            // Start the share intent
-                            context.startActivity(
-                                Intent.createChooser(
-                                    intent,
-                                    "Share Receipt"
-                                )
-                            )
-//                                    shareCardInfoMessage(
-//                                        context,
-//                                        "Type: ${orderDaybook.voucher.type} \n" +
-//                                                "Voucher No. : ${orderDaybook.voucher.voucherNumber} \n" +
-//                                                "Variety: ${orderDaybook.orderDetails[0].variety} \n" +
-//                                                "\n" +
-//                                                if (orderDaybook.voucher.type == "RECEIPT") {
-//                                                    "*Added Bags details:*\n" +
-//                                                            orderDaybook.orderDetails[0].bagSizes.joinToString(
-//                                                                "\n"
-//                                                            ) {
-//                                                                "${it.size}: ${it.quantity?.currentQuantity ?: "N/A"}"
-//                                                            }
-//                                                } else {
-//                                                    orderDaybook.orderDetails[0]?.bagSizes?.joinToString(
-//                                                        "\n"
-//                                                    ) {
-//                                                        "${it?.size}: ${it?.quantityRemoved}"
-//                                                    }?.let { Log.d("outgoing card crass", it) }
-//                                                    "*Removed Bags details:*\n" +
-//                                                            orderDaybook.orderDetails[0].bagSizes.joinToString(
-//                                                                "\n"
-//                                                            ) {
-//                                                                "${it}: Aa"
-//                                                            }
-//                                                } + "\n" +
-//                                                "\n" +
-//                                                "*Total bags* : ${if (orderDaybook.voucher.type == "RECEIPT") totalIncomingBags(orderDaybook) else totalOutgoingBags(orderDaybook)}  \n" + "\n" +
-//                                                "Farmer Details :\n" +
-//                                                "Name : ${orderDaybook.farmerId.name} \n" +
-//                                                "Acc no. : ${orderDaybook.farmerId._id.take(5)} \n" +
-//                                                "\n" +
-//                                                "${
-//                                                    buildAnnotatedString {
-//                                                        append("Powered By :")
-//                                                        withStyle(
-//                                                            style = SpanStyle(
-//                                                                color = Color.Red,
-//                                                                fontWeight = FontWeight.Bold
-//                                                            )
-//                                                        ) {
-//                                                            append("*ColdOp*")
-//                                                        }
-//                                                    }
-//                                                }"
-//                                    )
-                        },
-
-                                horizontalAlignment = Alignment.CenterHorizontally) {
-                            Image(
-                                painter = painterResource(id = R.drawable.sharecard),
-                                contentDescription = "Share Icon",
-                                modifier = Modifier
-                                    .width(20.dp)
-                                    .height(19.dp)
-                            )
-                            Text(text = "Share",fontSize = 12.sp
-                            )
                         }
-                    }
-
-//                    orderDaybook.orderDetails[0].location?.let { DetailRow("Chamber", it.chamber) }
-//                    orderDaybook.orderDetails[0].location?.let { DetailRow("Floor", it.floor) }
-//                    orderDaybook.orderDetails[0].location?.let { DetailRow("Row", it.row) }
-//
-                }
-
                 // Farmer Data
 
             }
@@ -662,3 +663,9 @@ fun shareCardInfoMessage(context: Context , message :String){
 
     context.startActivity(Intent.createChooser(shareIntent,"Share via"))
 }
+
+
+/**
+ * PrintOptionDialog displays a dialog that lets users choose between
+ * native Android printing or direct Bluetooth thermal printer connection
+ */

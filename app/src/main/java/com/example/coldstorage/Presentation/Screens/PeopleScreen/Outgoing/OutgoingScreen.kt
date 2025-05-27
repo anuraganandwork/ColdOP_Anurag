@@ -1,5 +1,6 @@
 package com.example.coldstorage.Presentation.Screens.PeopleScreen.Outgoing
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -66,6 +67,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutgoingStockScreen(fromDaybook: Boolean,accNum: String ,viewmodel: FunctionStoreOwner = hiltViewModel() ,navController: NavController) {
@@ -349,6 +351,7 @@ fun DropdownMenu_(
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun StockTable(selectedVariety:String ,fromDaybook: Boolean,accNum: String,viewmodel: FunctionStoreOwner  , navController: NavController) {
     val headers = listOf("V No.", "Variety", "Cut&Tok", "Goli", "No.12","Ration", "Seed")
@@ -792,7 +795,11 @@ Column(modifier = Modifier
     }} else{
         Column(modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.Center) {
            // Spacer(modifier = Modifier.padding(200.dp))
-            Text(text = "Please select farmer and size!" , modifier = Modifier.fillMaxWidth() , textAlign = TextAlign.Center)
+            Text(
+                text = "Please select ${if (fromDaybook) "farmer and size" else "size"}!",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
         }
 
     }

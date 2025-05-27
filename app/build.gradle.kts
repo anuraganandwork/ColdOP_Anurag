@@ -118,6 +118,12 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
+    implementation ("com.google.accompanist:accompanist-permissions:0.32.0")
+
+//    implementation ("com.github.DantSu:ESCPOS-ThermalPrinter-Android:3.2.0")
+
+    // If not already included
+
 }
 //9877741375
 //5461

@@ -196,6 +196,7 @@ fun QuantityRemovalComponent(
                                     // Integrated outgoingEntry function call
                                     if (qtyToRemoveState.value.isNotEmpty()) {
                                         outgoingEntry(
+
                                             qtyToRemoveState,
                                             row,
                                             outgoingResponseBody,
